@@ -287,13 +287,30 @@ body.dark .iframe-banner{background:#2a2510;border-color:#5a4a10}
 // ── CONFIG ─────────────────────────────────────────────────
 const API_BASE = 'https://api.football-data.org/v4';
 
-const LEAGUES = {
-  PL:  {name:'Premier League', flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', ucl:4, uel:2, rel:3},
-  PD:  {name:'La Liga',        flag:'🇪🇸',        ucl:4, uel:2, rel:3},
-  BL1: {name:'Bundesliga',     flag:'🇩🇪',        ucl:4, uel:2, rel:2},
-  SA:  {name:'Serie A',        flag:'🇮🇹',        ucl:4, uel:2, rel:3},
-  FL1: {name:'Ligue 1',        flag:'🇫🇷',        ucl:3, uel:3, rel:3}
+// Zone config (UCL/UEL/Relegation spots) by competition code.
+// These are league rules, not team data — they change very rarely.
+// Any competition not listed gets no zone highlighting.
+const ZONES = {
+  PL:  {ucl:4, uel:2, rel:3},
+  PD:  {ucl:4, uel:2, rel:3},
+  BL1: {ucl:4, uel:2, rel:2},
+  SA:  {ucl:4, uel:2, rel:3},
+  FL1: {ucl:3, uel:3, rel:3},
+  PPL: {ucl:4, uel:2, rel:3},  // Primeira Liga
+  DED: {ucl:2, uel:2, rel:3},  // Eredivisie
+  ELC: {ucl:0, uel:0, rel:3},  // Championship (promotion playoffs, no UCL)
+  BSA: {ucl:0, uel:6, rel:4},  // Brazilian Série A (Libertadores spots)
 };
+
+// Country flags by competition code
+const FLAGS = {
+  PL:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', PD:'🇪🇸', BL1:'🇩🇪', SA:'🇮🇹', FL1:'🇫🇷',
+  PPL:'🇵🇹', DED:'🇳🇱', ELC:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', BSA:'🇧🇷',
+  CL:'🇪🇺', WC:'🌍', EC:'🇪🇺'
+};
+
+// Competitions loaded dynamically from API — populated on init
+let LEAGUES = {};
 
 
 // ── COLORS ─────────────────────────────────────────────────
@@ -575,12 +592,17 @@ function formColLabel() {
 let chartInst = null;
 
 function renderLeagueTabs() {
-  document.getElementById('ltabs').innerHTML =
-    Object.entries(LEAGUES).map(([k, lg]) =>
-      `<button class="ltab ${k===S.league?'active':''}" onclick="setLeague('${k}')">
-        <span class="flag">${lg.flag}</span>
-        <span class="lname">${lg.name}</span>
-      </button>`).join('');
+  const entries = Object.entries(LEAGUES);
+  if (!entries.length) {
+    document.getElementById('ltabs').innerHTML =
+      '<span style="font-size:13px;color:var(--muted);padding:8px">Loading competitions…</span>';
+    return;
+  }
+  document.getElementById('ltabs').innerHTML = entries.map(([k, lg]) =>
+    `<button class="ltab ${k===S.league?'active':''}" onclick="setLeague('${k}')">
+      <span class="flag">${lg.flag}</span>
+      <span class="lname">${lg.name}</span>
+    </button>`).join('');
 }
 
 function renderKeyStatus() {
@@ -682,8 +704,9 @@ function renderError(code) {
 }
 
 function renderTable() {
-  const lg = LEAGUES[S.league], N = S.standings.length;
-  const uelEnd = lg.ucl + lg.uel, relStart = N - lg.rel;
+  const zones = ZONES[S.league] || {ucl:0, uel:0, rel:0};
+  const N = S.standings.length;
+  const uelEnd = zones.ucl + zones.uel, relStart = N - zones.rel;
   let rows = S.standings.filter(r => S.sel.has(r.team.name));
 
   const dir = S.sortDir === 'asc' ? 1 : -1;
@@ -744,9 +767,9 @@ function renderTable() {
       }).join('')}</tbody>
     </table></div>
     <div class="qleg">
-      <div class="qi"><div class="qdot" style="background:var(--ucl)"></div>Champions League (Top ${lg.ucl})</div>
-      <div class="qi"><div class="qdot" style="background:var(--uel)"></div>Europa League (${lg.ucl+1}–${uelEnd})</div>
-      <div class="qi"><div class="qdot" style="background:var(--rel)"></div>Relegation Zone (Bottom ${lg.rel})</div>
+      ${zones.ucl>0?`<div class="qi"><div class="qdot" style="background:var(--ucl)"></div>Champions League (Top ${zones.ucl})</div>`:''}
+      ${zones.uel>0?`<div class="qi"><div class="qdot" style="background:var(--uel)"></div>Europe (${zones.ucl+1}–${uelEnd})</div>`:''}
+      ${zones.rel>0?`<div class="qi"><div class="qdot" style="background:var(--rel)"></div>Relegation Zone (Bottom ${zones.rel})</div>`:''}
     </div>
   </div>`;
 }
@@ -808,6 +831,53 @@ function renderChart() {
       }
     }
   });
+}
+
+// ── COMPETITION DISCOVERY ──────────────────────────────────
+// Fetches all competitions available to this API key dynamically.
+// Filters to LEAGUE type only (have standings tables).
+// Falls back to a minimal hardcoded set if the fetch fails.
+async function loadCompetitions() {
+  try {
+    const data = await apiFetch('/competitions');
+    const leagues = (data.competitions || [])
+      .filter(c => c.type === 'LEAGUE')
+      .sort((a, b) => {
+        // Put the big 5 first, then alphabetical
+        const priority = ['PL','PD','BL1','SA','FL1'];
+        const ai = priority.indexOf(a.code), bi = priority.indexOf(b.code);
+        if (ai !== -1 && bi !== -1) return ai - bi;
+        if (ai !== -1) return -1;
+        if (bi !== -1) return 1;
+        return a.name.localeCompare(b.name);
+      });
+
+    LEAGUES = {};
+    leagues.forEach(c => {
+      if (!c.code) return; // skip competitions with no code
+      LEAGUES[c.code] = {
+        name: c.name,
+        flag: FLAGS[c.code] || '🏆',
+        ...(ZONES[c.code] || {ucl:0, uel:0, rel:0})
+      };
+    });
+
+    // Set default league to first available
+    if (!LEAGUES[S.league]) S.league = Object.keys(LEAGUES)[0] || 'PL';
+    renderLeagueTabs();
+    loadStandings();
+  } catch(e) {
+    // Fallback if competitions fetch fails
+    LEAGUES = {
+      PL:  {name:'Premier League', flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', ...ZONES.PL},
+      PD:  {name:'La Liga',        flag:'🇪🇸',        ...ZONES.PD},
+      BL1: {name:'Bundesliga',     flag:'🇩🇪',        ...ZONES.BL1},
+      SA:  {name:'Serie A',        flag:'🇮🇹',        ...ZONES.SA},
+      FL1: {name:'Ligue 1',        flag:'🇫🇷',        ...ZONES.FL1},
+    };
+    renderLeagueTabs();
+    loadStandings();
+  }
 }
 
 // ── LOADING ────────────────────────────────────────────────
@@ -927,7 +997,8 @@ function saveKey() {
   const k = document.getElementById('apiKeyInput').value.trim();
   if (!k) return;
   localStorage.setItem('fb_key', k);
-  renderKeyStatus(); loadStandings();
+  renderKeyStatus();
+  loadCompetitions();
 }
 
 function clearKey() {
@@ -958,7 +1029,7 @@ if (IN_IFRAME) {
   document.getElementById('ltabs').before(banner);
 }
 
-renderLeagueTabs();
+renderLeagueTabs(); // show placeholder while loading
 buildSeasonSelect();
 renderKeyStatus();
 
@@ -969,7 +1040,7 @@ if (localStorage.getItem('fb_dark') === '1') {
 }
 
 if (getKey()) {
-  loadStandings();
+  loadCompetitions(); // discovers all available leagues then loads standings
 } else {
   S.error = 'NO_KEY';
   renderContent();
