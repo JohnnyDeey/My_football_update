@@ -151,6 +151,13 @@ tbody td:last-child{font-family:var(--fb)}
 .step-n{width:24px;height:24px;border-radius:50%;background:var(--g700);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px}
 .step a{color:var(--g700)}
 .step code{background:var(--surface);border:1px solid var(--border);padding:1px 6px;border-radius:4px;font-family:var(--fm);font-size:11px}
+/* THROTTLE BAR */
+.throttle-bar{display:flex;align-items:center;gap:8px;padding:6px 0 8px;border-top:1px solid var(--border-lt)}
+.tb-label{font-size:11px;color:var(--muted);white-space:nowrap}
+.tb-track{flex:1;max-width:120px;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.tb-fill{height:100%;border-radius:2px;transition:width .4s,background .4s}
+.tb-count{font-size:11px;font-family:var(--fm);white-space:nowrap}
+.throttle-wait{display:flex;align-items:center;gap:8px;padding:7px 0;font-size:12px;color:var(--drw);border-top:1px solid var(--border-lt)}
 /* THEME TOGGLE */
 .theme-toggle{background:var(--surface);border:1.5px solid var(--border);border-radius:8px;width:36px;height:36px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
 .theme-toggle:hover{border-color:var(--g600)}
@@ -201,6 +208,13 @@ body.dark .iframe-banner{background:#2a2510;border-color:#5a4a10}
       </div>
       <div id="keyStatus"></div>
       <button class="theme-toggle" id="themeToggle" onclick="toggleDark()" title="Toggle dark mode">☀️</button>
+    </div>
+    <!-- Throttle bar: shows API quota remaining, appears after first request -->
+    <div id="throttleBar" class="throttle-bar" style="display:none"></div>
+    <!-- Wait indicator: shown when pausing for rate limit reset -->
+    <div id="throttleWait" class="throttle-wait" style="display:none">
+      <div class="spinner" style="width:16px;height:16px;border-width:2px"></div>
+      <span>Rate limit — resuming in <strong class="tw-secs">60s</strong></span>
     </div>
   </div>
 </header>
@@ -332,11 +346,89 @@ function buildSeasonSelect() {
   S.season = cur;
 }
 
-// ── API + CACHE ────────────────────────────────────────────
-// football-data.org v4 blocks CORS preflight from most browser origins.
-// We route through corsproxy.io which adds proper CORS headers on the way back.
-// Your API key is only ever sent to football-data.org (corsproxy forwards it).
+// ── API + THROTTLE ─────────────────────────────────────────
+// Routes through corsproxy.io to solve CORS (key forwarded to football-data.org only).
+// Reads X-Requests-Available-Minute and X-RequestCounter-Reset headers from every
+// response so we never blindly hit the rate limiter (free tier = 10 req/min).
 const PROXY = 'https://corsproxy.io/?';
+
+// Throttle state — updated after every response
+const throttle = {
+  available: 10,      // requests left this minute (pessimistic start)
+  resetInMs: 0,       // ms until the counter resets
+  resetAt: 0,         // absolute timestamp of next reset
+  queue: [],          // pending resolve callbacks
+  draining: false
+};
+
+function updateThrottle(headers) {
+  const avail = headers.get('X-Requests-Available-Minute');
+  const reset = headers.get('X-RequestCounter-Reset'); // seconds until reset
+  if (avail !== null) throttle.available = parseInt(avail);
+  if (reset !== null) {
+    const secs = parseInt(reset);
+    throttle.resetAt = Date.now() + secs * 1000;
+  }
+}
+
+function updateThrottleStatus() {
+  const el = document.getElementById('throttleBar');
+  if (!el) return;
+  const left = throttle.available;
+  const pct = Math.round((left / 10) * 100);
+  const color = left <= 2 ? 'var(--los)' : left <= 5 ? 'var(--drw)' : 'var(--win)';
+  el.innerHTML = `
+    <span class="tb-label">API quota</span>
+    <div class="tb-track"><div class="tb-fill" style="width:${pct}%;background:${color}"></div></div>
+    <span class="tb-count" style="color:${color}">${left}/10 per min</span>`;
+}
+
+// Returns a promise that resolves when it's safe to fire the next request.
+// If we're out of quota, waits until the reset timestamp.
+function acquireSlot() {
+  return new Promise(resolve => {
+    throttle.queue.push(resolve);
+    drainQueue();
+  });
+}
+
+async function drainQueue() {
+  if (throttle.draining || !throttle.queue.length) return;
+  throttle.draining = true;
+  while (throttle.queue.length) {
+    if (throttle.available <= 0 && throttle.resetAt > Date.now()) {
+      const wait = throttle.resetAt - Date.now() + 100; // +100ms buffer
+      showThrottleWait(wait);
+      await new Promise(r => setTimeout(r, wait));
+      throttle.available = 10; // reset assumed after waiting
+      hideThrottleWait();
+    }
+    const next = throttle.queue.shift();
+    throttle.available = Math.max(0, throttle.available - 1);
+    updateThrottleStatus();
+    next();
+    // Small gap between consecutive requests to stay well under the limit
+    if (throttle.queue.length) await new Promise(r => setTimeout(r, 200));
+  }
+  throttle.draining = false;
+}
+
+function showThrottleWait(ms) {
+  const secs = Math.ceil(ms / 1000);
+  const el = document.getElementById('throttleWait');
+  if (el) { el.style.display = 'flex'; el.querySelector('.tw-secs').textContent = secs + 's'; }
+  // Countdown
+  const interval = setInterval(() => {
+    const remaining = Math.ceil((throttle.resetAt - Date.now()) / 1000);
+    if (el) el.querySelector('.tw-secs').textContent = Math.max(0, remaining) + 's';
+    if (remaining <= 0) clearInterval(interval);
+  }, 500);
+}
+
+function hideThrottleWait() {
+  const el = document.getElementById('throttleWait');
+  if (el) el.style.display = 'none';
+}
 
 function getKey() { return localStorage.getItem('fb_key') || ''; }
 
@@ -350,6 +442,7 @@ async function apiFetch(path) {
   const isPast = mSeason && parseInt(mSeason[1]) < cur;
   const store = isPast ? localStorage : sessionStorage;
 
+  // Serve from cache if valid — no request needed, no quota used
   try {
     const raw = store.getItem(cacheId);
     if (raw) {
@@ -358,27 +451,37 @@ async function apiFetch(path) {
     }
   } catch {}
 
-  // Build the proxied URL
+  // Wait for a safe slot before firing
+  await acquireSlot();
+
   const target = `${API_BASE}${path}`;
   const url = `${PROXY}${encodeURIComponent(target)}`;
 
   let res;
   try {
-    res = await fetch(url, {
-      method: 'GET',
-      headers: {'X-Auth-Token': key}
-    });
+    res = await fetch(url, { method: 'GET', headers: {'X-Auth-Token': key} });
   } catch {
     const e = new Error(); e.code = 'NETWORK'; throw e;
   }
+
+  // Always read throttle headers, even on error responses
+  updateThrottle(res.headers);
+  updateThrottleStatus();
+
   if (res.status === 401) { const e = new Error(); e.code = 'BAD_KEY'; throw e; }
-  if (res.status === 429) { const e = new Error(); e.code = 'RATE'; throw e; }
+  if (res.status === 429) {
+    // Hard rate limit hit — reset available and retry after reset
+    throttle.available = 0;
+    if (!throttle.resetAt) throttle.resetAt = Date.now() + 60000;
+    const e = new Error(); e.code = 'RATE'; throw e;
+  }
   if (!res.ok) { const e = new Error(); e.code = 'HTTP_' + res.status; throw e; }
 
   const data = await res.json();
   try { store.setItem(cacheId, JSON.stringify({ts: Date.now(), d: data})); } catch {}
   return data;
 }
+
 
 // ── TREND DATA ─────────────────────────────────────────────
 function buildTrends(matches, teamNames) {
@@ -487,6 +590,9 @@ function renderKeyStatus() {
     ? `<span class="sdot"></span><span class="slabel">Connected</span>
        <button class="btn-link" onclick="clearKey()">Change key</button>`
     : '';
+  // Show throttle bar only when connected
+  document.getElementById('throttleBar').style.display = key ? 'flex' : 'none';
+  if (key) updateThrottleStatus();
 }
 
 function renderChips() {
