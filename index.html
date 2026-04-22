@@ -316,6 +316,11 @@ function buildSeasonSelect() {
 }
 
 // ── API + CACHE ────────────────────────────────────────────
+// football-data.org v4 blocks CORS preflight from most browser origins.
+// We route through corsproxy.io which adds proper CORS headers on the way back.
+// Your API key is only ever sent to football-data.org (corsproxy forwards it).
+const PROXY = 'https://corsproxy.io/?';
+
 function getKey() { return localStorage.getItem('fb_key') || ''; }
 
 async function apiFetch(path) {
@@ -336,16 +341,17 @@ async function apiFetch(path) {
     }
   } catch {}
 
+  // Build the proxied URL
+  const target = `${API_BASE}${path}`;
+  const url = `${PROXY}${encodeURIComponent(target)}`;
+
   let res;
   try {
-    res = await fetch(`${API_BASE}${path}`, {
+    res = await fetch(url, {
       method: 'GET',
-      mode: 'cors',
-      credentials: 'omit',
       headers: {'X-Auth-Token': key}
     });
   } catch {
-    // Fetch itself failed — CORS block (common from file:// origin) or no network
     const e = new Error(); e.code = 'NETWORK'; throw e;
   }
   if (res.status === 401) { const e = new Error(); e.code = 'BAD_KEY'; throw e; }
@@ -495,47 +501,10 @@ function renderError(code) {
     return;
   }
   if (code === 'NETWORK') {
-    const isFile = typeof IS_FILE !== 'undefined' && IS_FILE;
-    const heading = isFile
-      ? 'Browser blocked the request from a local file'
-      : 'External requests blocked in this preview';
-    const why = isFile
-      ? 'Edge, Chrome and Firefox all restrict API calls when an HTML file is opened directly via <code>file://</code>. The fix is to serve the file over <code>http://</code> instead — it takes 30 seconds with any of the options below.'
-      : "Claude's built-in viewer restricts outbound API calls.";
-
-    const localInstructions = isFile ? `
-      <div class="steps" style="margin-top:20px">
-        <div class="step">
-          <span class="step-n">A</span>
-          <span><strong>Easiest — Python (already on most computers):</strong><br>
-            Open Terminal / Command Prompt, run:<br>
-            <code>cd Downloads &amp;&amp; python -m http.server 8080</code><br>
-            Then open <a href="http://localhost:8080/football-analytics.html" target="_blank">http://localhost:8080/football-analytics.html</a></span>
-        </div>
-        <div class="step">
-          <span class="step-n">B</span>
-          <span><strong>Easiest no-install — Netlify Drop:</strong><br>
-            Drag <code>football-analytics.html</code> onto
-            <a href="https://app.netlify.com/drop" target="_blank">app.netlify.com/drop</a> — 
-            instant free public URL, works immediately.</span>
-        </div>
-        <div class="step">
-          <span class="step-n">C</span>
-          <span><strong>VS Code users:</strong><br>
-            Install the <em>Live Server</em> extension, right-click the file → <em>Open with Live Server</em>.</span>
-        </div>
-      </div>` : `
-      <div class="steps" style="margin-top:16px">
-        <div class="step"><span class="step-n">1</span><span>Download <code>football-analytics.html</code></span></div>
-        <div class="step"><span class="step-n">2</span><span>Drag it onto <a href="https://app.netlify.com/drop" target="_blank">app.netlify.com/drop</a> for an instant free URL</span></div>
-        <div class="step"><span class="step-n">3</span><span>Open that URL, paste your API key — done</span></div>
-      </div>`;
-
-    show(`<div class="errbox network-err">
-      <div class="net-icon">🔒</div>
-      <h3>${heading}</h3>
-      <p>${why}</p>
-      ${localInstructions}
+    show(`<div class="errbox">
+      <h3>Network error — couldn't reach the API</h3>
+      <p>This can happen if corsproxy.io (the relay service) is temporarily down, or if you have no internet connection. Please wait a moment and try again.</p>
+      <button class="retry-btn" onclick="loadStandings()">Try again</button>
     </div>`);
     return;
   }
