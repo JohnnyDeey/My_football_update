@@ -130,10 +130,10 @@ header{background:var(--card);border-bottom:3px solid var(--g700);position:stick
 /* TABLE */
 .twrap{overflow-x:auto;border-radius:10px;border:1.5px solid var(--border);box-shadow:var(--sh);-webkit-overflow-scrolling:touch}
 table{width:100%;border-collapse:separate;border-spacing:0;min-width:560px;background:var(--card)}
-thead th{background:var(--surface);padding:7px 10px;text-align:right;font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap;border-bottom:1.5px solid var(--border);transition:color .2s}
-thead th:first-child{text-align:center;min-width:36px;cursor:default;position:sticky;left:0;z-index:3;background:var(--surface)}
-thead th:nth-child(2){text-align:left;position:sticky;left:36px;z-index:3;background:var(--surface);box-shadow:2px 0 5px rgba(0,0,0,.07);transition:min-width .2s;min-width:80px}
-.twrap.scrolled thead th:nth-child(2){min-width:36px}
+thead th{background:var(--surface);padding:6px 8px;text-align:right;font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap;border-bottom:1.5px solid var(--border);transition:color .2s}
+thead th:first-child{text-align:center;min-width:34px;cursor:default;position:sticky;left:0;z-index:3;background:var(--surface)}
+thead th:nth-child(2){text-align:left;position:sticky;left:34px;z-index:3;background:var(--surface);box-shadow:2px 0 5px rgba(0,0,0,.07);transition:min-width .2s;min-width:72px}
+.twrap.scrolled thead th:nth-child(2){min-width:30px}
 .twrap.scrolled tbody td:nth-child(2) .cname{opacity:0;max-width:0;display:none}
 .twrap.scrolled tbody td:nth-child(2) .cc{gap:0}
 thead th:hover{color:var(--g700)}
@@ -146,16 +146,16 @@ tbody tr:hover td:nth-child(2){background:var(--g50)}
 tbody tr.ucl-row td:first-child{box-shadow:inset 3px 0 0 var(--ucl)}
 tbody tr.uel-row td:first-child{box-shadow:inset 3px 0 0 var(--uel)}
 tbody tr.rel-row td:first-child{box-shadow:inset 3px 0 0 var(--rel)}
-tbody td{padding:6px 10px;text-align:right;font-size:12px;font-family:var(--fm);border-top:1px solid var(--border-lt)}
+tbody td{padding:5px 8px;text-align:right;font-size:12px;font-family:var(--fm);border-top:1px solid var(--border-lt)}
 tbody td:first-child{text-align:center;font-family:var(--fb);position:sticky;left:0;z-index:2;background:var(--card)}
-tbody td:nth-child(2){text-align:left;font-family:var(--fb);position:sticky;left:36px;z-index:2;background:var(--card);box-shadow:2px 0 5px rgba(0,0,0,.07)}
+tbody td:nth-child(2){text-align:left;font-family:var(--fb);position:sticky;left:34px;z-index:2;background:var(--card);box-shadow:2px 0 5px rgba(0,0,0,.07)}
 tbody td:last-child{font-family:var(--fb)}
-.pbadge{display:inline-flex;width:20px;height:20px;align-items:center;justify-content:center;border-radius:5px;font-size:11px;font-weight:700;color:var(--muted);font-family:var(--fm)}
-.cc{display:flex;align-items:center;gap:6px}
-.crest{width:20px;height:20px;object-fit:contain;flex-shrink:0}
-.cbar{width:3px;height:20px;border-radius:2px;flex-shrink:0}
+.pbadge{display:inline-flex;width:18px;height:18px;align-items:center;justify-content:center;border-radius:4px;font-size:10px;font-weight:700;color:var(--muted);font-family:var(--fm)}
+.cc{display:flex;align-items:center;gap:5px}
+.crest{width:18px;height:18px;object-fit:contain;flex-shrink:0}
+.cbar{width:3px;height:18px;border-radius:2px;flex-shrink:0}
 .cname{font-weight:700;color:var(--text);font-size:11px;letter-spacing:.3px;font-family:var(--fm)}
-tbody td:nth-child(2) .cname{transition:opacity .15s,max-width .2s;opacity:1;max-width:50px;overflow:hidden;white-space:nowrap}
+tbody td:nth-child(2) .cname{transition:opacity .15s,max-width .2s;opacity:1;max-width:46px;overflow:hidden;white-space:nowrap}
 /* FORM BADGES - larger, more distinct like mikami */
 .fbs{display:flex;gap:4px;justify-content:flex-end}
 .fb{width:26px;height:26px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;letter-spacing:0}
@@ -178,7 +178,7 @@ body.dark thead th:nth-child(2){background:var(--surface)}
 .chart-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
 .chart-scroll::-webkit-scrollbar{height:4px}
 .chart-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-.chart-canvas-wrap{height:360px;min-width:100%}
+.chart-canvas-wrap{height:450px;min-width:100%}
 /* YEARLY TREND HEATMAP */
 .yearly-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:14px 0 14px 0;box-shadow:var(--sh)}
 .yearly-hint{font-size:11px;color:var(--muted);margin:0 14px 10px;line-height:1.5}
@@ -195,12 +195,16 @@ body.dark thead th:nth-child(2){background:var(--surface)}
 .yearly-scroll::-webkit-scrollbar{height:3px}
 .yearly-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 .yt{border-collapse:separate;border-spacing:2px;font-family:var(--fm);table-layout:fixed}
-.yt-head-club{position:sticky;left:0;z-index:3;background:var(--card);padding:3px 10px 3px 14px;text-align:left;font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;white-space:nowrap;width:84px;min-width:84px}
-.yt-head-yr{font-size:9px;font-weight:700;color:var(--muted);text-align:center;padding:3px 0;white-space:nowrap;width:26px;min-width:26px;letter-spacing:-.3px}
-.yt-club-cell{position:sticky;left:0;z-index:2;background:var(--card);padding:2px 8px 2px 14px;font-size:10px;font-weight:700;color:var(--text);white-space:nowrap;width:84px;min-width:84px;font-family:var(--fm);letter-spacing:.3px}
-.yt-pos{width:26px;min-width:26px;height:24px;border-radius:3px;text-align:center;vertical-align:middle;font-size:10px;font-weight:700;cursor:default;padding:0}
+.yt-head-club{position:sticky;left:0;z-index:5;background:var(--surface);padding:4px 6px 4px 12px;text-align:left;font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;width:60px;min-width:60px;border-bottom:1.5px solid var(--border)}
+.yt-head-yr{font-size:9px;font-weight:700;color:var(--muted);text-align:center;padding:4px 0;white-space:nowrap;width:24px;min-width:24px;letter-spacing:-.3px;border-bottom:1.5px solid var(--border)}
+.yt-club-cell{position:sticky;left:0;z-index:4;background:var(--card);padding:2px 5px 2px 10px;font-size:10px;font-weight:700;color:var(--text);white-space:nowrap;width:60px;min-width:60px;font-family:var(--fm);letter-spacing:.3px;border-top:1px solid var(--border-lt);display:flex;align-items:center;gap:4px}
+.yt-pos{width:24px;min-width:24px;height:22px;border-radius:3px;text-align:center;vertical-align:middle;font-size:10px;font-weight:700;cursor:default;padding:0;border-top:1px solid var(--border-lt)}
 .yt-absent{background:var(--border-lt)!important;color:var(--muted)!important;font-size:9px}
-body.dark .yt-club-cell,body.dark .yt-head-club{background:var(--card)}
+body.dark .yt-club-cell{background:var(--card)}
+body.dark .yt-head-club{background:var(--surface)}
+.yearly-scroll.scrolled .yt-tla{opacity:0;max-width:0;overflow:hidden}
+.yt-tla{transition:opacity .15s,max-width .15s;opacity:1;max-width:40px;overflow:hidden;white-space:nowrap;display:inline-block}
+.yt-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
 /* BAR CHART RACE */
 .bcr-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:18px;box-shadow:var(--sh)}
 .bcr-controls{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
@@ -210,14 +214,14 @@ body.dark .yt-club-cell,body.dark .yt-head-club{background:var(--card)}
 .bcr-scrub{flex:1;min-width:80px;accent-color:var(--g600)}
 .bcr-gw{font-family:var(--fd);font-size:22px;font-weight:800;color:var(--g700);white-space:nowrap;letter-spacing:.5px}
 .bcr-chart{position:relative;overflow:hidden;transition:height .3s}
-.bcr-row{position:absolute;left:0;right:0;display:flex;align-items:center;gap:8px;padding:0 4px;height:36px}
-.bcr-rank{font-family:var(--fm);font-size:11px;color:var(--muted);width:16px;text-align:right;flex-shrink:0}
-.bcr-crest{width:20px;height:20px;object-fit:contain;flex-shrink:0}
-.bcr-dot{width:20px;height:20px;border-radius:50%;flex-shrink:0}
-.bcr-name{font-size:12px;font-weight:600;width:88px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)}
-.bcr-bar-wrap{flex:1;height:22px;background:var(--border-lt);border-radius:4px;overflow:hidden}
+.bcr-row{position:absolute;left:0;right:0;display:flex;align-items:center;gap:6px;padding:0 4px;height:22px}
+.bcr-rank{font-family:var(--fm);font-size:9px;color:var(--muted);width:13px;text-align:right;flex-shrink:0}
+.bcr-crest{width:14px;height:14px;object-fit:contain;flex-shrink:0}
+.bcr-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0}
+.bcr-name{font-size:10px;font-weight:600;width:72px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)}
+.bcr-bar-wrap{flex:1;height:14px;background:var(--border-lt);border-radius:3px;overflow:hidden}
 .bcr-bar{height:100%;border-radius:4px;min-width:3px}
-.bcr-pts{font-family:var(--fm);font-size:12px;font-weight:500;width:32px;text-align:right;flex-shrink:0;color:var(--text2)}
+.bcr-pts{font-family:var(--fm);font-size:10px;font-weight:500;width:26px;text-align:right;flex-shrink:0;color:var(--text2)}
 /* QUAL LEGEND */
 .qleg{display:flex;gap:18px;margin-top:10px;flex-wrap:wrap}
 .qi{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
@@ -937,7 +941,7 @@ function renderBarRace() {
 function bcrInit(teams, ptsH, labels) {
   const chart = document.getElementById('bcrChart');
   if (!chart) return;
-  const ROW = 40;
+  const ROW = 22;
   chart.style.height = (teams.length * ROW + 8) + 'px';
   chart.innerHTML = '';
   teams.forEach(r => {
@@ -974,7 +978,7 @@ function bcrRender() {
     .sort((a,b) => b.pts - a.pts || a.name.localeCompare(b.name));
 
   const maxPts = Math.max(1, ...teams.map(t => t.pts));
-  const ROW = 40;
+  const ROW = 22;
 
   teams.forEach((t, rank) => {
     const id = 'bcr_' + t.name.replace(/\W/g,'_');
@@ -1349,6 +1353,30 @@ async function loadYearlyData(league) {
     }
   } catch(e) { console.warn('Mikami full CSV failed:', e); }
 
+  // Add fdco recent seasons (2023 onwards) — Mikami CSV stops at 2022
+  const cur = getCurrentSeason();
+  for (let y = 2023; y <= cur; y++) {
+    try {
+      const lk = `hist:${league}:${y}`;
+      let matches;
+      const cached = localStorage.getItem(lk);
+      if (cached) {
+        matches = JSON.parse(cached);
+      } else {
+        const text = await fetchCSV(fdcoUrl(src.fdco, y));
+        matches = parseFdcoCSV(text);
+        if (matches?.length) {
+          try { localStorage.setItem(lk, JSON.stringify(matches)); } catch {}
+        }
+      }
+      if (matches?.length) {
+        const standings = matchesToStandings(matches);
+        allData[y] = {};
+        standings.forEach(r => { allData[y][r.team.name] = r.position; });
+      }
+    } catch(e) { console.warn(`fdco yearly ${y} failed:`, e.message); }
+  }
+
   yearlyCache[league] = allData;
   return allData;
 }
@@ -1414,13 +1442,14 @@ function buildYearlyGrid(data, years, allTeams) {
 
   const rows = teams.map(name => {
     const tla = teamTLA(name);
+    const c = teamColor(name);
     const cells = years.map(y => {
       const pos=data[y]?.[name], total=Object.keys(data[y]||{}).length;
-      if (!pos) return `<td class="yt-pos yt-absent" title="${y-1}–${String(y).slice(2)}: not in league">–</td>`;
+      if (!pos) return `<td class="yt-pos yt-absent">–</td>`;
       const bg=posColor(pos,total), fg=textColor(pos,total);
       return `<td class="yt-pos" style="background:${bg};color:${fg}" title="${y-1}–${String(y).slice(2)}: #${pos} of ${total}">${pos}</td>`;
     }).join('');
-    return `<tr><td class="yt-club-cell">${tla}</td>${cells}</tr>`;
+    return `<tr><td class="yt-club-cell"><span class="yt-dot" style="background:${c}"></span><span class="yt-tla">${tla}</span></td>${cells}</tr>`;
   }).join('');
 
   // Checkboxes
@@ -1450,21 +1479,38 @@ function buildYearlyGrid(data, years, allTeams) {
         <button class="ycb-btn" onclick="yearlySelNone()">Deselect all</button>
         <button class="ycb-btn" onclick="yearlySelTop(10)">Top 10</button>
         <button class="ycb-btn" onclick="yearlySelTop(5)">Top 5</button>
+        <button class="ycb-btn" id="ycbToggle" onclick="toggleYearlyPanel()">▾ Show clubs</button>
       </div>
     </div>
-    <div class="yearly-clubs" id="yearlyCbs">${cbHtml}</div>
-    <div class="yearly-scroll">
+    <div class="yearly-clubs" id="yearlyCbs" style="display:none">${cbHtml}</div>
+    <div class="yearly-scroll" id="yearlyScroll">
       <table class="yt">
         <thead><tr>
-          <th class="yt-head-club">Club</th>${yearHeaders}
+          <th class="yt-head-club">CLUB</th>${yearHeaders}
         </tr></thead>
         <tbody id="ytBody">${rows}</tbody>
       </table>
     </div>
   </div>`;
 
-  // Store data reference for re-renders
   document.getElementById('content')._ytData = {data, years, allTeams};
+
+  // Scroll listener — same as standings table
+  requestAnimationFrame(() => {
+    const sc = document.getElementById('yearlyScroll');
+    if (sc) sc.addEventListener('scroll', function() {
+      this.classList.toggle('scrolled', this.scrollLeft > 8);
+    }, {passive:true});
+  });
+}
+
+function toggleYearlyPanel() {
+  const panel = document.getElementById('yearlyCbs');
+  const btn = document.getElementById('ycbToggle');
+  if (!panel||!btn) return;
+  const open = panel.style.display === 'none';
+  panel.style.display = open ? 'flex' : 'none';
+  btn.textContent = open ? '▴ Hide clubs' : '▾ Show clubs';
 }
 
 function toggleYearlyCb(name, label) {
@@ -1486,7 +1532,8 @@ function reRenderYearlyBody(data, years, allTeams) {
   if (body) body.innerHTML = teams.map(name=>{
     const tla=teamTLA(name);
     const cells=years.map(y=>{const pos=data[y]?.[name],total=Object.keys(data[y]||{}).length;if(!pos)return`<td class="yt-pos yt-absent">–</td>`;const bg=posColor(pos,total),fg=textColor(pos,total);return`<td class="yt-pos" style="background:${bg};color:${fg}" title="#${pos}">${pos}</td>`;}).join('');
-    return`<tr><td class="yt-club-cell">${tla}</td>${cells}</tr>`;
+    const c3=teamColor(name);
+    return`<tr><td class="yt-club-cell"><span class="yt-dot" style="background:${c3}"></span><span class="yt-tla">${tla}</span></td>${cells}</tr>`;
   }).join('');
 }
 
