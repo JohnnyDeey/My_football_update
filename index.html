@@ -174,11 +174,11 @@ body.dark thead th:nth-child(2){background:var(--surface)}
 .gp{color:var(--win)}.gn{color:var(--los)}
 .pts-cell{font-weight:700!important;font-size:14px!important}
 /* CHART — scrollable on mobile */
-.cwrap{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:18px;box-shadow:var(--sh)}
-.chart-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.cwrap{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:14px;box-shadow:var(--sh)}
+.chart-scroll{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
 .chart-scroll::-webkit-scrollbar{height:4px}
 .chart-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-.chart-canvas-wrap{height:450px;min-width:100%}
+.chart-canvas-wrap{min-width:100%;}
 /* YEARLY TREND HEATMAP */
 .yearly-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:14px 0 14px 0;box-shadow:var(--sh)}
 .yearly-hint{font-size:11px;color:var(--muted);margin:0 14px 10px;line-height:1.5}
@@ -191,20 +191,33 @@ body.dark thead th:nth-child(2){background:var(--surface)}
 .ycb{display:flex;align-items:center;gap:4px;padding:3px 8px;border-radius:14px;border:1.5px solid var(--border);font-size:11px;font-weight:500;cursor:pointer;font-family:var(--fb);color:var(--muted);transition:all .12s;user-select:none}
 .ycb input{width:12px;height:12px;accent-color:var(--g600);cursor:pointer;flex-shrink:0}
 .ycb.checked{border-color:var(--g600);color:var(--text);background:var(--g50)}
-.yearly-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding-bottom:4px}
+.yearly-scroll{overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding-bottom:4px;position:relative}
 .yearly-scroll::-webkit-scrollbar{height:3px}
 .yearly-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-.yt{border-collapse:separate;border-spacing:2px;font-family:var(--fm);table-layout:fixed}
-.yt-head-club{position:sticky;left:0;z-index:5;background:var(--surface);padding:4px 6px 4px 12px;text-align:left;font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;width:60px;min-width:60px;border-bottom:1.5px solid var(--border)}
-.yt-head-yr{font-size:9px;font-weight:700;color:var(--muted);text-align:center;padding:4px 0;white-space:nowrap;width:24px;min-width:24px;letter-spacing:-.3px;border-bottom:1.5px solid var(--border)}
-.yt-club-cell{position:sticky;left:0;z-index:4;background:var(--card);padding:2px 5px 2px 10px;font-size:10px;font-weight:700;color:var(--text);white-space:nowrap;width:60px;min-width:60px;font-family:var(--fm);letter-spacing:.3px;border-top:1px solid var(--border-lt);display:flex;align-items:center;gap:4px}
-.yt-pos{width:24px;min-width:24px;height:22px;border-radius:3px;text-align:center;vertical-align:middle;font-size:10px;font-weight:700;cursor:default;padding:0;border-top:1px solid var(--border-lt)}
+.yt{border-collapse:collapse;font-family:var(--fm);table-layout:fixed;border-spacing:0}
+.yt thead tr{background:var(--surface)}
+/* Sticky club column - MUST have solid background and high z-index */
+.yt-head-club{position:sticky;left:0;z-index:20;background:var(--surface);padding:4px 6px 4px 12px;text-align:left;font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;width:62px;min-width:62px;border-bottom:2px solid var(--border);box-shadow:2px 0 5px rgba(0,0,0,.08)}
+.yt-head-yr{font-size:9px;font-weight:700;color:var(--muted);text-align:center;padding:4px 1px;white-space:nowrap;width:26px;min-width:26px;letter-spacing:-.3px;border-bottom:2px solid var(--border);position:relative;z-index:0}
+.yt-club-cell{position:sticky;left:0;z-index:18;background:var(--card);padding:2px 5px 2px 10px;font-size:10px;font-weight:700;color:var(--text);white-space:nowrap;width:62px;min-width:62px;font-family:var(--fm);letter-spacing:.3px;border-bottom:1px solid var(--border-lt);box-shadow:2px 0 5px rgba(0,0,0,.08);vertical-align:middle}
+.yt-cell-inner{display:flex;align-items:center;gap:4px;width:100%}
+.yt-tla{transition:opacity .15s,max-width .15s;opacity:1;max-width:40px;overflow:hidden;display:inline-block;vertical-align:middle;white-space:nowrap}
+.yt-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0;vertical-align:middle}
+.yearly-scroll.scrolled .yt-tla{opacity:0;max-width:0}
+.yt-pos{width:26px;min-width:26px;height:22px;border-radius:0;text-align:center;vertical-align:middle;font-size:10px;font-weight:700;cursor:default;padding:0;border-bottom:1px solid var(--border-lt);border-right:1px solid rgba(255,255,255,.15)}
 .yt-absent{background:var(--border-lt)!important;color:var(--muted)!important;font-size:9px}
 body.dark .yt-club-cell{background:var(--card)}
 body.dark .yt-head-club{background:var(--surface)}
-.yearly-scroll.scrolled .yt-tla{opacity:0;max-width:0;overflow:hidden}
-.yt-tla{transition:opacity .15s,max-width .15s;opacity:1;max-width:40px;overflow:hidden;white-space:nowrap;display:inline-block}
-.yt-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
+
+/* Name popup toast */
+/* TLA tooltip toast — shown on tap/hover everywhere TLAs appear */
+.name-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+  background:rgba(10,10,10,.88);color:#fff;padding:7px 18px;border-radius:20px;
+  font-size:13px;font-weight:500;font-family:var(--fb);pointer-events:none;
+  z-index:1000;white-space:nowrap;opacity:1;transition:opacity .3s;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.name-toast.hide{opacity:0}
+/* Desktop: show full name as CSS tooltip via title attribute (browser native) */
+[data-fullname]{cursor:pointer}
 /* BAR CHART RACE */
 .bcr-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:18px;box-shadow:var(--sh)}
 .bcr-controls{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
@@ -222,6 +235,11 @@ body.dark .yt-head-club{background:var(--surface)}
 .bcr-bar-wrap{flex:1;height:14px;background:var(--border-lt);border-radius:3px;overflow:hidden}
 .bcr-bar{height:100%;border-radius:4px;min-width:3px}
 .bcr-pts{font-family:var(--fm);font-size:10px;font-weight:500;width:26px;text-align:right;flex-shrink:0;color:var(--text2)}
+/* TLA TOOLTIP — hover on desktop, click-to-show on mobile */
+.tla-wrap{position:relative;display:inline-flex;align-items:center;gap:4px;cursor:default}
+.tla-tip{position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);background:var(--text);color:var(--card);font-size:10px;font-weight:600;font-family:var(--fb);padding:3px 8px;border-radius:5px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:999;letter-spacing:.2px;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.tla-tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:var(--text)}
+.tla-wrap:hover .tla-tip,.tla-wrap.tip-show .tla-tip{opacity:1}
 /* QUAL LEGEND */
 .qleg{display:flex;gap:18px;margin-top:10px;flex-wrap:wrap}
 .qi{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
@@ -957,7 +975,7 @@ function bcrInit(teams, ptsH, labels) {
       ${r.team.crest
         ? `<img class="bcr-crest" src="${r.team.crest}" loading="lazy" onerror="this.style.display='none'">`
         : `<div class="bcr-dot" style="background:${c}"></div>`}
-      <span class="bcr-name">${short}</span>
+      <span class="bcr-name" data-fullname="${r.team.name||name}" title="${r.team.name||name}">${short}</span>
       <div class="bcr-bar-wrap">
         <div class="bcr-bar" style="background:${c};width:0%;transition:width 0.45s cubic-bezier(.4,0,.2,1)"></div>
       </div>
@@ -1057,6 +1075,14 @@ function formColLabel() {
 // ══════════════════════════════════════════════════════════════
 // RENDER
 // ══════════════════════════════════════════════════════════════
+// TOOLTIP — click shows full name briefly on mobile
+function tipClick(el) {
+  const wrap = el.closest(".tla-wrap");
+  if (!wrap) return;
+  wrap.classList.add("tip-show");
+  setTimeout(() => wrap.classList.remove("tip-show"), 1800);
+}
+
 let chartInst = null;
 
 function renderLeagueTabs() {
@@ -1230,14 +1256,17 @@ function renderTable() {
         const form=getFormForTeam(r.team.name);
         const pts=S.gwSlider&&r._sliderPts!=null?r._sliderPts:r.points;
         const tla=teamTLA(r.team.name, r.team.tla);
+        const fullName=r.team.name;
         return `<tr class="${zone}">
           <td><span class="pbadge">${pos}</span></td>
-          <td><div class="cc">
+          <td title="${fullName}" onclick="showNameToast('${fullName.replace(/'/g,"\\'")}')">
+            <div class="cc">
             ${r.team.crest
               ?`<img class="crest" src="${r.team.crest}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><div class="cbar" style="background:${c};display:none"></div>`
               :`<div class="cbar" style="background:${c}"></div>`}
-            <span class="cname">${tla}</span>
-          </div></td>
+            <span class="cname" data-fullname="${r.team.name}" title="${r.team.name}">${tla}</span>
+            </div>
+          </td>
           <td>${r.playedGames}</td>
           <td style="color:var(--win)">${r.won}</td>
           <td style="color:var(--drw)">${r.draw}</td>
@@ -1277,21 +1306,26 @@ function renderPositionChart() {
   const borderCol  = dark ? '#2d3d32' : '#d2dace';
   const {labels, posH} = S.trends;
   const GWS = labels.length;
-  // Each GW gets at least 28px — makes the chart scrollable on mobile
   const GW_WIDTH = 28;
   const minW = Math.max(GWS * GW_WIDTH, 320);
+  // Work out max position across all selected teams so chart is never clipped
+  const selectedData = S.standings.filter(r => S.sel.has(r.team.name));
+  const allPositions = selectedData.flatMap(r => posH[r.team.name]||[]).filter(Boolean);
+  const maxPos = allPositions.length ? Math.max(...allPositions) : 20;
+  // Height: at least 22px per position so bottom positions never get clipped
+  const chartH = Math.max(500, maxPos * 26 + 80);
 
   document.getElementById('content').innerHTML = `<div class="vc cwrap">
     <div class="chart-scroll">
-      <div class="chart-canvas-wrap" style="width:${minW}px">
+      <div class="chart-canvas-wrap" style="width:${minW}px;height:${chartH}px">
         <canvas id="mc"></canvas>
       </div>
     </div>
   </div>`;
 
-  const datasets = S.standings.filter(r => S.sel.has(r.team.name)).map(r => {
+  const datasets = selectedData.map(r => {
     const n = r.team.name, c = teamColor(n);
-    return {label:r.team.shortName||n, data:posH[n]||[], borderColor:c,
+    return {label:teamTLA(n, r.team.tla), data:posH[n]||[], borderColor:c,
       backgroundColor:c+'15', borderWidth:2.5, pointRadius:0,
       pointHoverRadius:5, tension:0.35, fill:false};
   });
@@ -1300,6 +1334,7 @@ function renderPositionChart() {
     type:'line', data:{labels, datasets},
     options:{
       responsive:true, maintainAspectRatio:false, animation:{duration:300},
+      layout:{padding:{top:8, bottom:16, left:4, right:8}},
       interaction:{mode:'index', intersect:false},
       plugins:{legend:{display:false}, tooltip:{
         backgroundColor:dark?'#1e2922':'#fff',
@@ -1310,7 +1345,8 @@ function renderPositionChart() {
       }},
       scales:{
         x:{grid:{color:gridColor}, ticks:{color:tickColor, font:{size:10}, maxRotation:0, autoSkip:true, maxTicksLimit:Math.ceil(GWS/5)}, border:{color:borderCol}},
-        y:{reverse:true, grid:{color:gridColor},
+        y:{reverse:true, min:1, max:maxPos,
+          grid:{color:gridColor},
           ticks:{color:tickColor, font:{size:11}, stepSize:1, callback:v=>`#${v}`},
           border:{color:borderCol},
           title:{display:true, text:'League Position', color:tickColor, font:{size:11}}}
@@ -1449,7 +1485,7 @@ function buildYearlyGrid(data, years, allTeams) {
       const bg=posColor(pos,total), fg=textColor(pos,total);
       return `<td class="yt-pos" style="background:${bg};color:${fg}" title="${y-1}–${String(y).slice(2)}: #${pos} of ${total}">${pos}</td>`;
     }).join('');
-    return `<tr><td class="yt-club-cell"><span class="yt-dot" style="background:${c}"></span><span class="yt-tla">${tla}</span></td>${cells}</tr>`;
+    return `<tr><td class="yt-club-cell" data-fullname="${name}" title="${name}"><span class="yt-dot" style="background:${c}"></span><span class="yt-tla">${tla}</span></td>${cells}</tr>`;
   }).join('');
 
   // Checkboxes
@@ -1533,7 +1569,7 @@ function reRenderYearlyBody(data, years, allTeams) {
     const tla=teamTLA(name);
     const cells=years.map(y=>{const pos=data[y]?.[name],total=Object.keys(data[y]||{}).length;if(!pos)return`<td class="yt-pos yt-absent">–</td>`;const bg=posColor(pos,total),fg=textColor(pos,total);return`<td class="yt-pos" style="background:${bg};color:${fg}" title="#${pos}">${pos}</td>`;}).join('');
     const c3=teamColor(name);
-    return`<tr><td class="yt-club-cell"><span class="yt-dot" style="background:${c3}"></span><span class="yt-tla">${tla}</span></td>${cells}</tr>`;
+    return`<tr><td class="yt-club-cell" data-fullname="${name}" title="${name}"><span class="yt-dot" style="background:${c3}"></span><span class="yt-tla">${tla}</span></td>${cells}</tr>`;
   }).join('');
 }
 
@@ -1626,6 +1662,30 @@ async function loadTrends() {
     renderContent();
   } catch(e) { S.trendsLoading=false; console.warn('Trends failed:',e.code); }
 }
+
+// ══════════════════════════════════════════════════════════════
+// NAME TOAST — tap to see full name on mobile, title attr on desktop
+// ══════════════════════════════════════════════════════════════
+let _toastTimer = null;
+function showNameToast(name) {
+  let el = document.getElementById('nameToast');
+  if (el) el.remove();
+  clearTimeout(_toastTimer);
+  el = document.createElement('div');
+  el.id = 'nameToast';
+  el.className = 'name-toast';
+  el.textContent = name;
+  document.body.appendChild(el);
+  _toastTimer = setTimeout(() => {
+    el.classList.add('hide');
+    setTimeout(() => el.remove(), 300);
+  }, 2200);
+}
+// Global delegated handler — any element with data-fullname shows toast on click/tap
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-fullname]');
+  if (el) showNameToast(el.dataset.fullname);
+}, {passive:true});
 
 // ══════════════════════════════════════════════════════════════
 // INTERACTIONS
@@ -1738,10 +1798,30 @@ function hidePrivacy() { document.getElementById('privacyModal').style.display='
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js', {scope:'./'})
-      .then(()=>console.log('SW registered'))
-      .catch(e=>console.log('SW failed:',e));
+      .then(reg => {
+        console.log('SW registered');
+        // Lock orientation to portrait to match manifest setting
+        if (screen.orientation?.lock) {
+          screen.orientation.lock('portrait').catch(() => {});
+        }
+      })
+      .catch(e => console.log('SW failed:', e));
   });
 }
+
+// Orientation lock — portrait only, respects phone settings
+// Uses Screen Orientation API which only works in standalone PWA mode
+window.addEventListener('load', () => {
+  if (window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone === true) {
+    // Running as installed PWA — lock to portrait
+    if (screen.orientation && screen.orientation.lock) {
+      screen.orientation.lock('portrait').catch(() => {
+        // Some browsers don't support locking — manifest orientation handles it
+      });
+    }
+  }
+});
 
 // Install prompt
 let deferredPrompt = null;
