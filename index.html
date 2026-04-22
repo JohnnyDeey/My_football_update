@@ -701,11 +701,13 @@ function renderError(code) {
   }
   const msgs = {
     BAD_KEY:  ['Invalid API key', 'Please double-check your key and try connecting again.'],
-    RATE:     ['Rate limit reached', 'Free tier allows 10 requests/minute. Wait a moment then try again.'],
-    NO_DATA:  ['No data for this season', 'This league may not have data for the selected season yet.'],
-    HTTP_403: ['Past seasons need a paid plan', 'football-data.org\'s free tier only covers the current season. To access historical data, you would need their Standard plan (€10/month) at football-data.org.'],
+    RATE:     ['Rate limit reached', 'All 10 requests/minute used up. The quota bar will show when it resets automatically.'],
+    NO_DATA:  ['No data available', 'This league may not have started yet, or standings aren\'t available for this season.'],
+    HTTP_403: ['Access denied (403)', 'Your API key doesn\'t have access to this competition, or it requires a paid plan.'],
+    HTTP_404: ['Not found (404)', 'This competition or season doesn\'t exist in the API. Try a different league.'],
+    HTTP_400: ['Bad request (400)', 'The API rejected the request. This is usually a season or competition code issue.'],
   };
-  const [title, detail] = msgs[code] || ['Something went wrong', `Code: ${code}`];
+  const [title, detail] = msgs[code] || ['Error loading data', `The API returned an unexpected error (${code}). Try again or switch leagues.`];
   show(`<div class="errbox"><h3>${title}</h3><p>${detail}</p>
     <button class="retry-btn" onclick="loadStandings()">Try again</button></div>`);
 }
@@ -840,51 +842,29 @@ function renderChart() {
   });
 }
 
-// ── COMPETITION DISCOVERY ──────────────────────────────────
-// Fetches all competitions available to this API key dynamically.
-// Filters to LEAGUE type only (have standings tables).
-// Falls back to a minimal hardcoded set if the fetch fails.
-async function loadCompetitions() {
+// ── COMPETITION SETUP ──────────────────────────────────────
+// The free tier always includes exactly these 9 league competitions.
+// We hardcode them (they never change) to avoid wasting a quota slot on
+// /competitions and to eliminate the caching/filter bugs.
+function setupLeagues() {
+  LEAGUES = {
+    PL:  {name:'Premier League',    flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', ...ZONES.PL},
+    PD:  {name:'La Liga',           flag:'🇪🇸',        ...ZONES.PD},
+    BL1: {name:'Bundesliga',        flag:'🇩🇪',        ...ZONES.BL1},
+    SA:  {name:'Serie A',           flag:'🇮🇹',        ...ZONES.SA},
+    FL1: {name:'Ligue 1',           flag:'🇫🇷',        ...ZONES.FL1},
+    PPL: {name:'Primeira Liga',     flag:'🇵🇹',        ...ZONES.PPL},
+    DED: {name:'Eredivisie',        flag:'🇳🇱',        ...ZONES.DED},
+    ELC: {name:'Championship',      flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',  ...ZONES.ELC},
+    BSA: {name:'Brasileirão',       flag:'🇧🇷',        ...ZONES.BSA},
+  };
+  // Clear any stale competition cache from previous versions
   try {
-    const data = await apiFetch('/competitions');
-    const leagues = (data.competitions || [])
-      .filter(c => c.type === 'LEAGUE')
-      .sort((a, b) => {
-        // Put the big 5 first, then alphabetical
-        const priority = ['PL','PD','BL1','SA','FL1'];
-        const ai = priority.indexOf(a.code), bi = priority.indexOf(b.code);
-        if (ai !== -1 && bi !== -1) return ai - bi;
-        if (ai !== -1) return -1;
-        if (bi !== -1) return 1;
-        return a.name.localeCompare(b.name);
-      });
-
-    LEAGUES = {};
-    leagues.forEach(c => {
-      if (!c.code) return; // skip competitions with no code
-      LEAGUES[c.code] = {
-        name: c.name,
-        flag: FLAGS[c.code] || '🏆',
-        ...(ZONES[c.code] || {ucl:0, uel:0, rel:0})
-      };
-    });
-
-    // Set default league to first available
-    if (!LEAGUES[S.league]) S.league = Object.keys(LEAGUES)[0] || 'PL';
-    renderLeagueTabs();
-    loadStandings();
-  } catch(e) {
-    // Fallback if competitions fetch fails
-    LEAGUES = {
-      PL:  {name:'Premier League', flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', ...ZONES.PL},
-      PD:  {name:'La Liga',        flag:'🇪🇸',        ...ZONES.PD},
-      BL1: {name:'Bundesliga',     flag:'🇩🇪',        ...ZONES.BL1},
-      SA:  {name:'Serie A',        flag:'🇮🇹',        ...ZONES.SA},
-      FL1: {name:'Ligue 1',        flag:'🇫🇷',        ...ZONES.FL1},
-    };
-    renderLeagueTabs();
-    loadStandings();
-  }
+    Object.keys(sessionStorage).filter(k => k === 'fc:/competitions').forEach(k => sessionStorage.removeItem(k));
+    Object.keys(localStorage).filter(k => k === 'fc:/competitions').forEach(k => localStorage.removeItem(k));
+  } catch {}
+  renderLeagueTabs();
+  loadStandings();
 }
 
 // ── LOADING ────────────────────────────────────────────────
@@ -1005,7 +985,7 @@ function saveKey() {
   if (!k) return;
   localStorage.setItem('fb_key', k);
   renderKeyStatus();
-  loadCompetitions();
+  setupLeagues();
 }
 
 function clearKey() {
@@ -1047,7 +1027,7 @@ if (localStorage.getItem('fb_dark') === '1') {
 }
 
 if (getKey()) {
-  loadCompetitions(); // discovers all available leagues then loads standings
+  setupLeagues(); // sets up all 9 free-tier leagues then loads standings
 } else {
   S.error = 'NO_KEY';
   renderContent();
