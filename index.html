@@ -37,12 +37,12 @@ body.dark{
   --win:#4ade80;--drw:#fbbf24;--los:#f87171;
   --sh:0 1px 3px rgba(0,0,0,.4);--shm:0 4px 12px rgba(0,0,0,.5);
 }
-body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px;line-height:1.5;min-height:100vh;transition:background .25s,color .25s}
-.wrap{max-width:1240px;margin:0 auto;padding:0 20px}
+body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px;line-height:1.5;min-height:100vh;transition:background .25s,color .25s;overflow-x:hidden}
+.wrap{max-width:1240px;margin:0 auto;padding:0 20px;min-width:0}
 /* HEADER */
 header{background:var(--card);border-bottom:3px solid var(--g700);position:sticky;top:0;z-index:200;box-shadow:var(--shm)}
-.hdr{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0 8px}
-.hdr-l{display:flex;align-items:center;gap:12px}
+.hdr{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0 8px;min-width:0}
+.hdr-l{display:flex;align-items:center;gap:12px;min-width:0;overflow:hidden}
 .logo{width:40px;height:40px;background:var(--g700);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
 .site-title{font-family:var(--fd);font-size:19px;font-weight:800;color:var(--g900);line-height:1}
 .site-sub{font-size:11px;color:var(--muted);margin-top:2px}
@@ -85,10 +85,10 @@ header{background:var(--card);border-bottom:3px solid var(--g700);position:stick
 .ltab:hover{border-color:var(--g600);color:var(--text)}
 .ltab.active{background:var(--g700);color:#fff;border-color:var(--g700);font-weight:700;box-shadow:var(--shm)}
 /* CONTROLS */
-.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-.ssel{background:var(--card);border:1.5px solid var(--border);color:var(--text);padding:7px 28px 7px 11px;border-radius:8px;font-family:var(--fb);font-size:13px;font-weight:500;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b7280'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;box-shadow:var(--sh)}
+.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;min-width:0}
+.ssel{background:var(--card);border:1.5px solid var(--border);color:var(--text);padding:7px 28px 7px 11px;border-radius:8px;font-family:var(--fb);font-size:13px;font-weight:500;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b7280'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;box-shadow:var(--sh);max-width:100%}
 .ssel:hover,.ssel:focus{border-color:var(--g600)}
-.fbtn{display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--card);border:1.5px solid var(--border);border-radius:8px;color:var(--text2);font-family:var(--fb);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;box-shadow:var(--sh)}
+.fbtn{display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--card);border:1.5px solid var(--border);border-radius:8px;color:var(--text2);font-family:var(--fb);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;box-shadow:var(--sh);white-space:nowrap}
 .fbtn:hover,.fbtn.open{border-color:var(--g600);color:var(--g700)}
 .fbadge{background:var(--g700);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px}
 /* FILTER PANEL */
@@ -119,8 +119,9 @@ header{background:var(--card);border-bottom:3px solid var(--g700);position:stick
 .sval{font-family:var(--fm);font-size:24px;font-weight:500;color:var(--text);line-height:1}
 .ssub{font-size:11px;color:var(--muted);margin-top:3px}
 /* VIEW TABS */
-.vtabs-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
-.vtabs{display:flex;gap:3px;background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:3px;box-shadow:var(--sh)}
+.vtabs-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;min-width:0}
+.vtabs{display:flex;gap:3px;background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:3px;box-shadow:var(--sh);overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.vtabs::-webkit-scrollbar{display:none}
 .vtab{padding:6px 16px;border-radius:7px;border:none;background:transparent;color:var(--muted);font-family:var(--fb);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap}
 .vtab:hover{color:var(--text)}
 .vtab.active{background:var(--g700);color:#fff;box-shadow:var(--sh)}
@@ -221,9 +222,93 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
 ::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 @media(max-width:640px){
-  .ltab .lname{display:none}.srow{grid-template-columns:1fr 1fr}
-  .site-title{font-size:16px}.site-sub{display:none}
+  /* LAYOUT */
+  .wrap{padding:0 12px}
+  body{font-size:13px}
+
+  /* HEADER */
+  .hdr{padding:10px 0 6px;gap:8px}
+  .logo{width:34px;height:34px;font-size:17px}
+  .site-title{font-size:15px}
+  .site-sub{display:none}
   .auth-name{display:none}
+  .theme-toggle{width:30px;height:30px;font-size:13px}
+  .btn-auth{padding:4px 9px;font-size:11px}
+  #throttleBar{flex-wrap:wrap;gap:5px}
+  .tb-reset{display:none}
+
+  /* LEAGUE TABS — icon only */
+  .ltab .lname{display:none}
+  .ltab{padding:7px 11px}
+
+  /* CONTROLS */
+  .controls{gap:6px}
+  .ssel{font-size:12px;padding:6px 24px 6px 9px}
+  .fbtn{font-size:12px;padding:6px 10px}
+  .form-ctrl{gap:6px}
+  .form-label{display:none}
+  .fmbtn{padding:4px 9px;font-size:11px}
+
+  /* STAT CARDS — 2 per row */
+  .srow{grid-template-columns:1fr 1fr;gap:8px}
+  .scard{padding:10px 12px}
+  .sval{font-size:20px}
+
+  /* VIEW TABS */
+  .vtabs-row{gap:8px}
+  .vtab{padding:6px 11px;font-size:12px}
+  .md-slider-wrap{flex-wrap:wrap;gap:6px;padding:7px 10px}
+  .md-label{font-size:11px}
+
+  /* TABLE — make it scroll with a clear indicator */
+  .twrap{border-radius:8px;-webkit-overflow-scrolling:touch}
+  table{min-width:520px}
+  thead th{padding:8px 8px;font-size:10px}
+  tbody td{padding:7px 8px;font-size:12px}
+  .cname{font-size:12px}
+  .fb{width:22px;height:22px;font-size:11px}
+  .fbs{gap:3px}
+  /* Hide less critical columns on very small screens */
+  thead th:nth-child(8), /* GA */
+  tbody td:nth-child(8){display:none}
+
+  /* BAR CHART RACE */
+  .bcr-controls{gap:7px}
+  .bcr-btn{padding:6px 12px;font-size:12px}
+  .bcr-gw{font-size:17px}
+  .bcr-name{width:68px;font-size:11px}
+  .bcr-pts{font-size:11px;width:26px}
+
+  /* CHART */
+  .cwrap{height:360px;padding:12px}
+
+  /* FILTER PANEL */
+  .fpanel{padding:12px}
+  .chips{gap:5px}
+  .chip{font-size:11px;padding:4px 9px}
+
+  /* FOOTER */
+  .footer-inner{flex-direction:column;gap:6px;text-align:center}
+
+  /* QUAL LEGEND */
+  .qleg{gap:10px}
+  .qi{font-size:10px}
+
+  /* MODAL */
+  .modal{padding:20px}
+  .modal h2{font-size:16px}
+}
+
+/* Extra small phones */
+@media(max-width:380px){
+  .ltab{padding:6px 9px}
+  .vtab{padding:5px 9px;font-size:11px}
+  .srow{grid-template-columns:1fr 1fr}
+  thead th:nth-child(6), /* L */
+  tbody td:nth-child(6),
+  thead th:nth-child(5), /* D */
+  tbody td:nth-child(5){display:none}
+  .bcr-name{width:52px;font-size:10px}
 }
 </style>
 </head>
@@ -326,7 +411,7 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
         <a href="https://www.football-data.co.uk" target="_blank">football-data.co.uk</a> (historical)
       </div>
       <div>
-        Contact: <a href="mailto:sjohndamilola92@gmail.com">sjohndamilola92@gmail.com</a> ·
+        Contact: <a href="mailto:your@email.com">your@email.com</a> ·
         <a href="#" onclick="showPrivacy();return false">Privacy Policy</a>
       </div>
     </div>
@@ -346,7 +431,7 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
       <li><strong>No tracking:</strong> This app contains no analytics, advertising, or third-party tracking of any kind.</li>
       <li><strong>No data sharing:</strong> Your data is never sold or shared with third parties.</li>
     </ul>
-    <p style="margin-top:12px">Questions? Contact: <a href="mailto:sjohndamilola92@gmail.com">sjohndamilola92@gmail.com</a></p>
+    <p style="margin-top:12px">Questions? Contact: <a href="mailto:your@email.com">your@email.com</a></p>
   </div>
 </div>
 
@@ -355,7 +440,7 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
 // FIREBASE
 // ══════════════════════════════════════════════════════════════
 const firebaseConfig = {
-  apiKey: "AIzaSyCQbtCVM3Cm7Jdzg8dsEkG1SOJqzALXhTw",
+  apiKey: "AIzaSyCeV1kVNRNFb7SWUR1V3CgBAkmT-ECLGPk",
   authDomain: "football-analytics-26e72.firebaseapp.com",
   projectId: "football-analytics-26e72",
   storageBucket: "football-analytics-26e72.firebasestorage.app",
