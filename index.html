@@ -58,14 +58,7 @@ header{background:var(--card);border-bottom:3px solid var(--g700);position:stick
 .btn-signout{background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline;font-family:var(--fb)}
 .theme-toggle{background:var(--surface);border:1.5px solid var(--border);border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .theme-toggle:hover{border-color:var(--g600)}
-/* THROTTLE */
-.throttle-bar{display:flex;align-items:center;gap:8px;padding:5px 0 7px;border-top:1px solid var(--border-lt);font-size:11px}
-.tb-label{color:var(--muted);white-space:nowrap}
-.tb-track{width:80px;height:4px;background:var(--border);border-radius:2px;overflow:hidden;flex-shrink:0}
-.tb-fill{height:100%;border-radius:2px;transition:width .4s,background .4s}
-.tb-count{font-family:var(--fm);white-space:nowrap}
-.tb-reset{color:var(--muted);font-family:var(--fm)}
-.throttle-wait{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12px;color:var(--drw);border-top:1px solid var(--border-lt)}
+/* SPINNER */
 .spinner{border:3px solid var(--border);border-top-color:var(--g600);border-radius:50%;animation:spin .75s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 /* API BAR */
@@ -137,14 +130,10 @@ header{background:var(--card);border-bottom:3px solid var(--g700);position:stick
 /* TABLE */
 .twrap{overflow-x:auto;border-radius:10px;border:1.5px solid var(--border);box-shadow:var(--sh);-webkit-overflow-scrolling:touch}
 table{width:100%;border-collapse:separate;border-spacing:0;min-width:560px;background:var(--card)}
-thead th{background:var(--surface);padding:10px 12px;text-align:right;font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap;border-bottom:1.5px solid var(--border);transition:color .2s}
-thead th:first-child{text-align:center;min-width:44px;cursor:default;position:sticky;left:0;z-index:3;background:var(--surface)}
-thead th:nth-child(2){text-align:left;position:sticky;left:44px;z-index:3;background:var(--surface);box-shadow:2px 0 5px rgba(0,0,0,.07);transition:min-width .2s}
-/* Default (not scrolled): show name — wide column */
-thead th:nth-child(2){min-width:150px}
-tbody td:nth-child(2) .cname{transition:opacity .15s,max-width .2s;opacity:1;max-width:120px;overflow:hidden;white-space:nowrap}
-/* Scrolled: hide name, shrink column to logo only */
-.twrap.scrolled thead th:nth-child(2){min-width:44px}
+thead th{background:var(--surface);padding:7px 10px;text-align:right;font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap;border-bottom:1.5px solid var(--border);transition:color .2s}
+thead th:first-child{text-align:center;min-width:36px;cursor:default;position:sticky;left:0;z-index:3;background:var(--surface)}
+thead th:nth-child(2){text-align:left;position:sticky;left:36px;z-index:3;background:var(--surface);box-shadow:2px 0 5px rgba(0,0,0,.07);transition:min-width .2s;min-width:80px}
+.twrap.scrolled thead th:nth-child(2){min-width:36px}
 .twrap.scrolled tbody td:nth-child(2) .cname{opacity:0;max-width:0;display:none}
 .twrap.scrolled tbody td:nth-child(2) .cc{gap:0}
 thead th:hover{color:var(--g700)}
@@ -157,15 +146,16 @@ tbody tr:hover td:nth-child(2){background:var(--g50)}
 tbody tr.ucl-row td:first-child{box-shadow:inset 3px 0 0 var(--ucl)}
 tbody tr.uel-row td:first-child{box-shadow:inset 3px 0 0 var(--uel)}
 tbody tr.rel-row td:first-child{box-shadow:inset 3px 0 0 var(--rel)}
-tbody td{padding:9px 12px;text-align:right;font-size:13px;font-family:var(--fm);border-top:1px solid var(--border-lt)}
+tbody td{padding:6px 10px;text-align:right;font-size:12px;font-family:var(--fm);border-top:1px solid var(--border-lt)}
 tbody td:first-child{text-align:center;font-family:var(--fb);position:sticky;left:0;z-index:2;background:var(--card)}
-tbody td:nth-child(2){text-align:left;font-family:var(--fb);position:sticky;left:44px;z-index:2;background:var(--card);box-shadow:2px 0 5px rgba(0,0,0,.07)}
+tbody td:nth-child(2){text-align:left;font-family:var(--fb);position:sticky;left:36px;z-index:2;background:var(--card);box-shadow:2px 0 5px rgba(0,0,0,.07)}
 tbody td:last-child{font-family:var(--fb)}
-.pbadge{display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center;border-radius:6px;font-size:12px;font-weight:700;color:var(--muted);font-family:var(--fm)}
-.cc{display:flex;align-items:center;gap:8px}
-.crest{width:22px;height:22px;object-fit:contain;flex-shrink:0}
-.cbar{width:4px;height:24px;border-radius:2px;flex-shrink:0}
-.cname{font-weight:600;color:var(--text)}
+.pbadge{display:inline-flex;width:20px;height:20px;align-items:center;justify-content:center;border-radius:5px;font-size:11px;font-weight:700;color:var(--muted);font-family:var(--fm)}
+.cc{display:flex;align-items:center;gap:6px}
+.crest{width:20px;height:20px;object-fit:contain;flex-shrink:0}
+.cbar{width:3px;height:20px;border-radius:2px;flex-shrink:0}
+.cname{font-weight:700;color:var(--text);font-size:11px;letter-spacing:.3px;font-family:var(--fm)}
+tbody td:nth-child(2) .cname{transition:opacity .15s,max-width .2s;opacity:1;max-width:50px;overflow:hidden;white-space:nowrap}
 /* FORM BADGES - larger, more distinct like mikami */
 .fbs{display:flex;gap:4px;justify-content:flex-end}
 .fb{width:26px;height:26px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;letter-spacing:0}
@@ -190,19 +180,27 @@ body.dark thead th:nth-child(2){background:var(--surface)}
 .chart-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 .chart-canvas-wrap{height:360px;min-width:100%}
 /* YEARLY TREND HEATMAP */
-.yearly-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:16px 0 16px 0;box-shadow:var(--sh)}
-.yearly-hint{font-size:12px;color:var(--muted);margin:0 16px 12px;line-height:1.5}
-.yearly-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding-bottom:6px}
-.yearly-scroll::-webkit-scrollbar{height:4px}
+.yearly-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:14px 0 14px 0;box-shadow:var(--sh)}
+.yearly-hint{font-size:11px;color:var(--muted);margin:0 14px 10px;line-height:1.5}
+.yearly-filter{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 14px 10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px}
+.yearly-filter-label{font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap}
+.yearly-filter-btns{display:flex;gap:5px;flex-wrap:wrap}
+.ycb-btn{padding:3px 10px;border-radius:5px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-weight:500;cursor:pointer;font-family:var(--fb);transition:all .15s}
+.ycb-btn:hover{border-color:var(--g600);color:var(--g700)}
+.yearly-clubs{display:flex;flex-wrap:wrap;gap:5px;margin:0 14px 10px}
+.ycb{display:flex;align-items:center;gap:4px;padding:3px 8px;border-radius:14px;border:1.5px solid var(--border);font-size:11px;font-weight:500;cursor:pointer;font-family:var(--fb);color:var(--muted);transition:all .12s;user-select:none}
+.ycb input{width:12px;height:12px;accent-color:var(--g600);cursor:pointer;flex-shrink:0}
+.ycb.checked{border-color:var(--g600);color:var(--text);background:var(--g50)}
+.yearly-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding-bottom:4px}
+.yearly-scroll::-webkit-scrollbar{height:3px}
 .yearly-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-.yt{border-collapse:separate;border-spacing:2px;font-family:var(--fm)}
-.yt-head-club{position:sticky;left:0;z-index:3;background:var(--card);padding:4px 12px 4px 16px;text-align:left;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;white-space:nowrap;min-width:130px}
-.yt-head-yr{font-size:9px;font-weight:700;color:var(--muted);text-align:center;padding:4px 2px;white-space:nowrap;min-width:30px;letter-spacing:-.3px}
-.yt-club-cell{position:sticky;left:0;z-index:2;background:var(--card);padding:3px 10px 3px 16px;font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;min-width:130px;font-family:var(--fb)}
-.yt-pos{width:30px;height:28px;border-radius:4px;text-align:center;vertical-align:middle;font-size:11px;font-weight:700;cursor:default;padding:0}
-.yt-absent{background:var(--border-lt);color:var(--muted);font-size:10px}
-body.dark .yt-club-cell{background:var(--card)}
-body.dark .yt-head-club{background:var(--card)}
+.yt{border-collapse:separate;border-spacing:2px;font-family:var(--fm);table-layout:fixed}
+.yt-head-club{position:sticky;left:0;z-index:3;background:var(--card);padding:3px 10px 3px 14px;text-align:left;font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;white-space:nowrap;width:84px;min-width:84px}
+.yt-head-yr{font-size:9px;font-weight:700;color:var(--muted);text-align:center;padding:3px 0;white-space:nowrap;width:26px;min-width:26px;letter-spacing:-.3px}
+.yt-club-cell{position:sticky;left:0;z-index:2;background:var(--card);padding:2px 8px 2px 14px;font-size:10px;font-weight:700;color:var(--text);white-space:nowrap;width:84px;min-width:84px;font-family:var(--fm);letter-spacing:.3px}
+.yt-pos{width:26px;min-width:26px;height:24px;border-radius:3px;text-align:center;vertical-align:middle;font-size:10px;font-weight:700;cursor:default;padding:0}
+.yt-absent{background:var(--border-lt)!important;color:var(--muted)!important;font-size:9px}
+body.dark .yt-club-cell,body.dark .yt-head-club{background:var(--card)}
 /* BAR CHART RACE */
 .bcr-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:18px;box-shadow:var(--sh)}
 .bcr-controls{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
@@ -271,8 +269,6 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
   .auth-name{display:none}
   .theme-toggle{width:30px;height:30px;font-size:13px}
   .btn-auth{padding:4px 9px;font-size:11px}
-  #throttleBar{flex-wrap:wrap;gap:5px}
-  .tb-reset{display:none}
 
   /* LEAGUE TABS — icon only */
   .ltab .lname{display:none}
@@ -365,11 +361,6 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
         <div id="keyStatus"></div>
         <button class="theme-toggle" id="themeToggle" onclick="toggleDark()" title="Toggle dark mode">☀️</button>
       </div>
-    </div>
-    <div id="throttleBar" class="throttle-bar" style="display:none"></div>
-    <div id="throttleWait" class="throttle-wait" style="display:none">
-      <div class="spinner" style="width:14px;height:14px;border-width:2px"></div>
-      <span>Rate limit — waiting for quota to reset…</span>
     </div>
   </div>
 </header>
@@ -607,8 +598,16 @@ function teamColor(name) {
   return colorCache[name];
 }
 
-// ══════════════════════════════════════════════════════════════
-// SEASONS
+// Generate stable 3-letter TLA from team name when API doesn't provide one
+function teamTLA(name, apiTla) {
+  if (apiTla && apiTla.length === 3) return apiTla.toUpperCase();
+  // Clean suffixes
+  const clean = name.replace(/ (F\.?C\.?|AFC|CF|SC|RFC|BC|AC|AS|SS|US|SD|RC|RCD|CA|CD|SV|VfB|VfL|TSG|FSV|FC)$/i,'').trim();
+  const words = clean.split(/[\s\-]+/).filter(Boolean);
+  if (words.length === 1) return words[0].slice(0,3).toUpperCase();
+  if (words.length === 2) return (words[0].slice(0,2) + words[1].slice(0,1)).toUpperCase();
+  return words.slice(0,3).map(w=>w[0]).join('').toUpperCase();
+}
 // ══════════════════════════════════════════════════════════════
 function getCurrentSeason() {
   const d = new Date();
@@ -659,7 +658,7 @@ function buildSeasonSelect() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// API THROTTLE
+// API FETCH — simple, no throttle UI
 // ══════════════════════════════════════════════════════════════
 const throttle = {available:10, resetAt:Date.now()+60000, queue:[], draining:false};
 
@@ -667,30 +666,15 @@ setInterval(() => {
   if (Date.now() >= throttle.resetAt) {
     throttle.available = 10;
     throttle.resetAt = Date.now() + 60000;
-    updateThrottleStatus();
     if (throttle.queue.length) drainQueue();
   }
 }, 1000);
-setInterval(updateThrottleStatus, 1000);
 
 function updateThrottle(headers) {
   const a = headers.get('X-Requests-Available-Minute');
   const r = headers.get('X-RequestCounter-Reset');
   if (a !== null) throttle.available = parseInt(a);
   if (r !== null) throttle.resetAt = Date.now() + parseInt(r) * 1000;
-}
-
-function updateThrottleStatus() {
-  const el = document.getElementById('throttleBar');
-  if (!el || el.style.display === 'none') return;
-  const left = throttle.available;
-  const pct = Math.round((left / 10) * 100);
-  const color = left <= 2 ? 'var(--los)' : left <= 5 ? 'var(--drw)' : 'var(--win)';
-  const secs = Math.max(0, Math.ceil((throttle.resetAt - Date.now()) / 1000));
-  el.innerHTML = `<span class="tb-label">API quota</span>
-    <div class="tb-track"><div class="tb-fill" style="width:${pct}%;background:${color}"></div></div>
-    <span class="tb-count" style="color:${color}">${left}/10 per min</span>
-    <span class="tb-reset">resets in ${secs}s</span>`;
 }
 
 function acquireSlot() {
@@ -703,14 +687,11 @@ async function drainQueue() {
   while (throttle.queue.length) {
     if (throttle.available <= 0) {
       const wait = Math.max(0, throttle.resetAt - Date.now()) + 200;
-      document.getElementById('throttleWait').style.display = 'flex';
       await new Promise(r => setTimeout(r, wait));
-      document.getElementById('throttleWait').style.display = 'none';
       if (throttle.available <= 0) throttle.available = 10;
     }
     const next = throttle.queue.shift();
     throttle.available = Math.max(0, throttle.available - 1);
-    updateThrottleStatus();
     next();
     if (throttle.queue.length) await new Promise(r => setTimeout(r, 150));
   }
@@ -733,7 +714,6 @@ async function apiFetch(path) {
   try { res = await fetch(url, {method:'GET', headers:{'X-Auth-Token':key}}); }
   catch { const e=new Error(); e.code='NETWORK'; throw e; }
   updateThrottle(res.headers);
-  updateThrottleStatus();
   if (res.status===401){const e=new Error();e.code='BAD_KEY';throw e;}
   if (res.status===429){throttle.available=0;const e=new Error();e.code='RATE';throw e;}
   if (!res.ok){const e=new Error();e.code='HTTP_'+res.status;throw e;}
@@ -1089,12 +1069,8 @@ function renderKeyStatus() {
   if (key) {
     el.innerHTML = `<span style="font-size:11px;color:var(--g600);font-weight:600">● Live</span>
       <button class="btn-signout" onclick="clearKey()">Disconnect</button>`;
-    document.getElementById('throttleBar').style.display = 'flex';
-    document.getElementById('apibar').style.display = 'none';
-    updateThrottleStatus();
   } else {
     el.innerHTML = `<button class="btn-auth" onclick="document.getElementById('apibar').style.display='block';document.getElementById('apiKeyInput').focus()">🔑 Add live key</button>`;
-    document.getElementById('throttleBar').style.display = 'none';
     document.getElementById('apibar').style.display = 'none';
   }
 }
@@ -1249,13 +1225,14 @@ function renderTable() {
         const c=teamColor(r.team.name),gd=r.goalDifference;
         const form=getFormForTeam(r.team.name);
         const pts=S.gwSlider&&r._sliderPts!=null?r._sliderPts:r.points;
+        const tla=teamTLA(r.team.name, r.team.tla);
         return `<tr class="${zone}">
           <td><span class="pbadge">${pos}</span></td>
           <td><div class="cc">
             ${r.team.crest
               ?`<img class="crest" src="${r.team.crest}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><div class="cbar" style="background:${c};display:none"></div>`
               :`<div class="cbar" style="background:${c}"></div>`}
-            <span class="cname">${r.team.shortName||r.team.name}</span>
+            <span class="cname">${tla}</span>
           </div></td>
           <td>${r.playedGames}</td>
           <td style="color:var(--win)">${r.won}</td>
@@ -1372,140 +1349,164 @@ async function loadYearlyData(league) {
     }
   } catch(e) { console.warn('Mikami full CSV failed:', e); }
 
-  // Also add fdco recent seasons (2023, 2024)
-  const cur = getCurrentSeason();
-  for (let y = 2023; y <= Math.min(2024, cur - 1); y++) {
-    try {
-      const lk = `hist:${league}:${y}`;
-      let matches;
-      const cached = localStorage.getItem(lk);
-      if (cached) {
-        matches = JSON.parse(cached);
-      } else {
-        const text = await fetchCSV(fdcoUrl(src.fdco, y));
-        matches = parseFdcoCSV(text);
-        try { localStorage.setItem(lk, JSON.stringify(matches)); } catch {}
-      }
-      const standings = matchesToStandings(matches);
-      allData[y] = {};
-      standings.forEach(r => { allData[y][r.team.name] = r.position; });
-    } catch(e) { console.warn(`fdco ${y} failed:`, e); }
-  }
-
   yearlyCache[league] = allData;
   return allData;
 }
+
+// Yearly trend selected clubs (separate from main S.sel)
+let yearlySelected = new Set();
 
 async function renderYearlyTrend() {
   if (chartInst) { chartInst.destroy(); chartInst = null; }
   const src = CSV_MAP[S.league];
   if (!src) {
     show(`<div class="errbox"><h3>Yearly trend: Big 5 only</h3>
-      <p>Historical data is available for Premier League, La Liga, Bundesliga, Serie A, and Ligue 1.</p></div>`);
+      <p>Historical data is only available for Premier League, La Liga, Bundesliga, Serie A, and Ligue 1.</p></div>`);
     return;
   }
 
   show(`<div class="yearly-wrap" style="padding:32px 16px;text-align:center">
-    <div class="spinner" style="width:28px;height:28px;margin:0 auto 12px"></div>
-    <p style="font-size:13px;color:var(--muted)">Loading all seasons… cached after first load.</p>
+    <div class="spinner" style="width:26px;height:26px;margin:0 auto 10px"></div>
+    <p style="font-size:12px;color:var(--muted)">Loading all seasons… cached after first load.</p>
   </div>`);
 
   let data;
   try { data = await loadYearlyData(S.league); }
-  catch(e) {
-    show(`<div class="errbox"><h3>Failed to load yearly data</h3><p>${e.message||e.code||'Unknown'}</p></div>`);
-    return;
-  }
+  catch(e) { show(`<div class="errbox"><h3>Failed to load yearly data</h3><p>${e.message||e.code||'Unknown'}</p></div>`); return; }
+  if (!data || !Object.keys(data).length) { show(`<div class="errbox"><h3>No data found</h3></div>`); return; }
 
-  if (!data || !Object.keys(data).length) {
-    show(`<div class="errbox"><h3>No yearly data</h3><p>Could not parse historical seasons.</p></div>`);
-    return;
-  }
-
-  const years = Object.keys(data).map(Number).sort((a,b) => a - b);
-
-  // All teams that ever appeared, sorted by: most seasons played desc, then best avg position
-  const allTeams = [...new Set(years.flatMap(y => Object.keys(data[y])))];
-  allTeams.sort((a, b) => {
-    const aSeas = years.filter(y => data[y]?.[a]).length;
-    const bSeas = years.filter(y => data[y]?.[b]).length;
-    if (bSeas !== aSeas) return bSeas - aSeas;
-    const aAvg = years.reduce((s,y) => s + (data[y]?.[a]||0), 0) / (aSeas||1);
-    const bAvg = years.reduce((s,y) => s + (data[y]?.[b]||0), 0) / (bSeas||1);
-    return aAvg - bAvg;
+  const years = Object.keys(data).map(Number).sort((a,b)=>a-b);
+  const allTeams = [...new Set(years.flatMap(y=>Object.keys(data[y])))];
+  allTeams.sort((a,b) => {
+    const aN=years.filter(y=>data[y]?.[a]).length, bN=years.filter(y=>data[y]?.[b]).length;
+    if (bN!==aN) return bN-aN;
+    const aA=years.reduce((s,y)=>s+(data[y]?.[a]||0),0)/(aN||1);
+    const bA=years.reduce((s,y)=>s+(data[y]?.[b]||0),0)/(bN||1);
+    return aA-bA;
   });
 
-  // Filter by current team selection if any match
-  const selMatch = allTeams.filter(t => S.sel.has(t));
-  const teams = selMatch.length ? selMatch : allTeams;
+  // Init selection to current standings teams if not yet set for this league
+  if (!yearlySelected.size || ![...yearlySelected].some(t=>allTeams.includes(t))) {
+    yearlySelected = new Set(allTeams.slice(0, Math.min(12, allTeams.length)));
+  }
 
-  // Color function: position 1=green, mid=amber, last=red
+  buildYearlyGrid(data, years, allTeams);
+}
+
+function buildYearlyGrid(data, years, allTeams) {
+  const teams = allTeams.filter(t => yearlySelected.has(t));
+
   function posColor(pos, total) {
-    if (!pos || !total) return null;
-    const r = (pos - 1) / Math.max(total - 1, 1); // 0=best, 1=worst
-    let h, s, l;
-    if (r <= 0.5) {
-      const t = r * 2;
-      h = 142 - (142 - 45) * t;  // green→amber
-      s = 65 + (85 - 65) * t;
-      l = 35 + (48 - 35) * t;
-    } else {
-      const t = (r - 0.5) * 2;
-      h = 45 - 45 * t;           // amber→red
-      s = 85 + (75 - 85) * t;
-      l = 48 + (38 - 48) * t;
-    }
+    if (!pos||!total) return null;
+    const r=(pos-1)/Math.max(total-1,1);
+    let h,s,l;
+    if (r<=0.5){const t=r*2;h=142-(142-45)*t;s=65+(85-65)*t;l=35+(48-35)*t;}
+    else{const t=(r-0.5)*2;h=45-45*t;s=85+(75-85)*t;l=48+(38-48)*t;}
     return `hsl(${Math.round(h)},${Math.round(s)}%,${Math.round(l)}%)`;
   }
-
-  // Text contrast: white for dark bg, dark for light bg
-  function textColor(pos, total) {
-    if (!pos) return 'var(--muted)';
-    const r = (pos - 1) / Math.max(total - 1, 1);
-    return r < 0.15 || r > 0.75 ? '#fff' : '#1a1a1a';
+  function textColor(pos,total){
+    if(!pos)return'var(--muted)';
+    const r=(pos-1)/Math.max(total-1,1);
+    return(r<0.18||r>0.72)?'#fff':'#1a1a1a';
   }
 
-  // Build the table
-  const yearHeaders = years.map(y =>
-    `<th class="yt-head-yr" title="${y-1}–${String(y).slice(2)}">'${String(y).slice(2)}</th>`
-  ).join('');
+  const yearHeaders = years.map(y=>`<th class="yt-head-yr">'${String(y).slice(2)}</th>`).join('');
 
   const rows = teams.map(name => {
+    const tla = teamTLA(name);
     const cells = years.map(y => {
-      const pos = data[y]?.[name];
-      const total = Object.keys(data[y] || {}).length;
+      const pos=data[y]?.[name], total=Object.keys(data[y]||{}).length;
       if (!pos) return `<td class="yt-pos yt-absent" title="${y-1}–${String(y).slice(2)}: not in league">–</td>`;
-      const bg = posColor(pos, total);
-      const fg = textColor(pos, total);
+      const bg=posColor(pos,total), fg=textColor(pos,total);
       return `<td class="yt-pos" style="background:${bg};color:${fg}" title="${y-1}–${String(y).slice(2)}: #${pos} of ${total}">${pos}</td>`;
     }).join('');
-    // Short display name
-    const short = name.replace(/ F\.?C\.?$/i,'').replace(/^(FC|AS|AC|SS|US|SD|RC|RCD|CA|CD) /i,'').trim();
-    return `<tr><td class="yt-club-cell">${short}</td>${cells}</tr>`;
+    return `<tr><td class="yt-club-cell">${tla}</td>${cells}</tr>`;
   }).join('');
 
-  // Legend
-  const lgSteps = [1,5,10,15,20];
-  const lgHtml = lgSteps.map(p => {
-    const bg = posColor(p, 20), fg = textColor(p, 20);
-    return `<span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:22px;border-radius:3px;font-size:11px;font-weight:700;background:${bg};color:${fg}">${p}</span>`;
+  // Checkboxes
+  const cbHtml = allTeams.map(name => {
+    const tla=teamTLA(name), checked=yearlySelected.has(name);
+    return `<label class="ycb ${checked?'checked':''}" onclick="toggleYearlyCb('${name.replace(/'/g,"\\'")}',this)">
+      <input type="checkbox" ${checked?'checked':''} onclick="event.stopPropagation()">
+      ${tla}
+    </label>`;
+  }).join('');
+
+  // Scale legend
+  const scale=[1,5,10,15,20].map(p=>{
+    const bg=posColor(p,20),fg=textColor(p,20);
+    return `<span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:18px;border-radius:3px;font-size:10px;font-weight:700;background:${bg};color:${fg}">${p}</span>`;
   }).join('');
 
   document.getElementById('content').innerHTML = `<div class="vc yearly-wrap">
     <p class="yearly-hint">
-      Final league position per season. Color: <span style="color:var(--win);font-weight:600">■ green = 1st</span> → <span style="color:var(--drw);font-weight:600">■ amber = mid</span> → <span style="color:var(--los);font-weight:600">■ red = last</span>. — means not in this league that year.<br>
-      <span style="display:flex;align-items:center;gap:4px;margin-top:5px;flex-wrap:wrap">Scale: ${lgHtml}</span>
+      Final position per season (Mikami data: 1993–2022). Color: <span style="color:var(--win);font-weight:600">■ 1st</span> → <span style="color:var(--drw);font-weight:600">■ mid</span> → <span style="color:var(--los);font-weight:600">■ last</span>. — = not in this league.
+      Scale: ${scale}
     </p>
+    <div class="yearly-filter">
+      <span class="yearly-filter-label">Clubs:</span>
+      <div class="yearly-filter-btns">
+        <button class="ycb-btn" onclick="yearlySelAll()">Select all</button>
+        <button class="ycb-btn" onclick="yearlySelNone()">Deselect all</button>
+        <button class="ycb-btn" onclick="yearlySelTop(10)">Top 10</button>
+        <button class="ycb-btn" onclick="yearlySelTop(5)">Top 5</button>
+      </div>
+    </div>
+    <div class="yearly-clubs" id="yearlyCbs">${cbHtml}</div>
     <div class="yearly-scroll">
       <table class="yt">
         <thead><tr>
-          <th class="yt-head-club">Club</th>
-          ${yearHeaders}
+          <th class="yt-head-club">Club</th>${yearHeaders}
         </tr></thead>
-        <tbody>${rows}</tbody>
+        <tbody id="ytBody">${rows}</tbody>
       </table>
     </div>
   </div>`;
+
+  // Store data reference for re-renders
+  document.getElementById('content')._ytData = {data, years, allTeams};
+}
+
+function toggleYearlyCb(name, label) {
+  if (yearlySelected.has(name)) yearlySelected.delete(name);
+  else yearlySelected.add(name);
+  label.classList.toggle('checked', yearlySelected.has(name));
+  label.querySelector('input').checked = yearlySelected.has(name);
+  // Re-render just the tbody and checkboxes
+  const ref = document.getElementById('content')._ytData;
+  if (!ref) return;
+  reRenderYearlyBody(ref.data, ref.years, ref.allTeams);
+}
+
+function reRenderYearlyBody(data, years, allTeams) {
+  const teams = allTeams.filter(t=>yearlySelected.has(t));
+  function posColor(pos,total){if(!pos||!total)return null;const r=(pos-1)/Math.max(total-1,1);let h,s,l;if(r<=0.5){const t=r*2;h=142-(142-45)*t;s=65+(85-65)*t;l=35+(48-35)*t;}else{const t=(r-0.5)*2;h=45-45*t;s=85+(75-85)*t;l=48+(38-48)*t;}return`hsl(${Math.round(h)},${Math.round(s)}%,${Math.round(l)}%)`;}
+  function textColor(pos,total){if(!pos)return'var(--muted)';const r=(pos-1)/Math.max(total-1,1);return(r<0.18||r>0.72)?'#fff':'#1a1a1a';}
+  const body = document.getElementById('ytBody');
+  if (body) body.innerHTML = teams.map(name=>{
+    const tla=teamTLA(name);
+    const cells=years.map(y=>{const pos=data[y]?.[name],total=Object.keys(data[y]||{}).length;if(!pos)return`<td class="yt-pos yt-absent">–</td>`;const bg=posColor(pos,total),fg=textColor(pos,total);return`<td class="yt-pos" style="background:${bg};color:${fg}" title="#${pos}">${pos}</td>`;}).join('');
+    return`<tr><td class="yt-club-cell">${tla}</td>${cells}</tr>`;
+  }).join('');
+}
+
+function yearlySelAll() {
+  const ref = document.getElementById('content')._ytData; if (!ref) return;
+  ref.allTeams.forEach(t=>yearlySelected.add(t));
+  document.querySelectorAll('.ycb').forEach(el=>{el.classList.add('checked');el.querySelector('input').checked=true;});
+  reRenderYearlyBody(ref.data, ref.years, ref.allTeams);
+}
+function yearlySelNone() {
+  const ref = document.getElementById('content')._ytData; if (!ref) return;
+  yearlySelected.clear();
+  document.querySelectorAll('.ycb').forEach(el=>{el.classList.remove('checked');el.querySelector('input').checked=false;});
+  reRenderYearlyBody(ref.data, ref.years, ref.allTeams);
+}
+function yearlySelTop(n) {
+  const ref = document.getElementById('content')._ytData; if (!ref) return;
+  yearlySelected = new Set(ref.allTeams.slice(0,n));
+  document.querySelectorAll('.ycb').forEach((el,i)=>{const on=yearlySelected.has(ref.allTeams[i]);el.classList.toggle('checked',on);el.querySelector('input').checked=on;});
+  reRenderYearlyBody(ref.data, ref.years, ref.allTeams);
 }
 
 // ══════════════════════════════════════════════════════════════
