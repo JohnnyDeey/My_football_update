@@ -157,6 +157,7 @@ tbody td:last-child{font-family:var(--fb)}
 .tb-track{flex:1;max-width:120px;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
 .tb-fill{height:100%;border-radius:2px;transition:width .4s,background .4s}
 .tb-count{font-size:11px;font-family:var(--fm);white-space:nowrap}
+.tb-reset{font-size:10px;color:var(--muted);font-family:var(--fm);white-space:nowrap}
 .throttle-wait{display:flex;align-items:center;gap:8px;padding:7px 0;font-size:12px;color:var(--drw);border-top:1px solid var(--border-lt)}
 /* THEME TOGGLE */
 .theme-toggle{background:var(--surface);border:1.5px solid var(--border);border-radius:8px;width:36px;height:36px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
@@ -214,7 +215,7 @@ body.dark .iframe-banner{background:#2a2510;border-color:#5a4a10}
     <!-- Wait indicator: shown when pausing for rate limit reset -->
     <div id="throttleWait" class="throttle-wait" style="display:none">
       <div class="spinner" style="width:16px;height:16px;border-width:2px"></div>
-      <span>Rate limit — resuming in <strong class="tw-secs">60s</strong></span>
+      <span>Rate limit reached — waiting for quota to reset…</span>
     </div>
   </div>
 </header>
@@ -364,28 +365,36 @@ function buildSeasonSelect() {
 }
 
 // ── API + THROTTLE ─────────────────────────────────────────
-// Routes through corsproxy.io to solve CORS (key forwarded to football-data.org only).
-// Reads X-Requests-Available-Minute and X-RequestCounter-Reset headers from every
-// response so we never blindly hit the rate limiter (free tier = 10 req/min).
+// Routes through corsproxy.io to solve CORS.
+// Reads X-Requests-Available-Minute and X-RequestCounter-Reset headers so we
+// never blindly hit the rate limiter (free tier = 10 req/min).
 const PROXY = 'https://corsproxy.io/?';
 
-// Throttle state — updated after every response
 const throttle = {
-  available: 10,      // requests left this minute (pessimistic start)
-  resetInMs: 0,       // ms until the counter resets
-  resetAt: 0,         // absolute timestamp of next reset
-  queue: [],          // pending resolve callbacks
+  available: 10,
+  resetAt: Date.now() + 60000, // first window ends 60s from now
+  queue: [],
   draining: false
 };
 
+// ── Auto-reset timer: ticks every second, resets counter when the window expires.
+// This runs silently in the background regardless of API activity.
+setInterval(() => {
+  if (Date.now() >= throttle.resetAt) {
+    throttle.available = 10;
+    throttle.resetAt = Date.now() + 60000; // next window
+    updateThrottleStatus();
+    // Drain any queued requests that were waiting for the reset
+    if (throttle.queue.length) drainQueue();
+  }
+}, 1000);
+
 function updateThrottle(headers) {
   const avail = headers.get('X-Requests-Available-Minute');
-  const reset = headers.get('X-RequestCounter-Reset'); // seconds until reset
+  const reset = headers.get('X-RequestCounter-Reset');
   if (avail !== null) throttle.available = parseInt(avail);
-  if (reset !== null) {
-    const secs = parseInt(reset);
-    throttle.resetAt = Date.now() + secs * 1000;
-  }
+  // Sync our reset clock to the server's actual window end
+  if (reset !== null) throttle.resetAt = Date.now() + parseInt(reset) * 1000;
 }
 
 function updateThrottleStatus() {
@@ -394,14 +403,17 @@ function updateThrottleStatus() {
   const left = throttle.available;
   const pct = Math.round((left / 10) * 100);
   const color = left <= 2 ? 'var(--los)' : left <= 5 ? 'var(--drw)' : 'var(--win)';
+  const secsLeft = Math.max(0, Math.ceil((throttle.resetAt - Date.now()) / 1000));
   el.innerHTML = `
     <span class="tb-label">API quota</span>
     <div class="tb-track"><div class="tb-fill" style="width:${pct}%;background:${color}"></div></div>
-    <span class="tb-count" style="color:${color}">${left}/10 per min</span>`;
+    <span class="tb-count" style="color:${color}">${left}/10 per min</span>
+    <span class="tb-reset" style="color:var(--muted)">resets in ${secsLeft}s</span>`;
 }
 
-// Returns a promise that resolves when it's safe to fire the next request.
-// If we're out of quota, waits until the reset timestamp.
+// Update the countdown display every second even without API activity
+setInterval(updateThrottleStatus, 1000);
+
 function acquireSlot() {
   return new Promise(resolve => {
     throttle.queue.push(resolve);
@@ -413,33 +425,28 @@ async function drainQueue() {
   if (throttle.draining || !throttle.queue.length) return;
   throttle.draining = true;
   while (throttle.queue.length) {
-    if (throttle.available <= 0 && throttle.resetAt > Date.now()) {
-      const wait = throttle.resetAt - Date.now() + 100; // +100ms buffer
+    if (throttle.available <= 0) {
+      // Wait until the server's minute window resets
+      const wait = Math.max(0, throttle.resetAt - Date.now()) + 200;
       showThrottleWait(wait);
       await new Promise(r => setTimeout(r, wait));
-      throttle.available = 10; // reset assumed after waiting
       hideThrottleWait();
+      // Timer will have reset available to 10 by now, but force it just in case
+      if (throttle.available <= 0) throttle.available = 10;
     }
     const next = throttle.queue.shift();
     throttle.available = Math.max(0, throttle.available - 1);
     updateThrottleStatus();
     next();
-    // Small gap between consecutive requests to stay well under the limit
-    if (throttle.queue.length) await new Promise(r => setTimeout(r, 200));
+    if (throttle.queue.length) await new Promise(r => setTimeout(r, 150));
   }
   throttle.draining = false;
 }
 
 function showThrottleWait(ms) {
-  const secs = Math.ceil(ms / 1000);
   const el = document.getElementById('throttleWait');
-  if (el) { el.style.display = 'flex'; el.querySelector('.tw-secs').textContent = secs + 's'; }
-  // Countdown
-  const interval = setInterval(() => {
-    const remaining = Math.ceil((throttle.resetAt - Date.now()) / 1000);
-    if (el) el.querySelector('.tw-secs').textContent = Math.max(0, remaining) + 's';
-    if (remaining <= 0) clearInterval(interval);
-  }, 500);
+  if (el) el.style.display = 'flex';
+  // The 1s interval on updateThrottleStatus will keep the countdown ticking
 }
 
 function hideThrottleWait() {
@@ -738,7 +745,7 @@ function renderTable() {
           style="${c.sk?'':'cursor:default'}">${c.l}</th>`).join('')}</tr></thead>
       <tbody>${rows.map(r => {
         const pos = r.position;
-        const zone = pos<=lg.ucl?'ucl-row':pos<=uelEnd?'uel-row':pos>relStart?'rel-row':'';
+        const zone = pos<=zones.ucl?'ucl-row':pos<=uelEnd?'uel-row':pos>relStart?'rel-row':'';
         const c = teamColor(r.team.name), gd = r.goalDifference;
         // Get form: prefer match-data (correct GW order), fallback to API string reversed
         const form = S.trends?.mdResults
