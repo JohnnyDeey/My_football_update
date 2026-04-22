@@ -10,7 +10,8 @@
 <meta name="apple-mobile-web-app-title" content="Football">
 <title>Football Analytics</title>
 <link rel="manifest" href="manifest.json">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2315803d'/><text x='50' y='72' font-size='58' text-anchor='middle'>⚽</text></svg>">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
@@ -325,6 +326,7 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
       </div>
       <div class="hdr-r">
         <div id="authArea"></div>
+        <div id="keyStatus"></div>
         <button class="theme-toggle" id="themeToggle" onclick="toggleDark()" title="Toggle dark mode">☀️</button>
       </div>
     </div>
@@ -337,14 +339,15 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
 </header>
 
 <div class="wrap" style="padding-top:18px">
-  <div class="apibar" id="apibar">
+  <div class="apibar" id="apibar" style="display:none">
     <div class="apibar-row">
-      <label for="apiKeyInput">🔑 football-data.org API key</label>
-      <input type="password" id="apiKeyInput" placeholder="Paste your free API key here…" autocomplete="off">
+      <label for="apiKeyInput">🔑 Live data API key</label>
+      <input type="password" id="apiKeyInput" placeholder="football-data.org key for current season…" autocomplete="off">
       <button class="btn-p" onclick="saveKey()">Connect</button>
+      <button class="btn-p" style="background:var(--muted)" onclick="document.getElementById('apibar').style.display='none'">✕</button>
     </div>
     <div class="apibar-hint">
-      Free key at <a href="https://www.football-data.org/client/register" target="_blank">football-data.org/client/register</a> — covers 9 leagues, live standings. Stored in your browser only.
+      Free key at <a href="https://www.football-data.org/client/register" target="_blank">football-data.org/client/register</a> — only needed for the current live season. Historical data works without it.
     </div>
   </div>
 
@@ -1042,9 +1045,19 @@ function renderLeagueTabs() {
 
 function renderKeyStatus() {
   const key = getKey();
-  document.getElementById('apibar').style.display = key ? 'none' : 'block';
-  document.getElementById('throttleBar').style.display = key ? 'flex' : 'none';
-  if (key) updateThrottleStatus();
+  const el = document.getElementById('keyStatus');
+  if (!el) return;
+  if (key) {
+    el.innerHTML = `<span style="font-size:11px;color:var(--g600);font-weight:600">● Live</span>
+      <button class="btn-signout" onclick="clearKey()">Disconnect</button>`;
+    document.getElementById('throttleBar').style.display = 'flex';
+    document.getElementById('apibar').style.display = 'none';
+    updateThrottleStatus();
+  } else {
+    el.innerHTML = `<button class="btn-auth" onclick="document.getElementById('apibar').style.display='block';document.getElementById('apiKeyInput').focus()">🔑 Add live key</button>`;
+    document.getElementById('throttleBar').style.display = 'none';
+    document.getElementById('apibar').style.display = 'none';
+  }
 }
 
 function renderChips() {
@@ -1116,9 +1129,17 @@ function renderContent() {
 
 function renderError(code) {
   if (code==='NO_KEY') {
-    show(`<div class="nokey"><h3>🔑 Connect to football-data.org</h3>
-      <p>Enter your free API key above to load live standings for 9 leagues. Historical data (1993–2024) loads automatically for the Big 5 leagues — no extra key needed.</p>
-      <a href="https://www.football-data.org/client/register" target="_blank">Get your free key →</a></div>`);
+    const hasCsv = !!CSV_MAP[S.league];
+    if (hasCsv) {
+      // Silently fall back to most recent historical season
+      S.season = 2024;
+      buildSeasonSelect();
+      loadData();
+      return;
+    }
+    show(`<div class="nokey"><h3>🔑 Live key needed for this league</h3>
+      <p>Historical data is only available for the Big 5 leagues. To view ${LEAGUES[S.league]?.name||S.league}, add your free API key.</p>
+      <button class="btn-p" style="margin-top:8px" onclick="document.getElementById('apibar').style.display='block'">Add API key</button></div>`);
     return;
   }
   if (code==='NETWORK') {
@@ -1269,6 +1290,18 @@ async function loadData() {
 }
 
 async function loadLiveSeason() {
+  if (!getKey()) {
+    // No key — fall back to most recent historical season if available
+    if (CSV_MAP[S.league]) {
+      S.season = 2024;
+      buildSeasonSelect();
+      await loadHistoricalSeason();
+    } else {
+      S.error = 'NO_KEY';
+      renderContent();
+    }
+    return;
+  }
   S.loading=true; S.error=null; S.standings=null; S.trends=null; S.trendsLoading=false;
   renderContent();
   try {
@@ -1479,12 +1512,8 @@ buildSeasonSelect();
 renderKeyStatus();
 renderAuthArea();
 
-if (getKey()) {
-  loadData();
-} else {
-  S.error='NO_KEY';
-  renderContent();
-}
+// Always load data — historical works without a key, live needs one
+loadData();
 </script>
 </body>
 </html>
