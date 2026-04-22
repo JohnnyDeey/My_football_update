@@ -136,14 +136,21 @@ header{background:var(--card);border-bottom:3px solid var(--g700);position:stick
 .md-val{font-family:var(--fm);font-size:12px;color:var(--g700);font-weight:500;white-space:nowrap;min-width:48px}
 /* TABLE */
 .twrap{overflow-x:auto;border-radius:10px;border:1.5px solid var(--border);box-shadow:var(--sh);-webkit-overflow-scrolling:touch}
-table{width:100%;border-collapse:separate;border-spacing:0;min-width:580px;background:var(--card)}
+table{width:100%;border-collapse:separate;border-spacing:0;min-width:560px;background:var(--card)}
 thead th{background:var(--surface);padding:10px 12px;text-align:right;font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap;border-bottom:1.5px solid var(--border);transition:color .2s}
 thead th:first-child{text-align:center;min-width:44px;cursor:default;position:sticky;left:0;z-index:3;background:var(--surface)}
-thead th:nth-child(2){text-align:left;min-width:150px;position:sticky;left:44px;z-index:3;background:var(--surface);box-shadow:2px 0 6px rgba(0,0,0,.06)}
+thead th:nth-child(2){text-align:left;position:sticky;left:44px;z-index:3;background:var(--surface);box-shadow:2px 0 5px rgba(0,0,0,.07);transition:min-width .2s}
+/* Default (not scrolled): show name — wide column */
+thead th:nth-child(2){min-width:150px}
+tbody td:nth-child(2) .cname{transition:opacity .15s,max-width .2s;opacity:1;max-width:120px;overflow:hidden;white-space:nowrap}
+/* Scrolled: hide name, shrink column to logo only */
+.twrap.scrolled thead th:nth-child(2){min-width:44px}
+.twrap.scrolled tbody td:nth-child(2) .cname{opacity:0;max-width:0;display:none}
+.twrap.scrolled tbody td:nth-child(2) .cc{gap:0}
 thead th:hover{color:var(--g700)}
 thead th.sa::after{content:' ↑';color:var(--g600)}
 thead th.sd::after{content:' ↓';color:var(--g600)}
-tbody tr{border-top:1px solid var(--border-lt);transition:background .12s}
+tbody tr{transition:background .12s}
 tbody tr:hover{background:var(--g50)}
 tbody tr:hover td:first-child,
 tbody tr:hover td:nth-child(2){background:var(--g50)}
@@ -152,7 +159,7 @@ tbody tr.uel-row td:first-child{box-shadow:inset 3px 0 0 var(--uel)}
 tbody tr.rel-row td:first-child{box-shadow:inset 3px 0 0 var(--rel)}
 tbody td{padding:9px 12px;text-align:right;font-size:13px;font-family:var(--fm);border-top:1px solid var(--border-lt)}
 tbody td:first-child{text-align:center;font-family:var(--fb);position:sticky;left:0;z-index:2;background:var(--card)}
-tbody td:nth-child(2){text-align:left;font-family:var(--fb);position:sticky;left:44px;z-index:2;background:var(--card);box-shadow:2px 0 6px rgba(0,0,0,.06)}
+tbody td:nth-child(2){text-align:left;font-family:var(--fb);position:sticky;left:44px;z-index:2;background:var(--card);box-shadow:2px 0 5px rgba(0,0,0,.07)}
 tbody td:last-child{font-family:var(--fb)}
 .pbadge{display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center;border-radius:6px;font-size:12px;font-weight:700;color:var(--muted);font-family:var(--fm)}
 .cc{display:flex;align-items:center;gap:8px}
@@ -182,10 +189,20 @@ body.dark thead th:nth-child(2){background:var(--surface)}
 .chart-scroll::-webkit-scrollbar{height:4px}
 .chart-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 .chart-canvas-wrap{height:360px;min-width:100%}
-/* YEARLY TREND */
-.yearly-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:18px;box-shadow:var(--sh)}
-.yearly-hint{font-size:12px;color:var(--muted);margin-bottom:12px}
-.yearly-loading{display:flex;align-items:center;gap:10px;padding:40px 0;justify-content:center;color:var(--muted);font-size:13px}
+/* YEARLY TREND HEATMAP */
+.yearly-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:16px 0 16px 0;box-shadow:var(--sh)}
+.yearly-hint{font-size:12px;color:var(--muted);margin:0 16px 12px;line-height:1.5}
+.yearly-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding-bottom:6px}
+.yearly-scroll::-webkit-scrollbar{height:4px}
+.yearly-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.yt{border-collapse:separate;border-spacing:2px;font-family:var(--fm)}
+.yt-head-club{position:sticky;left:0;z-index:3;background:var(--card);padding:4px 12px 4px 16px;text-align:left;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;white-space:nowrap;min-width:130px}
+.yt-head-yr{font-size:9px;font-weight:700;color:var(--muted);text-align:center;padding:4px 2px;white-space:nowrap;min-width:30px;letter-spacing:-.3px}
+.yt-club-cell{position:sticky;left:0;z-index:2;background:var(--card);padding:3px 10px 3px 16px;font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;min-width:130px;font-family:var(--fb)}
+.yt-pos{width:30px;height:28px;border-radius:4px;text-align:center;vertical-align:middle;font-size:11px;font-weight:700;cursor:default;padding:0}
+.yt-absent{background:var(--border-lt);color:var(--muted);font-size:10px}
+body.dark .yt-club-cell{background:var(--card)}
+body.dark .yt-head-club{background:var(--card)}
 /* BAR CHART RACE */
 .bcr-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:18px;box-shadow:var(--sh)}
 .bcr-controls{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
@@ -434,7 +451,7 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
         <a href="https://www.football-data.co.uk" target="_blank">football-data.co.uk</a> (historical)
       </div>
       <div>
-        Contact: <a href="mailto:sjohndamilola92@gmail.com">sjohndamilola92@gmail.com</a> ·
+        Contact: <a href="mailto:your@email.com">your@email.com</a> ·
         <a href="#" onclick="showPrivacy();return false">Privacy Policy</a>
       </div>
     </div>
@@ -454,7 +471,7 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
       <li><strong>No tracking:</strong> This app contains no analytics, advertising, or third-party tracking of any kind.</li>
       <li><strong>No data sharing:</strong> Your data is never sold or shared with third parties.</li>
     </ul>
-    <p style="margin-top:12px">Questions? Contact: <a href="mailto:sjohndamilola92@gmail.com">sjohndamilola92@gmail.com</a></p>
+    <p style="margin-top:12px">Questions? Contact: <a href="mailto:your@email.com">your@email.com</a></p>
   </div>
 </div>
 
@@ -1257,6 +1274,13 @@ function renderTable() {
       ${zones.rel>0?`<div class="qi"><div class="qdot" style="background:var(--rel)"></div>Relegation Zone (Bottom ${zones.rel})</div>`:''}
     </div>
   </div>`;
+  // Scroll listener: hide club name when scrolled right, show only logo
+  requestAnimationFrame(() => {
+    const tw = document.querySelector('.twrap');
+    if (tw) tw.addEventListener('scroll', function() {
+      this.classList.toggle('scrolled', this.scrollLeft > 8);
+    }, {passive:true});
+  });
 }
 
 function renderPositionChart() {
@@ -1377,95 +1401,111 @@ async function renderYearlyTrend() {
   const src = CSV_MAP[S.league];
   if (!src) {
     show(`<div class="errbox"><h3>Yearly trend: Big 5 only</h3>
-      <p>Historical season data is available for Premier League, La Liga, Bundesliga, Serie A, and Ligue 1 only.</p></div>`);
+      <p>Historical data is available for Premier League, La Liga, Bundesliga, Serie A, and Ligue 1.</p></div>`);
     return;
   }
 
-  show(`<div class="yearly-wrap">
-    <div class="yearly-loading"><div class="spinner" style="width:24px;height:24px"></div>
-    Loading all seasons… this only happens once.</div></div>`);
+  show(`<div class="yearly-wrap" style="padding:32px 16px;text-align:center">
+    <div class="spinner" style="width:28px;height:28px;margin:0 auto 12px"></div>
+    <p style="font-size:13px;color:var(--muted)">Loading all seasons… cached after first load.</p>
+  </div>`);
 
   let data;
   try { data = await loadYearlyData(S.league); }
-  catch(e) { show(`<div class="errbox"><h3>Failed to load yearly data</h3><p>${e.message||e.code||'Unknown error'}</p></div>`); return; }
-
-  if (!data || !Object.keys(data).length) {
-    show(`<div class="errbox"><h3>No yearly data found</h3><p>Could not parse historical seasons.</p></div>`); return;
+  catch(e) {
+    show(`<div class="errbox"><h3>Failed to load yearly data</h3><p>${e.message||e.code||'Unknown'}</p></div>`);
+    return;
   }
 
-  const years = Object.keys(data).map(Number).sort((a,b)=>a-b);
-  // All teams that ever appeared
-  const allTeams = [...new Set(years.flatMap(y => Object.keys(data[y])))].sort();
-  // Filter to selected teams — but for yearly view use a separate selection
-  const selected = [...S.sel].filter(t => allTeams.includes(t));
-  // If no selected teams match, use current standings teams
-  const teams = selected.length ? selected : allTeams.slice(0,8);
+  if (!data || !Object.keys(data).length) {
+    show(`<div class="errbox"><h3>No yearly data</h3><p>Could not parse historical seasons.</p></div>`);
+    return;
+  }
 
-  const YEAR_W = 36;
-  const minW = Math.max(years.length * YEAR_W, 400);
-  const dark = document.body.classList.contains('dark');
-  const gridColor = dark ? 'rgba(255,255,255,.05)' : 'rgba(0,0,0,.05)';
-  const tickColor = dark ? '#607a68' : '#9ca3af';
-  const borderCol = dark ? '#2d3d32' : '#d2dace';
+  const years = Object.keys(data).map(Number).sort((a,b) => a - b);
+
+  // All teams that ever appeared, sorted by: most seasons played desc, then best avg position
+  const allTeams = [...new Set(years.flatMap(y => Object.keys(data[y])))];
+  allTeams.sort((a, b) => {
+    const aSeas = years.filter(y => data[y]?.[a]).length;
+    const bSeas = years.filter(y => data[y]?.[b]).length;
+    if (bSeas !== aSeas) return bSeas - aSeas;
+    const aAvg = years.reduce((s,y) => s + (data[y]?.[a]||0), 0) / (aSeas||1);
+    const bAvg = years.reduce((s,y) => s + (data[y]?.[b]||0), 0) / (bSeas||1);
+    return aAvg - bAvg;
+  });
+
+  // Filter by current team selection if any match
+  const selMatch = allTeams.filter(t => S.sel.has(t));
+  const teams = selMatch.length ? selMatch : allTeams;
+
+  // Color function: position 1=green, mid=amber, last=red
+  function posColor(pos, total) {
+    if (!pos || !total) return null;
+    const r = (pos - 1) / Math.max(total - 1, 1); // 0=best, 1=worst
+    let h, s, l;
+    if (r <= 0.5) {
+      const t = r * 2;
+      h = 142 - (142 - 45) * t;  // green→amber
+      s = 65 + (85 - 65) * t;
+      l = 35 + (48 - 35) * t;
+    } else {
+      const t = (r - 0.5) * 2;
+      h = 45 - 45 * t;           // amber→red
+      s = 85 + (75 - 85) * t;
+      l = 48 + (38 - 48) * t;
+    }
+    return `hsl(${Math.round(h)},${Math.round(s)}%,${Math.round(l)}%)`;
+  }
+
+  // Text contrast: white for dark bg, dark for light bg
+  function textColor(pos, total) {
+    if (!pos) return 'var(--muted)';
+    const r = (pos - 1) / Math.max(total - 1, 1);
+    return r < 0.15 || r > 0.75 ? '#fff' : '#1a1a1a';
+  }
+
+  // Build the table
+  const yearHeaders = years.map(y =>
+    `<th class="yt-head-yr" title="${y-1}–${String(y).slice(2)}">'${String(y).slice(2)}</th>`
+  ).join('');
+
+  const rows = teams.map(name => {
+    const cells = years.map(y => {
+      const pos = data[y]?.[name];
+      const total = Object.keys(data[y] || {}).length;
+      if (!pos) return `<td class="yt-pos yt-absent" title="${y-1}–${String(y).slice(2)}: not in league">–</td>`;
+      const bg = posColor(pos, total);
+      const fg = textColor(pos, total);
+      return `<td class="yt-pos" style="background:${bg};color:${fg}" title="${y-1}–${String(y).slice(2)}: #${pos} of ${total}">${pos}</td>`;
+    }).join('');
+    // Short display name
+    const short = name.replace(/ F\.?C\.?$/i,'').replace(/^(FC|AS|AC|SS|US|SD|RC|RCD|CA|CD) /i,'').trim();
+    return `<tr><td class="yt-club-cell">${short}</td>${cells}</tr>`;
+  }).join('');
+
+  // Legend
+  const lgSteps = [1,5,10,15,20];
+  const lgHtml = lgSteps.map(p => {
+    const bg = posColor(p, 20), fg = textColor(p, 20);
+    return `<span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:22px;border-radius:3px;font-size:11px;font-weight:700;background:${bg};color:${fg}">${p}</span>`;
+  }).join('');
 
   document.getElementById('content').innerHTML = `<div class="vc yearly-wrap">
-    <p class="yearly-hint">Showing final league position per season. Gaps (—) mean the club was not in this league that year. Use Teams filter to select clubs.</p>
-    <div class="chart-scroll">
-      <div class="chart-canvas-wrap" style="width:${minW}px;height:400px">
-        <canvas id="mc"></canvas>
-      </div>
+    <p class="yearly-hint">
+      Final league position per season. Color: <span style="color:var(--win);font-weight:600">■ green = 1st</span> → <span style="color:var(--drw);font-weight:600">■ amber = mid</span> → <span style="color:var(--los);font-weight:600">■ red = last</span>. — means not in this league that year.<br>
+      <span style="display:flex;align-items:center;gap:4px;margin-top:5px;flex-wrap:wrap">Scale: ${lgHtml}</span>
+    </p>
+    <div class="yearly-scroll">
+      <table class="yt">
+        <thead><tr>
+          <th class="yt-head-club">Club</th>
+          ${yearHeaders}
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
     </div>
   </div>`;
-
-  const labels = years.map(y => `${y-1}–${String(y).slice(2)}`);
-  const datasets = teams.map(name => {
-    const c = teamColor(name);
-    const pts = years.map(y => data[y]?.[name] ?? null); // null = gap in chart
-    return {
-      label: name.replace(/ FC$|( F\.C\.)$/,'').replace('Manchester','Man'),
-      data: pts,
-      borderColor: c, backgroundColor: c+'20',
-      borderWidth: 2, pointRadius: pts.map(v => v!=null ? 4 : 0),
-      pointHoverRadius: 6, pointBackgroundColor: c,
-      tension: 0.3, fill: false,
-      spanGaps: false // breaks line at null = club not in league
-    };
-  });
-
-  chartInst = new Chart(document.getElementById('mc').getContext('2d'), {
-    type:'line', data:{labels, datasets},
-    options:{
-      responsive:true, maintainAspectRatio:false, animation:{duration:400},
-      interaction:{mode:'index', intersect:false},
-      plugins:{
-        legend:{display:teams.length<=12, position:'bottom',
-          labels:{color:tickColor, boxWidth:14, font:{size:11}, padding:10}},
-        tooltip:{
-          backgroundColor:dark?'#1e2922':'#fff',
-          borderColor:dark?'#2d3d32':'#d2dace', borderWidth:1,
-          titleColor:dark?'#607a68':'#6b7280',
-          bodyColor:dark?'#e8f0ea':'#0d1a0c', padding:12,
-          callbacks:{
-            title: ctx => ctx[0].label,
-            label: ctx => {
-              const v = ctx.parsed.y;
-              return `  ${ctx.dataset.label}: ${v!=null ? '#'+v : '— not in league'}`;
-            }
-          }
-        }
-      },
-      scales:{
-        x:{grid:{color:gridColor},
-          ticks:{color:tickColor,font:{size:10},maxRotation:45,autoSkip:true,maxTicksLimit:Math.ceil(years.length/3)},
-          border:{color:borderCol}},
-        y:{reverse:true, min:1,
-          grid:{color:gridColor},
-          ticks:{color:tickColor,font:{size:11},stepSize:1,callback:v=>`#${v}`},
-          border:{color:borderCol},
-          title:{display:true,text:'Final Position',color:tickColor,font:{size:11}}}
-      }
-    }
-  });
 }
 
 // ══════════════════════════════════════════════════════════════
