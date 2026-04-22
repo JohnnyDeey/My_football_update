@@ -281,66 +281,27 @@ const LEAGUES = {
   FL1: {name:'Ligue 1',        flag:'🇫🇷',        ucl:3, uel:3, rel:3}
 };
 
-const COLORS = {
-  'Arsenal FC':'#EF0107','Chelsea FC':'#034694','Liverpool FC':'#C8102E',
-  'Manchester City FC':'#6CABDD','Manchester United FC':'#DA291C',
-  'Tottenham Hotspur FC':'#1C3F6A','Newcastle United FC':'#888',
-  'Aston Villa FC':'#7EC8E3','Brighton & Hove Albion FC':'#0057B8',
-  'West Ham United FC':'#7A263A','Wolverhampton Wanderers FC':'#FDB913',
-  'Crystal Palace FC':'#1B458F','Brentford FC':'#E30613','Fulham FC':'#CC0000',
-  'Everton FC':'#003399','Nottingham Forest FC':'#DD0000',
-  'AFC Bournemouth':'#E63946','Burnley FC':'#6C1D45','Luton Town FC':'#F78F1E',
-  'Sheffield United FC':'#EE2737','Ipswich Town FC':'#0C2340',
-  'Leicester City FC':'#003090','Southampton FC':'#D71920',
-  'Real Madrid CF':'#D4A017','FC Barcelona':'#A50044',
-  'Club Atlético de Madrid':'#CE3524','Girona FC':'#CD1315',
-  'Athletic Club':'#EE2320','Real Betis Balompié':'#00954C',
-  'Real Sociedad de Fútbol':'#0078BF','Villarreal CF':'#D4B800',
-  'CA Osasuna':'#CF2027','Getafe CF':'#0066B3',
-  'RC Celta de Vigo':'#6BACE4','Sevilla FC':'#D01010',
-  'RCD Mallorca':'#E8271A','Valencia CF':'#F7941D',
-  'Rayo Vallecano de Madrid':'#CF0A0A','UD Las Palmas':'#D4B800',
-  'Deportivo Alavés':'#1A5091','Cádiz CF':'#F5C400',
-  'Granada CF':'#CC2200','UD Almería':'#CE2222',
-  'RCD Espanyol de Barcelona':'#004D98','Real Valladolid CF':'#783BB6',
-  'CD Leganés':'#003E8A',
-  'Bayer 04 Leverkusen':'#E32221','FC Bayern München':'#DC052D',
-  'RB Leipzig':'#DD0741','Borussia Dortmund':'#E8C000',
-  'VfB Stuttgart':'#D9271E','Eintracht Frankfurt':'#E1000F',
-  'SC Freiburg':'#E8000F','VfL Wolfsburg':'#65B32E',
-  'TSG 1899 Hoffenheim':'#1463A5','Werder Bremen':'#1D7F24',
-  '1. FSV Mainz 05':'#C0272E','FC Augsburg':'#BA3733',
-  '1. FC Union Berlin':'#EB1923','Borussia Mönchengladbach':'#888',
-  '1. FC Köln':'#F05A22','1. FC Heidenheim 1846':'#CE1620',
-  'VfL Bochum 1848':'#005CA8','SV Darmstadt 98':'#004A9C',
-  'Holstein Kiel':'#003DA5','FC St. Pauli 1910':'#7B3F00',
-  'Inter Milan':'#0068A8','AC Milan':'#FB090B','Juventus FC':'#444',
-  'SSC Napoli':'#12A0C3','Atalanta BC':'#1C4EA1','AS Roma':'#8B1A1A',
-  'SS Lazio':'#5BB8D4','ACF Fiorentina':'#7B1FA2','Bologna FC 1909':'#C8102E',
-  'Torino FC':'#850100','AC Monza':'#F00','Genoa CFC':'#A50000',
-  'Udinese Calcio':'#777','US Sassuolo Calcio':'#00623A','US Lecce':'#D4B800',
-  'Cagliari Calcio':'#CC0000','Hellas Verona FC':'#003DA5',
-  'Empoli FC':'#0052A5','Frosinone Calcio':'#D4B800',
-  'US Salernitana 1919':'#841C24','Venezia FC':'#FF671F',
-  'Como 1907':'#2C6ABC','Parma Calcio 1913':'#C8B400',
-  'Paris Saint-Germain FC':'#004170','AS Monaco FC':'#D4000C',
-  'Stade Brestois 29':'#DD0000','LOSC Lille':'#E32419',
-  'OGC Nice':'#CC0000','Olympique Lyonnais':'#0067A5',
-  'RC Lens':'#D4B800','Olympique de Marseille':'#2FAEE0',
-  'Stade Rennais FC 1901':'#E30613','Toulouse FC':'#6B0066',
-  'Stade de Reims':'#E41A23','FC Nantes':'#D4B800',
-  'RC Strasbourg Alsace':'#003189','Montpellier HSC':'#F7941D',
-  'Le Havre AC':'#003189','FC Metz':'#8B0000',
-  'FC Lorient':'#F7941D','Clermont Foot 63':'#CC2200',
-  'Angers SCO':'#222','AJ Auxerre':'#0F3D91','AS Saint-Étienne':'#2F7D3B'
-};
 
+// ── COLORS ─────────────────────────────────────────────────
+// Fully dynamic — no hardcoded team list.
+// Colors are derived deterministically from the team name so they are
+// stable and consistent across sessions without any manual maintenance.
+// The API already provides official club crests which are used in the table;
+// these generated colors are used for chart lines and filter chips only.
+const colorCache = {};
 function teamColor(name) {
-  if (COLORS[name]) return COLORS[name];
+  if (colorCache[name]) return colorCache[name];
+  // Hash the name to get a stable hue
   let h = 0;
   for (let i = 0; i < name.length; i++) h = name.charCodeAt(i) + ((h << 5) - h);
-  return `hsl(${Math.abs(h) % 360},55%,42%)`;
+  // Use high saturation and mid-low lightness so colors are vivid but readable
+  const hue = Math.abs(h) % 360;
+  const sat = 55 + (Math.abs(h >> 8) % 20); // 55–74%
+  const lit = 38 + (Math.abs(h >> 16) % 14); // 38–51%
+  colorCache[name] = `hsl(${hue},${sat}%,${lit}%)`;
+  return colorCache[name];
 }
+
 
 // ── SEASONS ────────────────────────────────────────────────
 // Fully dynamic — auto-includes new seasons without any code change
