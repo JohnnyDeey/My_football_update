@@ -132,22 +132,24 @@ header{background:var(--card);border-bottom:3px solid var(--g700);position:stick
 .md-slider{flex:1;accent-color:var(--g600);min-width:80px}
 .md-val{font-family:var(--fm);font-size:12px;color:var(--g700);font-weight:500;white-space:nowrap;min-width:48px}
 /* TABLE */
-.twrap{overflow-x:auto;border-radius:10px;border:1.5px solid var(--border);box-shadow:var(--sh)}
-table{width:100%;border-collapse:collapse;min-width:580px;background:var(--card)}
+.twrap{overflow-x:auto;border-radius:10px;border:1.5px solid var(--border);box-shadow:var(--sh);-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:separate;border-spacing:0;min-width:580px;background:var(--card)}
 thead th{background:var(--surface);padding:10px 12px;text-align:right;font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap;border-bottom:1.5px solid var(--border);transition:color .2s}
-thead th:first-child{text-align:center;min-width:44px;cursor:default}
-thead th:nth-child(2){text-align:left;min-width:155px}
+thead th:first-child{text-align:center;min-width:44px;cursor:default;position:sticky;left:0;z-index:3;background:var(--surface)}
+thead th:nth-child(2){text-align:left;min-width:150px;position:sticky;left:44px;z-index:3;background:var(--surface);box-shadow:2px 0 6px rgba(0,0,0,.06)}
 thead th:hover{color:var(--g700)}
 thead th.sa::after{content:' ↑';color:var(--g600)}
 thead th.sd::after{content:' ↓';color:var(--g600)}
 tbody tr{border-top:1px solid var(--border-lt);transition:background .12s}
 tbody tr:hover{background:var(--g50)}
+tbody tr:hover td:first-child,
+tbody tr:hover td:nth-child(2){background:var(--g50)}
 tbody tr.ucl-row td:first-child{box-shadow:inset 3px 0 0 var(--ucl)}
 tbody tr.uel-row td:first-child{box-shadow:inset 3px 0 0 var(--uel)}
 tbody tr.rel-row td:first-child{box-shadow:inset 3px 0 0 var(--rel)}
-tbody td{padding:9px 12px;text-align:right;font-size:13px;font-family:var(--fm)}
-tbody td:first-child{text-align:center;font-family:var(--fb)}
-tbody td:nth-child(2){text-align:left;font-family:var(--fb)}
+tbody td{padding:9px 12px;text-align:right;font-size:13px;font-family:var(--fm);border-top:1px solid var(--border-lt)}
+tbody td:first-child{text-align:center;font-family:var(--fb);position:sticky;left:0;z-index:2;background:var(--card)}
+tbody td:nth-child(2){text-align:left;font-family:var(--fb);position:sticky;left:44px;z-index:2;background:var(--card);box-shadow:2px 0 6px rgba(0,0,0,.06)}
 tbody td:last-child{font-family:var(--fb)}
 .pbadge{display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center;border-radius:6px;font-size:12px;font-weight:700;color:var(--muted);font-family:var(--fm)}
 .cc{display:flex;align-items:center;gap:8px}
@@ -163,10 +165,24 @@ tbody td:last-child{font-family:var(--fb)}
 body.dark .fb.W{background:rgba(74,222,128,.15);color:#4ade80;border-color:rgba(74,222,128,.3)}
 body.dark .fb.D{background:rgba(251,191,36,.15);color:#fbbf24;border-color:rgba(251,191,36,.3)}
 body.dark .fb.L{background:rgba(248,113,113,.15);color:#f87171;border-color:rgba(248,113,113,.3)}
+body.dark tbody td:first-child,
+body.dark tbody td:nth-child(2){background:var(--card)}
+body.dark tbody tr:hover td:first-child,
+body.dark tbody tr:hover td:nth-child(2){background:var(--g50)}
+body.dark thead th:first-child,
+body.dark thead th:nth-child(2){background:var(--surface)}
 .gp{color:var(--win)}.gn{color:var(--los)}
 .pts-cell{font-weight:700!important;font-size:14px!important}
-/* CHART */
-.cwrap{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:18px;height:480px;box-shadow:var(--sh)}
+/* CHART — scrollable on mobile */
+.cwrap{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:18px;box-shadow:var(--sh)}
+.chart-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.chart-scroll::-webkit-scrollbar{height:4px}
+.chart-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.chart-canvas-wrap{height:360px;min-width:100%}
+/* YEARLY TREND */
+.yearly-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:18px;box-shadow:var(--sh)}
+.yearly-hint{font-size:12px;color:var(--muted);margin-bottom:12px}
+.yearly-loading{display:flex;align-items:center;gap:10px;padding:40px 0;justify-content:center;color:var(--muted);font-size:13px}
 /* BAR CHART RACE */
 .bcr-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:18px;box-shadow:var(--sh)}
 .bcr-controls{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
@@ -396,7 +412,8 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
     <div class="vtabs">
       <button class="vtab active" onclick="setView('table')">📊 Standings</button>
       <button class="vtab" onclick="setView('race')">🏁 Bar Race</button>
-      <button class="vtab" onclick="setView('position')">📉 Position Trend</button>
+      <button class="vtab" onclick="setView('position')">📉 Season Trend</button>
+      <button class="vtab" onclick="setView('yearly')">📆 Yearly Trend</button>
     </div>
     <div id="mdSliderWrap" style="display:none"></div>
   </div>
@@ -414,7 +431,7 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
         <a href="https://www.football-data.co.uk" target="_blank">football-data.co.uk</a> (historical)
       </div>
       <div>
-        Contact: <a href="mailto:your@email.com">your@email.com</a> ·
+        Contact: <a href="mailto:sjohndamilola92@gmail.com">sjohndamilola92@gmail.com</a> ·
         <a href="#" onclick="showPrivacy();return false">Privacy Policy</a>
       </div>
     </div>
@@ -434,7 +451,7 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
       <li><strong>No tracking:</strong> This app contains no analytics, advertising, or third-party tracking of any kind.</li>
       <li><strong>No data sharing:</strong> Your data is never sold or shared with third parties.</li>
     </ul>
-    <p style="margin-top:12px">Questions? Contact: <a href="mailto:your@email.com">your@email.com</a></p>
+    <p style="margin-top:12px">Questions? Contact: <a href="mailto:sjohndamilola92@gmail.com">sjohndamilola92@gmail.com</a></p>
   </div>
 </div>
 
@@ -1124,6 +1141,7 @@ function renderContent() {
   }
   if (S.view==='table')    renderTable();
   else if (S.view==='race') renderBarRace();
+  else if (S.view==='yearly') renderYearlyTrend();
   else                     renderPositionChart();
 }
 
@@ -1243,34 +1261,203 @@ function renderPositionChart() {
     if (!S.trendsLoading) loadTrends();
     return;
   }
-  document.getElementById('content').innerHTML=`<div class="vc"><div class="cwrap"><canvas id="mc"></canvas></div></div>`;
-  const dark=document.body.classList.contains('dark');
-  const gridColor=()=>dark?'rgba(255,255,255,.05)':'rgba(0,0,0,.05)';
-  const tickColor=()=>dark?'#607a68':'#9ca3af';
-  const borderColor=()=>dark?'#2d3d32':'#d2dace';
-  const {labels,posH}=S.trends;
-  const datasets=S.standings.filter(r=>S.sel.has(r.team.name)).map(r=>{
-    const n=r.team.name,c=teamColor(n);
-    return {label:r.team.shortName||n,data:posH[n]||[],borderColor:c,backgroundColor:c+'15',
-      borderWidth:2.5,pointRadius:0,pointHoverRadius:5,tension:0.35,fill:false};
+  const dark = document.body.classList.contains('dark');
+  const gridColor  = dark ? 'rgba(255,255,255,.05)' : 'rgba(0,0,0,.05)';
+  const tickColor  = dark ? '#607a68' : '#9ca3af';
+  const borderCol  = dark ? '#2d3d32' : '#d2dace';
+  const {labels, posH} = S.trends;
+  const GWS = labels.length;
+  // Each GW gets at least 28px — makes the chart scrollable on mobile
+  const GW_WIDTH = 28;
+  const minW = Math.max(GWS * GW_WIDTH, 320);
+
+  document.getElementById('content').innerHTML = `<div class="vc cwrap">
+    <div class="chart-scroll">
+      <div class="chart-canvas-wrap" style="width:${minW}px">
+        <canvas id="mc"></canvas>
+      </div>
+    </div>
+  </div>`;
+
+  const datasets = S.standings.filter(r => S.sel.has(r.team.name)).map(r => {
+    const n = r.team.name, c = teamColor(n);
+    return {label:r.team.shortName||n, data:posH[n]||[], borderColor:c,
+      backgroundColor:c+'15', borderWidth:2.5, pointRadius:0,
+      pointHoverRadius:5, tension:0.35, fill:false};
   });
-  chartInst=new Chart(document.getElementById('mc').getContext('2d'),{
-    type:'line',data:{labels,datasets},
-    options:{responsive:true,maintainAspectRatio:false,animation:{duration:300},
-      interaction:{mode:'index',intersect:false},
-      plugins:{legend:{display:false},tooltip:{
-        backgroundColor:()=>dark?'#1e2922':'#fff',
-        borderColor:()=>dark?'#2d3d32':'#d2dace',borderWidth:1,
-        titleColor:()=>dark?'#607a68':'#6b7280',
-        bodyColor:()=>dark?'#e8f0ea':'#0d1a0c',padding:12,
-        callbacks:{title:ctx=>ctx[0].label,label:ctx=>`  ${ctx.dataset.label}: #${ctx.parsed.y}`}
+
+  chartInst = new Chart(document.getElementById('mc').getContext('2d'), {
+    type:'line', data:{labels, datasets},
+    options:{
+      responsive:true, maintainAspectRatio:false, animation:{duration:300},
+      interaction:{mode:'index', intersect:false},
+      plugins:{legend:{display:false}, tooltip:{
+        backgroundColor:dark?'#1e2922':'#fff',
+        borderColor:dark?'#2d3d32':'#d2dace', borderWidth:1,
+        titleColor:dark?'#607a68':'#6b7280',
+        bodyColor:dark?'#e8f0ea':'#0d1a0c', padding:12,
+        callbacks:{title:ctx=>ctx[0].label, label:ctx=>`  ${ctx.dataset.label}: #${ctx.parsed.y}`}
       }},
       scales:{
-        x:{grid:{color:gridColor},ticks:{color:tickColor,font:{size:11},maxTicksLimit:12},border:{color:borderColor}},
-        y:{reverse:true,grid:{color:gridColor},
+        x:{grid:{color:gridColor}, ticks:{color:tickColor, font:{size:10}, maxRotation:0, autoSkip:true, maxTicksLimit:Math.ceil(GWS/5)}, border:{color:borderCol}},
+        y:{reverse:true, grid:{color:gridColor},
+          ticks:{color:tickColor, font:{size:11}, stepSize:1, callback:v=>`#${v}`},
+          border:{color:borderCol},
+          title:{display:true, text:'League Position', color:tickColor, font:{size:11}}}
+      }
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// YEARLY TREND
+// ══════════════════════════════════════════════════════════════
+// yearlyCache[league] = { year: { teamName: finalPosition } }
+const yearlyCache = {};
+
+async function loadYearlyData(league) {
+  if (yearlyCache[league]) return yearlyCache[league];
+  const src = CSV_MAP[league];
+  if (!src) return null;
+
+  // Parse ALL years from single mikami file (most efficient)
+  let allData = {};
+  try {
+    const text = await fetchCSV(MIKAMI + src.mikami);
+    // Group by season end year
+    const byYear = {};
+    for (const line of text.split('\n').slice(1)) {
+      const c = line.split(',');
+      if (c.length < 8) continue;
+      const yr = parseInt(c[0]);
+      if (isNaN(yr)) continue;
+      (byYear[yr] = byYear[yr] || []).push(line);
+    }
+    // For each year, compute final standings
+    for (const [yr, lines] of Object.entries(byYear)) {
+      const header = 'Season_End_Year,Date,HomeTeam,HomeTeamJP,AwayTeam,AwayTeamJP,HomeGoals,AwayGoals,Result\n';
+      const matches = parseMikamiCSV(header + lines.join('\n'), parseInt(yr));
+      const standings = matchesToStandings(matches);
+      allData[yr] = {};
+      standings.forEach(r => { allData[yr][r.team.name] = r.position; });
+    }
+  } catch(e) { console.warn('Mikami full CSV failed:', e); }
+
+  // Also add fdco recent seasons (2023, 2024)
+  const cur = getCurrentSeason();
+  for (let y = 2023; y <= Math.min(2024, cur - 1); y++) {
+    try {
+      const lk = `hist:${league}:${y}`;
+      let matches;
+      const cached = localStorage.getItem(lk);
+      if (cached) {
+        matches = JSON.parse(cached);
+      } else {
+        const text = await fetchCSV(fdcoUrl(src.fdco, y));
+        matches = parseFdcoCSV(text);
+        try { localStorage.setItem(lk, JSON.stringify(matches)); } catch {}
+      }
+      const standings = matchesToStandings(matches);
+      allData[y] = {};
+      standings.forEach(r => { allData[y][r.team.name] = r.position; });
+    } catch(e) { console.warn(`fdco ${y} failed:`, e); }
+  }
+
+  yearlyCache[league] = allData;
+  return allData;
+}
+
+async function renderYearlyTrend() {
+  if (chartInst) { chartInst.destroy(); chartInst = null; }
+  const src = CSV_MAP[S.league];
+  if (!src) {
+    show(`<div class="errbox"><h3>Yearly trend: Big 5 only</h3>
+      <p>Historical season data is available for Premier League, La Liga, Bundesliga, Serie A, and Ligue 1 only.</p></div>`);
+    return;
+  }
+
+  show(`<div class="yearly-wrap">
+    <div class="yearly-loading"><div class="spinner" style="width:24px;height:24px"></div>
+    Loading all seasons… this only happens once.</div></div>`);
+
+  let data;
+  try { data = await loadYearlyData(S.league); }
+  catch(e) { show(`<div class="errbox"><h3>Failed to load yearly data</h3><p>${e.message||e.code||'Unknown error'}</p></div>`); return; }
+
+  if (!data || !Object.keys(data).length) {
+    show(`<div class="errbox"><h3>No yearly data found</h3><p>Could not parse historical seasons.</p></div>`); return;
+  }
+
+  const years = Object.keys(data).map(Number).sort((a,b)=>a-b);
+  // All teams that ever appeared
+  const allTeams = [...new Set(years.flatMap(y => Object.keys(data[y])))].sort();
+  // Filter to selected teams — but for yearly view use a separate selection
+  const selected = [...S.sel].filter(t => allTeams.includes(t));
+  // If no selected teams match, use current standings teams
+  const teams = selected.length ? selected : allTeams.slice(0,8);
+
+  const YEAR_W = 36;
+  const minW = Math.max(years.length * YEAR_W, 400);
+  const dark = document.body.classList.contains('dark');
+  const gridColor = dark ? 'rgba(255,255,255,.05)' : 'rgba(0,0,0,.05)';
+  const tickColor = dark ? '#607a68' : '#9ca3af';
+  const borderCol = dark ? '#2d3d32' : '#d2dace';
+
+  document.getElementById('content').innerHTML = `<div class="vc yearly-wrap">
+    <p class="yearly-hint">Showing final league position per season. Gaps (—) mean the club was not in this league that year. Use Teams filter to select clubs.</p>
+    <div class="chart-scroll">
+      <div class="chart-canvas-wrap" style="width:${minW}px;height:400px">
+        <canvas id="mc"></canvas>
+      </div>
+    </div>
+  </div>`;
+
+  const labels = years.map(y => `${y-1}–${String(y).slice(2)}`);
+  const datasets = teams.map(name => {
+    const c = teamColor(name);
+    const pts = years.map(y => data[y]?.[name] ?? null); // null = gap in chart
+    return {
+      label: name.replace(/ FC$|( F\.C\.)$/,'').replace('Manchester','Man'),
+      data: pts,
+      borderColor: c, backgroundColor: c+'20',
+      borderWidth: 2, pointRadius: pts.map(v => v!=null ? 4 : 0),
+      pointHoverRadius: 6, pointBackgroundColor: c,
+      tension: 0.3, fill: false,
+      spanGaps: false // breaks line at null = club not in league
+    };
+  });
+
+  chartInst = new Chart(document.getElementById('mc').getContext('2d'), {
+    type:'line', data:{labels, datasets},
+    options:{
+      responsive:true, maintainAspectRatio:false, animation:{duration:400},
+      interaction:{mode:'index', intersect:false},
+      plugins:{
+        legend:{display:teams.length<=12, position:'bottom',
+          labels:{color:tickColor, boxWidth:14, font:{size:11}, padding:10}},
+        tooltip:{
+          backgroundColor:dark?'#1e2922':'#fff',
+          borderColor:dark?'#2d3d32':'#d2dace', borderWidth:1,
+          titleColor:dark?'#607a68':'#6b7280',
+          bodyColor:dark?'#e8f0ea':'#0d1a0c', padding:12,
+          callbacks:{
+            title: ctx => ctx[0].label,
+            label: ctx => {
+              const v = ctx.parsed.y;
+              return `  ${ctx.dataset.label}: ${v!=null ? '#'+v : '— not in league'}`;
+            }
+          }
+        }
+      },
+      scales:{
+        x:{grid:{color:gridColor},
+          ticks:{color:tickColor,font:{size:10},maxRotation:45,autoSkip:true,maxTicksLimit:Math.ceil(years.length/3)},
+          border:{color:borderCol}},
+        y:{reverse:true, min:1,
+          grid:{color:gridColor},
           ticks:{color:tickColor,font:{size:11},stepSize:1,callback:v=>`#${v}`},
-          border:{color:borderColor},
-          title:{display:true,text:'League Position',color:tickColor,font:{size:11}}}
+          border:{color:borderCol},
+          title:{display:true,text:'Final Position',color:tickColor,font:{size:11}}}
       }
     }
   });
@@ -1366,7 +1553,7 @@ function setView(v) {
   S.view=v;
   if (v!=='race') { bcr.playing=false; clearTimeout(bcr.timer); }
   document.querySelectorAll('.vtab').forEach((b,i)=>
-    b.classList.toggle('active',['table','race','position'][i]===v));
+    b.classList.toggle('active',['table','race','position','yearly'][i]===v));
   renderContent();
 }
 
