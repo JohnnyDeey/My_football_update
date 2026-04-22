@@ -314,13 +314,22 @@ function buildSeasonSelect() {
   const sel = document.getElementById('ssel');
   const cur = getCurrentSeason();
   sel.innerHTML = '';
-  for (let y = cur; y >= 2015; y--) {
+  // Free tier of football-data.org only covers the current season.
+  // Past seasons return 403. We show them as disabled with a label.
+  const opt = document.createElement('option');
+  opt.value = cur;
+  opt.textContent = `${cur}–${String(cur+1).slice(2)} (current)`;
+  sel.appendChild(opt);
+  // Add past seasons as disabled so the user understands they exist but need a paid plan
+  for (let y = cur-1; y >= 2015; y--) {
     const o = document.createElement('option');
     o.value = y;
-    o.textContent = `${y}–${String(y + 1).slice(2)}`;
-    if (y === S.season) o.selected = true;
+    o.textContent = `${y}–${String(y+1).slice(2)} — paid plan only`;
+    o.disabled = true;
     sel.appendChild(o);
   }
+  sel.value = cur;
+  S.season = cur;
 }
 
 // ── API + CACHE ────────────────────────────────────────────
@@ -385,9 +394,10 @@ function buildTrends(matches, teamNames) {
   const pts = {}, gd = {}, gf = {};
   teamNames.forEach(n => { pts[n]=0; gd[n]=0; gf[n]=0; });
   const ptsH = {}, posH = {};
-  // mdResults[team][md] = 'W'|'D'|'L'
-  const mdResults = {};
-  teamNames.forEach(n => { ptsH[n]=[]; posH[n]=[]; mdResults[n]={}; });
+  // teamResults[team] = flat list of results oldest→newest, one entry per match played
+  // mdResults[team][md] = 'W'|'D'|'L' (for GW range queries)
+  const teamResults = {}, mdResults = {};
+  teamNames.forEach(n => { ptsH[n]=[]; posH[n]=[]; teamResults[n]=[]; mdResults[n]={}; });
   const labels = [];
 
   for (const md of mds) {
@@ -398,16 +408,20 @@ function buildTrends(matches, teamNames) {
       pts[h]=pts[h]||0; pts[a]=pts[a]||0;
       gd[h]=gd[h]||0;  gd[a]=gd[a]||0;
       gf[h]=gf[h]||0;  gf[a]=gf[a]||0;
-      if (hs>as2)       { pts[h]+=3; if(mdResults[h]) mdResults[h][md]='W'; if(mdResults[a]) mdResults[a][md]='L'; }
-      else if (as2>hs)  { pts[a]+=3; if(mdResults[a]) mdResults[a][md]='W'; if(mdResults[h]) mdResults[h][md]='L'; }
-      else              { pts[h]++;  pts[a]++;  if(mdResults[h]) mdResults[h][md]='D'; if(mdResults[a]) mdResults[a][md]='D'; }
+      let rh, ra;
+      if (hs>as2)      { pts[h]+=3; rh='W'; ra='L'; }
+      else if (as2>hs) { pts[a]+=3; rh='L'; ra='W'; }
+      else             { pts[h]++; pts[a]++; rh='D'; ra='D'; }
       gd[h]+=hs-as2; gd[a]+=as2-hs; gf[h]+=hs; gf[a]+=as2;
+      // Store in both flat list and indexed by matchday
+      if (teamResults[h]) { teamResults[h].push(rh); mdResults[h][md]=rh; }
+      if (teamResults[a]) { teamResults[a].push(ra); mdResults[a][md]=ra; }
     });
     const sorted=[...teamNames].sort((a,b)=>(pts[b]||0)-(pts[a]||0)||(gd[b]||0)-(gd[a]||0)||(gf[b]||0)-(gf[a]||0));
     teamNames.forEach(n=>{ ptsH[n].push(pts[n]||0); posH[n].push(sorted.indexOf(n)+1); });
     labels.push(`GW ${md}`);
   }
-  return {ptsH, posH, labels, mdResults, mds};
+  return {ptsH, posH, labels, teamResults, mdResults, mds};
 }
 
 // ── STATE ──────────────────────────────────────────────────
@@ -423,23 +437,19 @@ const S = {
 };
 
 // ── FORM HELPERS ───────────────────────────────────────────
-// Returns form array oldest→newest for display left-to-right
+// Returns form array oldest→newest, guaranteed N entries where available
 function getFormForTeam(teamName) {
-  // Prefer computed match data (accurate order & GW range support)
-  if (S.trends?.mdResults) {
-    const {mdResults, mds} = S.trends;
-    let relevantMds;
+  if (S.trends?.teamResults) {
+    const flat = S.trends.teamResults[teamName] || []; // already oldest→newest
+    if (S.formMode === 'last') return flat.slice(-S.formCount);
+    if (S.formMode === 'all')  return flat;
     if (S.formMode === 'range' && S.gwFrom != null && S.gwTo != null) {
-      relevantMds = mds.filter(md => md >= S.gwFrom && md <= S.gwTo);
-    } else {
-      relevantMds = mds; // all played matchdays, oldest first
-      if (S.formMode === 'last') relevantMds = relevantMds.slice(-S.formCount);
+      const {mdResults, mds} = S.trends;
+      return mds
+        .filter(md => md >= S.gwFrom && md <= S.gwTo && mdResults[teamName]?.[md])
+        .map(md => mdResults[teamName][md]);
     }
-    return relevantMds
-      .filter(md => mdResults[teamName]?.[md])
-      .map(md => mdResults[teamName][md]);
   }
-  // Fallback to API form string (reverse since API gives newest-first)
   return [];
 }
 
@@ -555,9 +565,10 @@ function renderError(code) {
     return;
   }
   const msgs = {
-    BAD_KEY: ['Invalid API key', 'Please double-check your key and try connecting again.'],
-    RATE:    ['Rate limit reached', 'Free tier allows 10 requests/minute. Wait a moment then try again.'],
-    NO_DATA: ['No data for this season', 'This league may not have data for the selected season yet.'],
+    BAD_KEY:  ['Invalid API key', 'Please double-check your key and try connecting again.'],
+    RATE:     ['Rate limit reached', 'Free tier allows 10 requests/minute. Wait a moment then try again.'],
+    NO_DATA:  ['No data for this season', 'This league may not have data for the selected season yet.'],
+    HTTP_403: ['Past seasons need a paid plan', 'football-data.org\'s free tier only covers the current season. To access historical data, you would need their Standard plan (€10/month) at football-data.org.'],
   };
   const [title, detail] = msgs[code] || ['Something went wrong', `Code: ${code}`];
   show(`<div class="errbox"><h3>${title}</h3><p>${detail}</p>
