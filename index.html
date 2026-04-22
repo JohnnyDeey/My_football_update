@@ -17,6 +17,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+<!-- config.js is gitignored — contains your Firebase credentials -->
+<!-- Copy config.example.js → config.js and fill in your values -->
+<script src="config.js" onerror="console.warn('config.js not found — Firebase sync disabled')"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -431,7 +434,7 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
         <a href="https://www.football-data.co.uk" target="_blank">football-data.co.uk</a> (historical)
       </div>
       <div>
-        Contact: <a href="mailto:sjohndamilola92@gmail.com">sjohndamilola92@gmail.com</a> ·
+        Contact: <a href="mailto:your@email.com">your@email.com</a> ·
         <a href="#" onclick="showPrivacy();return false">Privacy Policy</a>
       </div>
     </div>
@@ -451,7 +454,7 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
       <li><strong>No tracking:</strong> This app contains no analytics, advertising, or third-party tracking of any kind.</li>
       <li><strong>No data sharing:</strong> Your data is never sold or shared with third parties.</li>
     </ul>
-    <p style="margin-top:12px">Questions? Contact: <a href="mailto:sjohndamilola92@gmail.com">sjohndamilola92@gmail.com</a></p>
+    <p style="margin-top:12px">Questions? Contact: <a href="mailto:your@email.com">your@email.com</a></p>
   </div>
 </div>
 
@@ -459,34 +462,36 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
 // ══════════════════════════════════════════════════════════════
 // FIREBASE
 // ══════════════════════════════════════════════════════════════
-const firebaseConfig = {
-  apiKey: "AIzaSyCeV1kVNRNFb7SWUR1V3CgBAkmT-ECLGPk",
-  authDomain: "football-analytics-26e72.firebaseapp.com",
-  projectId: "football-analytics-26e72",
-  storageBucket: "football-analytics-26e72.firebasestorage.app",
-  messagingSenderId: "458729335310",
-  appId: "1:458729335310:web:5861c5d69493c52ee0ea5f"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
-// Enable offline persistence so cached data works without internet
-db.enablePersistence({synchronizeTabs:true}).catch(e => {
-  if (e.code === 'failed-precondition') console.log('Multiple tabs open — offline sync limited');
-});
+// Firebase config loaded from config.js (gitignored — never commit this file)
+// Copy config.example.js → config.js and fill in your values
+const _cfg = window.FIREBASE_CONFIG || null;
+let auth = null, db = null;
+if (_cfg) {
+  firebase.initializeApp(_cfg);
+  auth = firebase.auth();
+  db = firebase.firestore();
+  db.enablePersistence({synchronizeTabs:true}).catch(e => {
+    if (e.code === 'failed-precondition') console.log('Multiple tabs — offline sync limited');
+  });
+} else {
+  console.warn('No Firebase config — sync disabled. See config.example.js');
+}
 
 let currentUser = null;
-auth.onAuthStateChanged(user => {
-  currentUser = user;
-  renderAuthArea();
-  if (user) showSyncBanner();
-});
+if (auth) {
+  auth.onAuthStateChanged(user => {
+    currentUser = user;
+    renderAuthArea();
+    if (user) showSyncBanner();
+  });
+}
 
 function signIn() {
+  if (!auth) { alert('Firebase not configured. See config.example.js'); return; }
   const provider = new firebase.auth.GoogleAuthProvider();
   auth.signInWithPopup(provider).catch(e => console.error('Sign in failed:', e));
 }
-function signOut() { auth.signOut(); }
+function signOut() { if (auth) auth.signOut(); }
 
 function renderAuthArea() {
   const el = document.getElementById('authArea');
@@ -513,7 +518,7 @@ function showSyncBanner() {
 
 // Firestore helpers
 async function fsave(league, year, matches) {
-  if (!currentUser) return;
+  if (!currentUser || !db) return;
   try {
     await db.collection('users').doc(currentUser.uid)
       .collection('seasons').doc(`${league}_${year}`)
@@ -522,7 +527,7 @@ async function fsave(league, year, matches) {
 }
 
 async function fload(league, year) {
-  if (!currentUser) return null;
+  if (!currentUser || !db) return null;
   try {
     const doc = await db.collection('users').doc(currentUser.uid)
       .collection('seasons').doc(`${league}_${year}`).get();
