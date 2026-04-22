@@ -19,7 +19,15 @@
   --shm:0 4px 8px rgba(0,0,0,.09),0 2px 4px rgba(0,0,0,.05);
   --fd:'Syne',sans-serif;--fb:'DM Sans',sans-serif;--fm:'DM Mono',monospace;
 }
-body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px;line-height:1.5;min-height:100vh}
+body.dark{
+  --bg:#111714;--surface:#18201b;--card:#1e2922;
+  --border:#2d3d32;--border-lt:#243028;
+  --g900:#86efac;--g700:#4ade80;--g600:#22c55e;--g50:#162219;
+  --text:#e8f0ea;--text2:#a3b8a8;--muted:#607a68;
+  --win:#4ade80;--drw:#fbbf24;--los:#f87171;
+  --sh:0 1px 3px rgba(0,0,0,.4);--shm:0 4px 12px rgba(0,0,0,.5);
+}
+body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px;line-height:1.5;min-height:100vh;transition:background .25s,color .25s}
 .wrap{max-width:1240px;margin:0 auto;padding:0 20px}
 /* HEADER */
 header{background:var(--card);border-bottom:3px solid var(--g700);position:sticky;top:0;z-index:200;box-shadow:var(--shm)}
@@ -143,6 +151,28 @@ tbody td:last-child{font-family:var(--fb)}
 .step-n{width:24px;height:24px;border-radius:50%;background:var(--g700);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px}
 .step a{color:var(--g700)}
 .step code{background:var(--surface);border:1px solid var(--border);padding:1px 6px;border-radius:4px;font-family:var(--fm);font-size:11px}
+/* THEME TOGGLE */
+.theme-toggle{background:var(--surface);border:1.5px solid var(--border);border-radius:8px;width:36px;height:36px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.theme-toggle:hover{border-color:var(--g600)}
+/* FORM CONTROLS */
+.form-ctrl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.form-label{font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap}
+.form-btns{display:flex;gap:4px;flex-wrap:wrap}
+.fmbtn{padding:5px 11px;border-radius:6px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);font-family:var(--fb);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
+.fmbtn:hover{border-color:var(--g600);color:var(--g700)}
+.fmbtn.active{background:var(--g700);border-color:var(--g700);color:#fff}
+.gw-range{display:flex;align-items:center;gap:6px;margin-top:6px;width:100%}
+.gw-range input{width:64px;padding:5px 8px;border-radius:6px;border:1.5px solid var(--border);background:var(--card);color:var(--text);font-family:var(--fm);font-size:12px;outline:none;transition:border-color .2s}
+.gw-range input:focus{border-color:var(--g600)}
+.gw-range span{color:var(--muted)}
+/* DARK MODE - win/draw/loss badges */
+body.dark .fb.W{background:rgba(74,222,128,.15);color:var(--win)}
+body.dark .fb.D{background:rgba(251,191,36,.15);color:var(--drw)}
+body.dark .fb.L{background:rgba(248,113,113,.15);color:var(--los)}
+body.dark .errbox{background:#1e1a1a;border-color:#5a2a2a}
+body.dark .nokey{background:var(--g50);border-color:var(--g600)}
+body.dark .apibar{background:var(--g50);border-color:var(--border)}
+body.dark .iframe-banner{background:#2a2510;border-color:#5a4a10}
 /* ANIM */
 .vc{animation:fi .2s ease}
 @keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
@@ -170,6 +200,7 @@ tbody td:last-child{font-family:var(--fb)}
         </div>
       </div>
       <div id="keyStatus"></div>
+      <button class="theme-toggle" id="themeToggle" onclick="toggleDark()" title="Toggle dark mode">☀️</button>
     </div>
   </div>
 </header>
@@ -197,6 +228,22 @@ tbody td:last-child{font-family:var(--fb)}
       <span class="fbadge" id="fbadge"></span>
       <span id="farr">▾</span>
     </button>
+    <div class="form-ctrl" id="formCtrl" style="display:none">
+      <span class="form-label">Form</span>
+      <div class="form-btns">
+        <button class="fmbtn active" onclick="setFormMode('last',5)">Last 5</button>
+        <button class="fmbtn" onclick="setFormMode('last',10)">Last 10</button>
+        <button class="fmbtn" onclick="setFormMode('last',15)">Last 15</button>
+        <button class="fmbtn" onclick="setFormMode('all')">All</button>
+        <button class="fmbtn range-toggle" onclick="toggleFormRange()">GW Range ▾</button>
+      </div>
+      <div class="gw-range" id="gwRange" style="display:none">
+        <input type="number" id="gwFrom" min="1" max="38" value="1" placeholder="GW from">
+        <span>–</span>
+        <input type="number" id="gwTo"   min="1" max="38" value="17" placeholder="GW to">
+        <button class="fmbtn" onclick="applyGwRange()">Apply</button>
+      </div>
+    </div>
   </div>
 
   <div class="fpanel" id="fpanel">
@@ -368,49 +415,87 @@ function buildTrends(matches, teamNames) {
   if (!matches?.length) return null;
   const byMd = {};
   matches.forEach(m => {
-    if (!m.matchday || m.score?.fullTime?.home === null || m.score?.fullTime?.home === undefined) return;
+    if (!m.matchday || m.score?.fullTime?.home == null) return;
     (byMd[m.matchday] = byMd[m.matchday] || []).push(m);
   });
-  const maxMd = Math.max(...Object.keys(byMd).map(Number));
-  if (!isFinite(maxMd)) return null;
+  const mds = Object.keys(byMd).map(Number).sort((a,b)=>a-b);
+  if (!mds.length) return null;
 
   const pts = {}, gd = {}, gf = {};
-  teamNames.forEach(n => { pts[n] = 0; gd[n] = 0; gf[n] = 0; });
+  teamNames.forEach(n => { pts[n]=0; gd[n]=0; gf[n]=0; });
   const ptsH = {}, posH = {};
-  teamNames.forEach(n => { ptsH[n] = []; posH[n] = []; });
+  // mdResults[team][md] = 'W'|'D'|'L'
+  const mdResults = {};
+  teamNames.forEach(n => { ptsH[n]=[]; posH[n]=[]; mdResults[n]={}; });
   const labels = [];
 
-  for (let md = 1; md <= maxMd; md++) {
-    (byMd[md] || []).forEach(m => {
-      const h = m.homeTeam.name, a = m.awayTeam.name;
-      const hs = m.score.fullTime.home, as2 = m.score.fullTime.away;
-      if (hs === null || hs === undefined) return;
-      pts[h] = pts[h] || 0; pts[a] = pts[a] || 0;
-      gd[h] = gd[h] || 0; gd[a] = gd[a] || 0;
-      gf[h] = gf[h] || 0; gf[a] = gf[a] || 0;
-      if (hs > as2)       pts[h] += 3;
-      else if (as2 > hs)  pts[a] += 3;
-      else               { pts[h]++; pts[a]++; }
-      gd[h] += hs - as2; gd[a] += as2 - hs;
-      gf[h] += hs;       gf[a] += as2;
+  for (const md of mds) {
+    (byMd[md]||[]).forEach(m => {
+      const h=m.homeTeam.name, a=m.awayTeam.name;
+      const hs=m.score.fullTime.home, as2=m.score.fullTime.away;
+      if (hs==null) return;
+      pts[h]=pts[h]||0; pts[a]=pts[a]||0;
+      gd[h]=gd[h]||0;  gd[a]=gd[a]||0;
+      gf[h]=gf[h]||0;  gf[a]=gf[a]||0;
+      if (hs>as2)       { pts[h]+=3; if(mdResults[h]) mdResults[h][md]='W'; if(mdResults[a]) mdResults[a][md]='L'; }
+      else if (as2>hs)  { pts[a]+=3; if(mdResults[a]) mdResults[a][md]='W'; if(mdResults[h]) mdResults[h][md]='L'; }
+      else              { pts[h]++;  pts[a]++;  if(mdResults[h]) mdResults[h][md]='D'; if(mdResults[a]) mdResults[a][md]='D'; }
+      gd[h]+=hs-as2; gd[a]+=as2-hs; gf[h]+=hs; gf[a]+=as2;
     });
-    const sorted = [...teamNames].sort((a, b) =>
-      (pts[b]||0)-(pts[a]||0) || (gd[b]||0)-(gd[a]||0) || (gf[b]||0)-(gf[a]||0));
-    teamNames.forEach(n => {
-      ptsH[n].push(pts[n] || 0);
-      posH[n].push(sorted.indexOf(n) + 1);
-    });
+    const sorted=[...teamNames].sort((a,b)=>(pts[b]||0)-(pts[a]||0)||(gd[b]||0)-(gd[a]||0)||(gf[b]||0)-(gf[a]||0));
+    teamNames.forEach(n=>{ ptsH[n].push(pts[n]||0); posH[n].push(sorted.indexOf(n)+1); });
     labels.push(`GW ${md}`);
   }
-  return {ptsH, posH, labels};
+  return {ptsH, posH, labels, mdResults, mds};
 }
 
 // ── STATE ──────────────────────────────────────────────────
 const S = {
   league: 'PL', season: getCurrentSeason(), view: 'table',
   sel: new Set(), sortCol: 'pts', sortDir: 'desc',
-  fopen: false, standings: null, trends: null, loading: false, error: null
+  fopen: false, standings: null, trends: null, loading: false, error: null,
+  trendsLoading: false,
+  // Form window
+  formMode: 'last', formCount: 5, gwFrom: null, gwTo: null,
+  // Per-team form computed from matches (ordered oldest→newest)
+  teamForm: {}
 };
+
+// ── FORM HELPERS ───────────────────────────────────────────
+// Returns form array oldest→newest for display left-to-right
+function getFormForTeam(teamName) {
+  // Prefer computed match data (accurate order & GW range support)
+  if (S.trends?.mdResults) {
+    const {mdResults, mds} = S.trends;
+    let relevantMds;
+    if (S.formMode === 'range' && S.gwFrom != null && S.gwTo != null) {
+      relevantMds = mds.filter(md => md >= S.gwFrom && md <= S.gwTo);
+    } else {
+      relevantMds = mds; // all played matchdays, oldest first
+      if (S.formMode === 'last') relevantMds = relevantMds.slice(-S.formCount);
+    }
+    return relevantMds
+      .filter(md => mdResults[teamName]?.[md])
+      .map(md => mdResults[teamName][md]);
+  }
+  // Fallback to API form string (reverse since API gives newest-first)
+  return [];
+}
+
+function apiFallbackForm(apiFormStr, count) {
+  // API string is newest-first e.g. "L,L,W,W,W" → reverse to oldest-first
+  const arr = (apiFormStr||'').split(',').filter(Boolean);
+  arr.reverse(); // now oldest→newest
+  if (S.formMode === 'last') return arr.slice(-count);
+  return arr;
+}
+
+function formColLabel() {
+  if (S.formMode === 'range' && S.gwFrom != null && S.gwTo != null)
+    return `GW ${S.gwFrom}–${S.gwTo}`;
+  if (S.formMode === 'all') return 'All form';
+  return `Last ${S.formCount}`;
+}
 
 // ── RENDER ─────────────────────────────────────────────────
 let chartInst = null;
@@ -541,7 +626,7 @@ function renderTable() {
     {k:'draw',l:'D',sk:'d'},{k:'lost',l:'L',sk:'l'},
     {k:'goalsFor',l:'GF',sk:'gf'},{k:'goalsAgainst',l:'GA',sk:'ga'},
     {k:'goalDifference',l:'GD',sk:'gd'},{k:'points',l:'PTS',sk:'pts'},
-    {k:'form',l:'Last 5',sk:null}
+    {k:'form',l:formColLabel(),sk:null}
   ];
 
   document.getElementById('content').innerHTML = `<div class="vc">
@@ -554,7 +639,10 @@ function renderTable() {
         const pos = r.position;
         const zone = pos<=lg.ucl?'ucl-row':pos<=uelEnd?'uel-row':pos>relStart?'rel-row':'';
         const c = teamColor(r.team.name), gd = r.goalDifference;
-        const form = (r.form||'').split(',').filter(Boolean).slice(-5);
+        // Get form: prefer match-data (correct GW order), fallback to API string reversed
+        const form = S.trends?.mdResults
+          ? getFormForTeam(r.team.name)
+          : apiFallbackForm(r.form, S.formCount);
         const short = r.team.shortName || r.team.name;
         return `<tr class="${zone}">
           <td><span class="pbadge">${pos}</span></td>
@@ -589,7 +677,8 @@ function renderChart() {
   if (chartInst) { chartInst.destroy(); chartInst = null; }
   if (!S.trends) {
     show('<div class="loading"><div class="spinner"></div><span>Loading match history…</span></div>');
-    loadTrends().then(() => { if (S.view !== 'table') renderChart(); });
+    // loadTrends is already running in background; it will call renderContent() when done
+    if (!S.trendsLoading) loadTrends();
     return;
   }
   document.getElementById('content').innerHTML = `<div class="vc"><div class="cwrap"><canvas id="mc"></canvas></div></div>`;
@@ -613,8 +702,12 @@ function renderChart() {
       plugins: {
         legend: {display: false},
         tooltip: {
-          backgroundColor: '#fff', borderColor: '#d2dace', borderWidth: 1,
-          titleColor: '#6b7280', bodyColor: '#0d1a0c', padding: 12,
+          backgroundColor: ()=>document.body.classList.contains('dark')?'#1e2922':'#fff',
+          borderColor: ()=>document.body.classList.contains('dark')?'#2d3d32':'#d2dace',
+          borderWidth: 1,
+          titleColor: ()=>document.body.classList.contains('dark')?'#607a68':'#6b7280',
+          bodyColor: ()=>document.body.classList.contains('dark')?'#e8f0ea':'#0d1a0c',
+          padding: 12,
           callbacks: {
             title: ctx => ctx[0].label,
             label: ctx => `  ${ctx.dataset.label}: ${isPts ? ctx.parsed.y + ' pts' : '#' + ctx.parsed.y}`
@@ -622,13 +715,17 @@ function renderChart() {
         }
       },
       scales: {
-        x: {grid:{color:'rgba(0,0,0,.05)'},ticks:{color:'#9ca3af',font:{size:11},maxTicksLimit:12},border:{color:'#d2dace'}},
+        x: {
+          grid:{color:()=>document.body.classList.contains('dark')?'rgba(255,255,255,.05)':'rgba(0,0,0,.05)'},
+          ticks:{color:()=>document.body.classList.contains('dark')?'#607a68':'#9ca3af',font:{size:11},maxTicksLimit:12},
+          border:{color:()=>document.body.classList.contains('dark')?'#2d3d32':'#d2dace'}
+        },
         y: {
           reverse: !isPts,
-          grid:{color:'rgba(0,0,0,.05)'},
-          ticks:{color:'#9ca3af',font:{size:11},...(isPts?{}:{stepSize:1,callback:v=>`#${v}`})},
-          border:{color:'#d2dace'},
-          title:{display:true,text:isPts?'Cumulative Points':'League Position',color:'#9ca3af',font:{size:11}}
+          grid:{color:()=>document.body.classList.contains('dark')?'rgba(255,255,255,.05)':'rgba(0,0,0,.05)'},
+          ticks:{color:()=>document.body.classList.contains('dark')?'#607a68':'#9ca3af',font:{size:11},...(isPts?{}:{stepSize:1,callback:v=>`#${v}`})},
+          border:{color:()=>document.body.classList.contains('dark')?'#2d3d32':'#d2dace'},
+          title:{display:true,text:isPts?'Cumulative Points':'League Position',color:()=>document.body.classList.contains('dark')?'#607a68':'#9ca3af',font:{size:11}}
         }
       }
     }
@@ -646,6 +743,7 @@ async function loadStandings() {
     S.standings = total.table;
     S.sel = new Set(S.standings.map(r => r.team.name));
     S.loading = false;
+    document.getElementById('formCtrl').style.display = 'flex';
     renderChips(); renderStats(); updateBadge(); renderContent();
     loadTrends(); // background pre-fetch
   } catch(e) {
@@ -656,21 +754,64 @@ async function loadStandings() {
 }
 
 async function loadTrends() {
-  if (S.trends || !S.standings) return;
+  if (S.trends || S.trendsLoading || !S.standings) return;
+  S.trendsLoading = true;
   try {
-    const data = await apiFetch(`/competitions/${S.league}/matches?season=${S.season}&status=FINISHED`);
+    const data = await apiFetch(`/competitions/${S.league}/matches?season=${S.season}&status=FINISHED&limit=500`);
     S.trends = buildTrends(data.matches, S.standings.map(r => r.team.name));
-    if (S.view !== 'table') renderChart();
-  } catch(e) { console.warn('Trend load failed:', e.code); }
+    S.trendsLoading = false;
+    // Re-render so form column updates from match data (correct order)
+    renderContent();
+  } catch(e) {
+    S.trendsLoading = false;
+    console.warn('Trend load failed:', e.code);
+  }
 }
 
 // ── INTERACTIONS ───────────────────────────────────────────
+function toggleDark() {
+  const dark = document.body.classList.toggle('dark');
+  localStorage.setItem('fb_dark', dark ? '1' : '0');
+  document.getElementById('themeToggle').textContent = dark ? '🌙' : '☀️';
+  // Redraw chart with new colors if visible
+  if (S.view !== 'table' && S.trends) renderChart();
+}
+
+function setFormMode(mode, count) {
+  S.formMode = mode;
+  S.formCount = count || 5;
+  // Highlight active button
+  document.querySelectorAll('.fmbtn:not(.range-toggle)').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  // Hide GW range if switching away
+  if (mode !== 'range') document.getElementById('gwRange').style.display = 'none';
+  renderContent();
+}
+
+function toggleFormRange() {
+  const el = document.getElementById('gwRange');
+  const open = el.style.display === 'none';
+  el.style.display = open ? 'flex' : 'none';
+  document.querySelector('.range-toggle').textContent = `GW Range ${open ? '▴' : '▾'}`;
+}
+
+function applyGwRange() {
+  const from = parseInt(document.getElementById('gwFrom').value);
+  const to   = parseInt(document.getElementById('gwTo').value);
+  if (isNaN(from) || isNaN(to) || from > to) return;
+  S.formMode = 'range'; S.gwFrom = from; S.gwTo = to;
+  document.querySelectorAll('.fmbtn:not(.range-toggle)').forEach(b => b.classList.remove('active'));
+  document.querySelector('.range-toggle').classList.add('active');
+  renderContent();
+}
+
 function setLeague(k) {
-  S.league = k; S.standings = null; S.trends = null;
+  S.league = k; S.standings = null; S.trends = null; S.trendsLoading = false;
   S.fopen = false;
   document.getElementById('fpanel').classList.remove('open');
   document.getElementById('fbtn').classList.remove('open');
   document.getElementById('farr').textContent = '▾';
+  document.getElementById('formCtrl').style.display = 'none';
   renderLeagueTabs(); loadStandings();
 }
 
@@ -721,7 +862,8 @@ function clearKey() {
 
 document.getElementById('apiKeyInput').addEventListener('keydown', e => { if(e.key==='Enter') saveKey(); });
 document.getElementById('ssel').addEventListener('change', e => {
-  S.season = parseInt(e.target.value); S.trends = null; loadStandings();
+  S.season = parseInt(e.target.value); S.trends = null; S.trendsLoading = false;
+  loadStandings();
 });
 
 // ── INIT ───────────────────────────────────────────────────
@@ -741,6 +883,12 @@ if (IN_IFRAME) {
 renderLeagueTabs();
 buildSeasonSelect();
 renderKeyStatus();
+
+// Restore dark mode preference
+if (localStorage.getItem('fb_dark') === '1') {
+  document.body.classList.add('dark');
+  document.getElementById('themeToggle').textContent = '🌙';
+}
 
 if (getKey()) {
   loadStandings();
