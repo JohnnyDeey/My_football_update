@@ -446,9 +446,8 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
   <div class="wrap">
     <div class="footer-inner">
       <div>
-        Data: <a href="https://www.football-data.org" target="_blank">football-data.org</a> (live) ·
-        <a href="https://mikami3345.cloudfree.jp/SoccerData/MatchData.html" target="_blank">mikami3345</a> &amp;
-        <a href="https://www.football-data.co.uk" target="_blank">football-data.co.uk</a> (historical)
+        Data: <a href="https://mikami3345.cloudfree.jp/SoccerData/MatchData.html" target="_blank">mikami3345.cloudfree.jp</a> (1993–2022) ·
+        <a href="https://www.football-data.co.uk" target="_blank">football-data.co.uk</a> (2023–present)
       </div>
       <div>
         Contact: <a href="mailto:your@email.com">your@email.com</a> ·
@@ -491,7 +490,7 @@ if (_cfg) {
     if (e.code === 'failed-precondition') console.log('Multiple tabs — offline sync limited');
   });
 } else {
-  console.warn('No Firebase config — sync disabled. See config.example.js');
+  // Firebase sync disabled — no config provided (optional feature)
 }
 
 let currentUser = null;
@@ -504,7 +503,7 @@ if (auth) {
 }
 
 function signIn() {
-  if (!auth) { alert('Firebase not configured. See config.example.js'); return; }
+  if (!auth) { console.log('Firebase not configured — sync disabled'); return; }
   const provider = new firebase.auth.GoogleAuthProvider();
   auth.signInWithPopup(provider).catch(e => console.error('Sign in failed:', e));
 }
@@ -556,7 +555,14 @@ async function fload(league, year) {
 // CONFIG — No API key needed. All data from Mikami (1993–2022) + football-data.co.uk (2023+)
 // ══════════════════════════════════════════════════════════════
 // football-data.co.uk is the same source Mikami uses for his own website.
-const PROXY = 'https://corsproxy.io/?';
+// Multiple CORS proxies — tried in order until one works
+const PROXIES = [
+  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  url => `https://proxy.cors.sh/${url}`,
+  url => `https://corsproxy.org/?${encodeURIComponent(url)}`,
+];
+const PROXY = 'https://corsproxy.io/?'; // kept for any remaining references
 const MIKAMI   = 'https://mikami3345.cloudfree.jp/SoccerData/csv_data/';
 const FDCO     = 'https://www.football-data.co.uk/mmz4281/';
 
@@ -770,9 +776,18 @@ function parseFdcoCSV(text) {
 }
 
 async function fetchCSV(url) {
-  const res = await fetch(PROXY + encodeURIComponent(url));
-  if (!res.ok) throw new Error('CSV fetch failed: ' + res.status);
-  return res.text();
+  let lastErr;
+  for (const makeUrl of PROXIES) {
+    try {
+      const res = await fetch(makeUrl(url), {signal: AbortSignal.timeout(12000)});
+      if (res.ok) return res.text();
+      lastErr = new Error(`HTTP ${res.status}`);
+    } catch(e) {
+      lastErr = e;
+      // Try next proxy
+    }
+  }
+  throw lastErr || new Error('All proxies failed for: ' + url);
 }
 
 async function loadHistoricalMatches(league, year) {
@@ -1158,7 +1173,7 @@ function renderError(code) {
     RATE:    ['Rate limit reached','Quota resets automatically — the bar above shows the countdown.'],
     NO_DATA: ['No data available','This league may not have started or standings aren\'t available yet.'],
     NO_CSV:  ['No historical data','Historical CSV data is only available for the Big 5 leagues.'],
-    EMPTY_CSV:['Empty CSV','The CSV file returned no matches for this season.'],
+    EMPTY_CSV:['No data found','The data file returned no matches. This season may not have started yet, or the data source is temporarily unavailable. Try again later.'],
     HTTP_403:['Access denied','Your API key doesn\'t have access to this competition or season.'],
     HTTP_404:['Not found','This competition doesn\'t exist in the API.'],
   };
