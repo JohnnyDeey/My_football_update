@@ -569,20 +569,20 @@ function showSyncBanner() {
 }
 
 // Firestore helpers
+// Shared public collection — no auth needed, rules allow read/write
+// Data imported via admin-import.html is available to all devices instantly
 async function fsave(league, year, matches) {
-  if (!currentUser || !db) return;
+  if (!db) return;
   try {
-    await db.collection('users').doc(currentUser.uid)
-      .collection('seasons').doc(`${league}_${year}`)
+    await db.collection('seasons').doc(`${league}_${year}`)
       .set({matches, league, year, at: firebase.firestore.FieldValue.serverTimestamp()});
   } catch(e) { console.warn('Firestore save failed:', e.code); }
 }
 
 async function fload(league, year) {
-  if (!currentUser || !db) return null;
+  if (!db) return null;
   try {
-    const doc = await db.collection('users').doc(currentUser.uid)
-      .collection('seasons').doc(`${league}_${year}`).get();
+    const doc = await db.collection('seasons').doc(`${league}_${year}`).get();
     return doc.exists ? doc.data().matches : null;
   } catch(e) { console.warn('Firestore load failed:', e.code); return null; }
 }
@@ -818,7 +818,11 @@ function parseFdcoCSV(text) {
     if (!line.trim()) continue;
     const c = line.split(',');
     if (c.length < 6) continue;
-    const home=c[2].trim(), away=c[3].trim(), hg=parseInt(c[4]), ag=parseInt(c[5]);
+    // New fdco format (2024+) has a Time column: Div,Date,Time,HomeTeam,AwayTeam,FTHG,FTAG
+    // Old format: Div,Date,HomeTeam,AwayTeam,FTHG,FTAG
+    const hasTime = /^\d{1,2}:\d{2}$/.test(c[2].trim());
+    const off = hasTime ? 1 : 0;
+    const home=c[2+off].trim(), away=c[3+off].trim(), hg=parseInt(c[4+off]), ag=parseInt(c[5+off]);
     if (!home||!away||isNaN(hg)||isNaN(ag)) continue;
     matches.push({date:parseDateDDMMYY(c[1]), home, away, hg, ag});
   }
