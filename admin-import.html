@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Football Analytics — Data Import</title>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g700:#15803d;--g600:#16a34a;--g50:#f0fdf4;--g900:#14532d;
+  --bg:#f1f5f2;--card:#fff;--border:#d1d9d4;--muted:#6b7280;
+  --text:#0d1a0c;--win:#16a34a;--err:#dc2626;--warn:#d97706;
+}
+body{background:var(--bg);font-family:'DM Sans',system-ui,sans-serif;color:var(--text);min-height:100vh}
+header{background:var(--card);border-bottom:3px solid var(--g700);padding:16px 24px;display:flex;align-items:center;gap:14px}
+.logo{width:36px;height:36px;background:var(--g700);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px}
+h1{font-size:18px;font-weight:700;color:var(--g900)}
+.sub{font-size:12px;color:var(--muted);margin-top:2px}
+.wrap{max-width:960px;margin:0 auto;padding:24px 20px}
+.info-box{background:#fffbeb;border:1.5px solid #fcd34d;border-radius:10px;padding:14px 16px;margin-bottom:24px;font-size:13px;color:#78350f;line-height:1.6}
+.info-box strong{color:#92400e}
+.card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:20px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.card-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.card-sub{font-size:12px;color:var(--muted);margin-bottom:16px}
+.auth-area{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.btn{padding:9px 20px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-green{background:var(--g700);color:#fff}
+.btn-green:hover{background:var(--g900)}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--muted)}
+.btn-outline:hover{border-color:var(--g600);color:var(--g700)}
+.btn-red{background:#fee2e2;color:var(--err);border:1.5px solid #fecaca}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.avatar{width:28px;height:28px;border-radius:50%;border:2px solid var(--g600)}
+.tag{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600}
+.tag-green{background:#dcfce7;color:#166534}
+.tag-amber{background:#fef3c7;color:#92400e}
+.tag-red{background:#fee2e2;color:#991b1b}
+.tag-grey{background:#f3f4f6;color:#6b7280}
+/* League grid */
+.league-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.league-card{border:1.5px solid var(--border);border-radius:10px;padding:14px;background:var(--bg)}
+.league-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.league-flag{font-size:20px}
+.league-name{font-size:13px;font-weight:700}
+.season-list{display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto}
+.season-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px}
+.season-row:last-child{border:none}
+.season-label{flex:1;font-weight:500}
+.season-status{min-width:72px;text-align:center}
+.season-btn{padding:4px 10px;font-size:11px;border-radius:6px;border:1.5px solid var(--g600);background:transparent;color:var(--g700);cursor:pointer;font-weight:600;white-space:nowrap}
+.season-btn:hover{background:var(--g50)}
+.season-btn:disabled{opacity:.4;cursor:not-allowed}
+/* Progress */
+.progress-area{margin-top:16px}
+.prog-row{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px}
+.prog-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.prog-dot.done{background:var(--win)}
+.prog-dot.err{background:var(--err)}
+.prog-dot.run{background:var(--warn);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+/* Import all button */
+.import-all-area{margin-top:20px;padding-top:16px;border-top:1.5px solid var(--border);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.spinner{width:16px;height:16px;border:2.5px solid var(--border);border-top-color:var(--g600);border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+#log{margin-top:16px;background:#0d1a0c;color:#4ade80;font-family:monospace;font-size:11px;padding:12px;border-radius:8px;max-height:200px;overflow-y:auto;display:none}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">⚽</div>
+  <div>
+    <h1>Football Analytics — Data Import</h1>
+    <div class="sub">One-click import of all CSV seasons into Firebase</div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="info-box">
+    <strong>How this works:</strong> This page downloads football match data directly from
+    football-data.co.uk (free, no API key) and saves it to your Firebase Firestore.
+    Once imported, your main app loads all data instantly from Firebase — no more proxy issues,
+    works offline, syncs across all your devices. You only need to re-import the
+    <strong>current season</strong> after each matchday (takes ~5 seconds).
+  </div>
+
+  <!-- Auth -->
+  <div class="card">
+    <div class="card-title">Step 1 — Sign in to Firebase</div>
+    <div class="card-sub">Sign in with the same Google account you use on the main app.</div>
+    <div class="auth-area" id="authArea">
+      <button class="btn btn-green" onclick="doSignIn()">Sign in with Google</button>
+    </div>
+  </div>
+
+  <!-- Import -->
+  <div class="card" id="importCard" style="display:none">
+    <div class="card-title">Step 2 — Import seasons into Firebase</div>
+    <div class="card-sub">
+      Green = already in Firebase. Click <strong>Import</strong> to fetch from football-data.co.uk and save.
+      Use <strong>Import All Missing</strong> to do everything in one go.
+    </div>
+
+    <div class="import-all-area">
+      <button class="btn btn-green" id="importAllBtn" onclick="importAll()">⬇ Import All Missing</button>
+      <button class="btn btn-outline" onclick="refreshStatus()">↻ Refresh status</button>
+      <span id="importAllStatus" style="font-size:12px;color:var(--muted)"></span>
+    </div>
+
+    <div class="progress-area" id="progressArea"></div>
+
+    <div style="margin-top:20px">
+      <div class="league-grid" id="leagueGrid"></div>
+    </div>
+
+    <pre id="log"></pre>
+  </div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+// FIREBASE
+// ══════════════════════════════════════════════════
+firebase.initializeApp({
+  apiKey: "AIzaSyCQbtCVM3Cm7Jdzg8dsEkG1SOJqzALXhTw",
+  authDomain: "football-analytics-26e72.firebaseapp.com",
+  projectId: "football-analytics-26e72",
+  storageBucket: "football-analytics-26e72.firebasestorage.app",
+  messagingSenderId: "458729335310",
+  appId: "1:458729335310:web:5861c5d69493c52ee0ea5f"
+});
+const auth = firebase.auth();
+const db   = firebase.firestore();
+
+let currentUser = null;
+auth.onAuthStateChanged(user => {
+  currentUser = user;
+  renderAuth();
+  if (user) {
+    document.getElementById('importCard').style.display = 'block';
+    buildGrid();
+    refreshStatus();
+  }
+});
+
+function doSignIn() {
+  auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
+    .catch(e => alert('Sign in failed: ' + e.message));
+}
+function doSignOut() {
+  auth.signOut();
+  document.getElementById('importCard').style.display = 'none';
+}
+
+function renderAuth() {
+  const el = document.getElementById('authArea');
+  if (currentUser) {
+    el.innerHTML = `
+      ${currentUser.photoURL ? `<img src="${currentUser.photoURL}" class="avatar">` : ''}
+      <span style="font-size:13px;font-weight:600">${currentUser.displayName}</span>
+      <span class="tag tag-green">Signed in</span>
+      <button class="btn btn-outline" onclick="doSignOut()" style="padding:5px 12px;font-size:12px">Sign out</button>`;
+  } else {
+    el.innerHTML = `<button class="btn btn-green" onclick="doSignIn()">Sign in with Google</button>`;
+  }
+}
+
+// ══════════════════════════════════════════════════
+// DATA SOURCES
+// ══════════════════════════════════════════════════
+const FDCO = 'https://www.football-data.co.uk/mmz4281/';
+const JSDELIVR = 'https://cdn.jsdelivr.net/gh/footballcsv/cache.footballdata@master/';
+const MIKAMI = 'https://mikami3345.cloudfree.jp/SoccerData/csv_data/';
+const PROXIES = [
+  u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+  u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+  u => `https://proxy.cors.sh/${u}`,
+];
+
+const FDCO_TO_GH = {
+  E0:'ENG.1', E1:'ENG.2', SP1:'ESP.1', D1:'DEU.1',
+  I1:'ITA.1', F1:'FRA.1', N1:'NED.1', P1:'POR.1',
+};
+
+const LEAGUES = {
+  PL: {name:'Premier League',  flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', mikami:'Premier_1993-2022.csv', fdco:'E0', from:1992},
+  PD: {name:'La Liga',          flag:'🇪🇸', mikami:'LaLiga1_1994-2022.csv',  fdco:'SP1', from:1993},
+  BL1:{name:'Bundesliga',       flag:'🇩🇪', mikami:'Bundes_1994-2022.csv',    fdco:'D1',  from:1993},
+  SA: {name:'Serie A',          flag:'🇮🇹', mikami:'SerieA_1994-2022.csv',    fdco:'I1',  from:1993},
+  FL1:{name:'Ligue 1',          flag:'🇫🇷', mikami:'Ligue1_1993-2022.csv',    fdco:'F1',  from:1992},
+  PPL:{name:'Primeira Liga',    flag:'🇵🇹', fdco:'P1',  from:2000},
+  DED:{name:'Eredivisie',       flag:'🇳🇱', fdco:'N1',  from:2000},
+  ELC:{name:'Championship',     flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', fdco:'E1',  from:2000},
+};
+
+function getCurrentSeason() {
+  const d = new Date();
+  return d.getMonth() >= 7 ? d.getFullYear() : d.getFullYear() - 1;
+}
+
+const cur = getCurrentSeason(); // start year of current season e.g. 2025
+
+// Firebase doc IDs to check what's already stored
+const fbStatus = {}; // league_year → true/false
+
+async function refreshStatus() {
+  if (!currentUser) return;
+  log('Checking Firebase for existing data…');
+  for (const league of Object.keys(LEAGUES)) {
+    const lg = LEAGUES[league];
+    const years = [];
+    for (let y = lg.from; y <= cur; y++) years.push(y);
+    for (const year of years) {
+      try {
+        const doc = await db.collection('users').doc(currentUser.uid)
+          .collection('seasons').doc(`${league}_${year}`).get();
+        fbStatus[`${league}_${year}`] = doc.exists && doc.data()?.matches?.length > 0;
+      } catch(e) {
+        fbStatus[`${league}_${year}`] = false;
+      }
+    }
+  }
+  log('Status refreshed.');
+  buildGrid();
+}
+
+// ══════════════════════════════════════════════════
+// CSV PARSING
+// ══════════════════════════════════════════════════
+function parseDateDDMMYY(str) {
+  const p = str.trim().split('/');
+  if (p.length < 3) return 0;
+  let yr = parseInt(p[2]);
+  yr += yr < 50 ? 2000 : 1900;
+  return new Date(yr, parseInt(p[1])-1, parseInt(p[0])).getTime();
+}
+
+function assignMatchdays(matches) {
+  matches.sort((a,b) => a.date - b.date);
+  const teamMd = {};
+  for (const m of matches) {
+    const md = Math.max(teamMd[m.home]||0, teamMd[m.away]||0) + 1;
+    m.md = md;
+    teamMd[m.home] = md;
+    teamMd[m.away] = md;
+  }
+  return matches;
+}
+
+function parseMikamiCSV(text, endYear) {
+  const matches = [];
+  for (const line of text.split('\n').slice(1)) {
+    const c = line.split(',');
+    if (c.length < 8) continue;
+    if (parseInt(c[0]) !== endYear) continue;
+    const home=c[2].trim(), away=c[4].trim(), hg=parseInt(c[6]), ag=parseInt(c[7]);
+    if (!home||!away||isNaN(hg)||isNaN(ag)) continue;
+    matches.push({date:parseDateDDMMYY(c[1]), home, away, hg, ag});
+  }
+  return assignMatchdays(matches);
+}
+
+function parseFdcoCSV(text) {
+  const matches = [];
+  for (const line of text.split('\n').slice(1)) {
+    if (!line.trim()) continue;
+    const c = line.split(',');
+    if (c.length < 6) continue;
+    const home=c[2].trim(), away=c[3].trim(), hg=parseInt(c[4]), ag=parseInt(c[5]);
+    if (!home||!away||isNaN(hg)||isNaN(ag)) continue;
+    matches.push({date:parseDateDDMMYY(c[1]), home, away, hg, ag});
+  }
+  return assignMatchdays(matches);
+}
+
+// ══════════════════════════════════════════════════
+// FETCH WITH FALLBACKS
+// ══════════════════════════════════════════════════
+async function fetchWithFallback(url) {
+  // Try direct first (works from admin page which may have different CORS)
+  try {
+    const r = await fetch(url, {signal:AbortSignal.timeout(10000)});
+    if (r.ok) { log('  ✓ Direct fetch: ' + url.split('/').slice(-2).join('/')); return r.text(); }
+  } catch {}
+  // Try jsDelivr for fdco-equivalent URLs
+  // Try proxies
+  for (const mkUrl of PROXIES) {
+    try {
+      const r = await fetch(mkUrl(url), {signal:AbortSignal.timeout(12000)});
+      if (r.ok) { log('  ✓ Via proxy'); return r.text(); }
+    } catch {}
+  }
+  throw new Error('All fetch attempts failed for: ' + url);
+}
+
+async function fetchCSVForSeason(league, startYear) {
+  const lg = LEAGUES[league];
+
+  if (startYear <= 2021 && lg.mikami) {
+    // Mikami — one big file, filter by season_end_year
+    const text = await fetchWithFallback(MIKAMI + lg.mikami);
+    return parseMikamiCSV(text, startYear + 1);
+  }
+
+  // Try jsDelivr mirror first (CORS-enabled)
+  const ghCode = FDCO_TO_GH[lg.fdco];
+  if (ghCode) {
+    const season = `${startYear}-${String(startYear+1).slice(2)}`;
+    const ghUrl = `${JSDELIVR}${season}/${ghCode}.csv`;
+    try {
+      const r = await fetch(ghUrl, {signal:AbortSignal.timeout(12000)});
+      if (r.ok) {
+        const text = await r.text();
+        if (text.length > 200) {
+          log('  ✓ jsDelivr: ' + season + '/' + ghCode + '.csv');
+          return parseFdcoCSV(text);
+        }
+      }
+    } catch(e) { log('  jsDelivr miss for ' + season); }
+  }
+
+  // Fallback: football-data.co.uk via proxy
+  const y1 = String(startYear).slice(2).padStart(2,'0');
+  const y2 = String(startYear+1).slice(2).padStart(2,'0');
+  const fdcoUrl = `${FDCO}${y1}${y2}/${lg.fdco}.csv`;
+  const text = await fetchWithFallback(fdcoUrl);
+  return parseFdcoCSV(text);
+}
+
+// ══════════════════════════════════════════════════
+// FIREBASE SAVE
+// ══════════════════════════════════════════════════
+async function saveToFirebase(league, year, matches) {
+  await db.collection('users').doc(currentUser.uid)
+    .collection('seasons').doc(`${league}_${year}`)
+    .set({matches, league, year, at: firebase.firestore.FieldValue.serverTimestamp()});
+  fbStatus[`${league}_${year}`] = true;
+}
+
+// ══════════════════════════════════════════════════
+// IMPORT ONE SEASON
+// ══════════════════════════════════════════════════
+async function importSeason(league, year, btnEl) {
+  if (!currentUser) { alert('Please sign in first'); return; }
+  if (btnEl) { btnEl.disabled = true; btnEl.textContent = '…'; }
+  log(`Importing ${league} ${year}–${String(year+1).slice(2)}…`);
+
+  try {
+    const matches = await fetchCSVForSeason(league, year);
+    if (!matches?.length) throw new Error('No matches found');
+    await saveToFirebase(league, year, matches);
+    log(`  ✅ Saved ${matches.length} matches`);
+    if (btnEl) {
+      btnEl.textContent = '✓ Done';
+      btnEl.style.color = 'var(--win)';
+      btnEl.style.borderColor = 'var(--win)';
+    }
+    // Update status badge
+    const badge = document.getElementById(`status_${league}_${year}`);
+    if (badge) { badge.className = 'tag tag-green'; badge.textContent = `${matches.length} matches`; }
+    return true;
+  } catch(e) {
+    log(`  ❌ Failed: ${e.message}`);
+    if (btnEl) { btnEl.disabled = false; btnEl.textContent = 'Retry'; }
+    const badge = document.getElementById(`status_${league}_${year}`);
+    if (badge) { badge.className = 'tag tag-red'; badge.textContent = 'Failed'; }
+    return false;
+  }
+}
+
+// ══════════════════════════════════════════════════
+// IMPORT ALL MISSING
+// ══════════════════════════════════════════════════
+let importing = false;
+async function importAll() {
+  if (!currentUser || importing) return;
+  importing = true;
+  const btn = document.getElementById('importAllBtn');
+  const status = document.getElementById('importAllStatus');
+  btn.disabled = true;
+
+  // Collect all missing seasons
+  const todo = [];
+  for (const league of Object.keys(LEAGUES)) {
+    const lg = LEAGUES[league];
+    for (let y = lg.from; y <= cur; y++) {
+      if (!fbStatus[`${league}_${y}`]) todo.push({league, year:y});
+    }
+  }
+
+  if (!todo.length) {
+    status.textContent = '✅ Everything is already imported!';
+    btn.disabled = false;
+    importing = false;
+    return;
+  }
+
+  status.textContent = `Importing ${todo.length} seasons…`;
+  log(`\n=== Importing ${todo.length} missing seasons ===`);
+
+  let done = 0, failed = 0;
+  for (const {league, year} of todo) {
+    status.textContent = `${done + failed}/${todo.length} — ${league} ${year}–${String(year+1).slice(2)}…`;
+    const ok = await importSeason(league, year, null);
+    if (ok) done++; else failed++;
+    // Small delay to avoid hammering
+    await new Promise(r => setTimeout(r, 400));
+  }
+
+  status.textContent = `✅ Done: ${done} imported, ${failed} failed`;
+  log(`\n=== Complete: ${done} OK, ${failed} failed ===`);
+  btn.disabled = false;
+  importing = false;
+  buildGrid();
+}
+
+// ══════════════════════════════════════════════════
+// BUILD UI GRID
+// ══════════════════════════════════════════════════
+function buildGrid() {
+  const grid = document.getElementById('leagueGrid');
+  grid.innerHTML = Object.entries(LEAGUES).map(([code, lg]) => {
+    const years = [];
+    for (let y = lg.from; y <= cur; y++) years.push(y);
+    // Show most recent 8 seasons, with a "show all" toggle
+    const recent = years.slice(-8).reverse();
+    const rows = recent.map(y => {
+      const key = `${code}_${y}`;
+      const stored = fbStatus[key];
+      const isCurrent = (y === cur);
+      const label = `${y}–${String(y+1).slice(2)}${isCurrent?' (current)':''}`;
+      const statusHtml = stored
+        ? `<span class="tag tag-green" id="status_${key}">✓ Saved</span>`
+        : `<span class="tag tag-grey" id="status_${key}">Not yet</span>`;
+      return `<div class="season-row">
+        <span class="season-label">${label}</span>
+        <span class="season-status">${statusHtml}</span>
+        <button class="season-btn" onclick="importSeason('${code}',${y},this)" ${stored&&!isCurrent?'style="opacity:.4"':''}>
+          ${stored && !isCurrent ? 'Reimport' : 'Import'}
+        </button>
+      </div>`;
+    }).join('');
+
+    const totalYears = years.length;
+    const savedCount = years.filter(y => fbStatus[`${code}_${y}`]).length;
+
+    return `<div class="league-card">
+      <div class="league-header">
+        <span class="league-flag">${lg.flag}</span>
+        <div>
+          <div class="league-name">${lg.name}</div>
+          <div style="font-size:11px;color:var(--muted)">${savedCount}/${totalYears} seasons in Firebase</div>
+        </div>
+      </div>
+      <div class="season-list">${rows}</div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════
+// LOG
+// ══════════════════════════════════════════════════
+function log(msg) {
+  const el = document.getElementById('log');
+  el.style.display = 'block';
+  el.textContent += msg + '\n';
+  el.scrollTop = el.scrollHeight;
+  console.log(msg);
+}
+</script>
+</body>
+</html>
