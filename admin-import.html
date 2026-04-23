@@ -461,7 +461,7 @@ function buildMikGrid(){
     var lg=LG[code];
     var years=[],saved=0;
     for(var y=lg.from;y<=lg.to;y++){years.push(y);if(fbStatus[code+'_'+y]>0)saved++;}
-    var shown=years.slice().reverse().slice(0,10);
+    var shown=years.slice().reverse();
     var rows='';
     for(var i=0;i<shown.length;i++){
       var y=shown[i],key=code+'_'+y,cnt=fbStatus[key]||0;
