@@ -300,8 +300,9 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
   .sval{font-size:20px}
 
   /* VIEW TABS */
-  .vtabs-row{gap:8px}
-  .vtab{padding:6px 11px;font-size:12px}
+  .vtabs-row{gap:6px}
+  .vtabs{width:100%;overflow-x:auto}
+  .vtab{padding:5px 10px;font-size:11px;flex-shrink:0}
   .md-slider-wrap{flex-wrap:wrap;gap:6px;padding:7px 10px}
   .md-label{font-size:11px}
 
@@ -309,7 +310,14 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
   .twrap{border-radius:8px;-webkit-overflow-scrolling:touch}
   table{min-width:520px}
   thead th{padding:8px 8px;font-size:10px}
-  tbody td{padding:7px 8px;font-size:12px}
+  tbody td{padding:3px 5px;font-size:11px}
+  thead th{padding:4px 5px;font-size:9px}
+  .pbadge{width:16px;height:16px;font-size:9px}
+  .crest{width:16px;height:16px}
+  .cbar{width:3px;height:16px}
+  .cname{font-size:10px}
+  .fb{width:20px;height:20px;font-size:10px}
+  .fbs{gap:2px}
   .cname{font-size:12px}
   .fb{width:22px;height:22px;font-size:11px}
   .fbs{gap:3px}
@@ -440,7 +448,7 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
         <a href="https://www.football-data.co.uk" target="_blank">football-data.co.uk</a> (2023–present)
       </div>
       <div>
-        Contact: <a href="mailto:your@email.com">your@email.com</a> ·
+        Contact: <a href="mailto:sjohndamilola92@gmail.com">sjohndamilola92@gmail.com</a> ·
         <a href="#" onclick="showPrivacy();return false">Privacy Policy</a>
       </div>
     </div>
@@ -460,7 +468,7 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
       <li><strong>No tracking:</strong> This app contains no analytics, advertising, or third-party tracking of any kind.</li>
       <li><strong>No data sharing:</strong> Your data is never sold or shared with third parties.</li>
     </ul>
-    <p style="margin-top:12px">Questions? Contact: <a href="mailto:your@email.com">your@email.com</a></p>
+    <p style="margin-top:12px">Questions? Contact: <a href="mailto:sjohndamilola92@gmail.com">sjohndamilola92@gmail.com</a></p>
   </div>
 </div>
 
@@ -721,14 +729,15 @@ function parseDateDDMMYY(str) {
 
 function assignMatchdays(matches) {
   matches.sort((a,b) => a.date - b.date);
-  const lastMd = {};
-  let md = 1;
+  // Each match gets md = max(last md of home, last md of away) + 1
+  // This guarantees no team appears twice in the same matchday
+  // and keeps totals close to the actual number of gameweeks (38 for EPL etc.)
+  const teamMd = {};
   for (const m of matches) {
-    const max = Math.max(lastMd[m.home]||0, lastMd[m.away]||0);
-    if (max >= md) md = max + 1;
+    const md = Math.max(teamMd[m.home]||0, teamMd[m.away]||0) + 1;
     m.md = md;
-    lastMd[m.home] = md;
-    lastMd[m.away] = md;
+    teamMd[m.home] = md;
+    teamMd[m.away] = md;
   }
   return matches;
 }
@@ -785,18 +794,18 @@ async function loadHistoricalMatches(league, year) {
   const src = CSV_MAP[league];
   if (!src) { const e=new Error(); e.code='NO_CSV'; throw e; }
   let matches;
-  if (year <= 2022 && src.mikami) {
-    // Mikami CSV (all 1993–2022 in one file)
-    // parseMikamiCSV filters by the season_end_year column
-    // Mikami's season_end_year = start year + 1, e.g. 1993 means 1992-93 season
-    // But our year value IS the start year, so we pass year+1 to get the right season
+  if (year <= 2021 && src.mikami) {
+    // Mikami CSV: covers Season_End_Year 1993–2022 = seasons 1992-93 to 2021-22
+    // Our year = start year, Mikami's column = end year (year+1)
     const text = await fetchCSV(MIKAMI + src.mikami);
     matches = parseMikamiCSV(text, year + 1);
-  } else {
-    // football-data.co.uk — same source Mikami uses, no API key, updates daily
-    // fdcoUrl expects the END year: 2023 = 2022-23, 2026 = 2025-26
+  } else if (src.fdco) {
+    // football-data.co.uk — same source Mikami used, no API key, updates daily after matchdays
+    // fdcoUrl needs END year: start_year+1 → e.g. 2022 start → 2023 end → 2223/E0.csv (2022-23)
     const text = await fetchCSV(fdcoUrl(src.fdco, year + 1));
     matches = parseFdcoCSV(text);
+  } else {
+    const e=new Error(); e.code='NO_CSV'; throw e;
   }
   if (!matches?.length) { const e=new Error(); e.code='EMPTY_CSV'; throw e; }
   // 4. Cache
@@ -1160,7 +1169,7 @@ function renderError(code) {
     RATE:    ['Rate limit reached','Quota resets automatically — the bar above shows the countdown.'],
     NO_DATA: ['No data available','This league may not have started or standings aren\'t available yet.'],
     NO_CSV:  ['No historical data','Historical CSV data is only available for the Big 5 leagues.'],
-    EMPTY_CSV:['No data found','The data file returned no matches. This season may not have started yet, or the data source is temporarily unavailable. Try again later.'],
+    EMPTY_CSV:['No data found',`The data source returned no matches for this season. <br><br>For the <strong>current season</strong>, try a different historical season below, or check back after the next matchday.<br><br>For <strong>historical seasons</strong>, try clearing your browser cache and retrying.`],
     HTTP_403:['Access denied','Your API key doesn\'t have access to this competition or season.'],
     HTTP_404:['Not found','This competition doesn\'t exist in the API.'],
   };
