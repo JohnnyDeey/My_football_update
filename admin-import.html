@@ -522,7 +522,7 @@ async function importAllFdco(){
 
 async function getFdcoMatches(code,y){
   var fdcoCode=FDCO_CODES[code];
-  var ghCode=GH_MAP[fdcoCode];
+  var ghCode=GH[fdcoCode];
   // Try jsDelivr first (CORS-enabled, no proxy)
   if(ghCode){
     var season=y+'-'+String(y+1).slice(2);
