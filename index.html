@@ -181,23 +181,61 @@ body.dark thead th:nth-child(2){background:var(--surface)}
 .ycb{display:flex;align-items:center;gap:4px;padding:3px 8px;border-radius:14px;border:1.5px solid var(--border);font-size:11px;font-weight:500;cursor:pointer;font-family:var(--fb);color:var(--muted);transition:all .12s;user-select:none}
 .ycb input{width:12px;height:12px;accent-color:var(--g600);cursor:pointer;flex-shrink:0}
 .ycb.checked{border-color:var(--g600);color:var(--text);background:var(--g50)}
-.yearly-scroll{overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding-bottom:4px;position:relative}
+/* ── YEARLY TREND TABLE ── */
+/* Key: overflow-x:auto on the wrapper enables sticky inside it on mobile */
+.yearly-scroll{overflow-x:auto;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;position:relative;isolation:isolate}
 .yearly-scroll::-webkit-scrollbar{height:3px}
 .yearly-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-.yt{border-collapse:collapse;font-family:var(--fm);table-layout:fixed;border-spacing:0}
-.yt thead tr{background:var(--surface)}
-/* Sticky club column - MUST have solid background and high z-index */
-.yt-head-club{position:sticky;left:0;z-index:20;background:var(--surface);padding:4px 6px 4px 12px;text-align:left;font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;width:62px;min-width:62px;border-bottom:2px solid var(--border);box-shadow:2px 0 5px rgba(0,0,0,.08)}
-.yt-head-yr{font-size:9px;font-weight:700;color:var(--muted);text-align:center;padding:4px 1px;white-space:nowrap;width:26px;min-width:26px;letter-spacing:-.3px;border-bottom:2px solid var(--border);position:relative;z-index:0}
-.yt-club-cell{position:sticky;left:0;z-index:18;background:var(--card);padding:2px 5px 2px 10px;font-size:10px;font-weight:700;color:var(--text);white-space:nowrap;width:62px;min-width:62px;font-family:var(--fm);letter-spacing:.3px;border-bottom:1px solid var(--border-lt);box-shadow:2px 0 5px rgba(0,0,0,.08);vertical-align:middle}
-.yt-cell-inner{display:flex;align-items:center;gap:4px;width:100%}
-.yt-tla{transition:opacity .15s,max-width .15s;opacity:1;max-width:40px;overflow:hidden;display:inline-block;vertical-align:middle;white-space:nowrap}
-.yt-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0;vertical-align:middle}
+/* border-collapse:separate is REQUIRED for sticky+borders to work cross-browser */
+.yt{border-collapse:separate;border-spacing:0;font-family:var(--fm);width:max-content}
+/* Club column — sticky left, always on top */
+.yt-head-club{
+  position:sticky;left:0;z-index:30;
+  background:var(--surface);
+  padding:5px 8px 5px 10px;
+  text-align:left;font-size:9px;font-weight:700;
+  color:var(--muted);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;
+  min-width:58px;width:58px;
+  border-bottom:2px solid var(--border);
+  /* Hard shadow to cover year columns sliding underneath */
+  box-shadow:3px 0 0 var(--surface),4px 0 6px rgba(0,0,0,.12)}
+.yt-head-yr{
+  font-size:9px;font-weight:700;color:var(--muted);
+  text-align:center;padding:5px 1px;
+  min-width:24px;width:24px;
+  border-bottom:2px solid var(--border)}
+.yt-club-cell{
+  position:sticky;left:0;z-index:20;
+  background:var(--card);
+  padding:2px 6px 2px 10px;
+  font-size:10px;font-weight:700;color:var(--text);
+  white-space:nowrap;min-width:58px;width:58px;
+  font-family:var(--fm);letter-spacing:.3px;
+  border-bottom:1px solid var(--border-lt);
+  /* Shadow covers data cells scrolling underneath */
+  box-shadow:3px 0 0 var(--card),4px 0 6px rgba(0,0,0,.10)}
+.yt-tla{
+  display:inline-block;vertical-align:middle;
+  white-space:nowrap;overflow:hidden;
+  max-width:38px;transition:opacity .15s,max-width .15s}
+.yt-dot{
+  width:8px;height:8px;border-radius:50%;
+  display:inline-block;flex-shrink:0;vertical-align:middle;margin-right:3px}
 .yearly-scroll.scrolled .yt-tla{opacity:0;max-width:0}
-.yt-pos{width:26px;min-width:26px;height:22px;border-radius:0;text-align:center;vertical-align:middle;font-size:10px;font-weight:700;cursor:default;padding:0;border-bottom:1px solid var(--border-lt);border-right:1px solid rgba(255,255,255,.15)}
+.yt-pos{
+  min-width:24px;width:24px;height:22px;
+  text-align:center;vertical-align:middle;
+  font-size:10px;font-weight:700;cursor:default;padding:0;
+  border-bottom:1px solid var(--border-lt);
+  border-left:1px solid rgba(255,255,255,.08)}
 .yt-absent{background:var(--border-lt)!important;color:var(--muted)!important;font-size:9px}
-body.dark .yt-club-cell{background:var(--card)}
-body.dark .yt-head-club{background:var(--surface)}
+body.dark .yt-club-cell{
+  background:var(--card);
+  box-shadow:3px 0 0 var(--card),4px 0 6px rgba(0,0,0,.3)}
+body.dark .yt-head-club{
+  background:var(--surface);
+  box-shadow:3px 0 0 var(--surface),4px 0 6px rgba(0,0,0,.3)}
 
 /* Name popup toast */
 /* TLA tooltip toast — shown on tap/hover everywhere TLAs appear */
