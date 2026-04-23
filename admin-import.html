@@ -18,17 +18,18 @@ header{background:var(--card);border-bottom:3px solid var(--g700);padding:14px 2
 .logo{width:34px;height:34px;background:var(--g700);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
 h1{font-size:16px;font-weight:700;color:var(--g900)}
 .sub{font-size:11px;color:var(--muted);margin-top:1px}
-.wrap{max-width:880px;margin:0 auto;padding:20px 16px}
-.info{background:#fffbeb;border:1.5px solid #fcd34d;border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:12px;color:#78350f;line-height:1.7}
+.wrap{max-width:960px;margin:0 auto;padding:20px 16px}
+.info{background:#fffbeb;border:1.5px solid #fcd34d;border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:12px;color:#78350f;line-height:1.8}
 .info strong{color:#92400e}
+.info ol{margin-left:18px;margin-top:6px}
 .card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .card-title{font-size:14px;font-weight:700;margin-bottom:3px}
 .card-sub{font-size:12px;color:var(--muted);margin-bottom:14px}
-.btn{padding:8px 18px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:'DM Sans',system-ui,sans-serif}
-.btn-g{background:var(--g700);color:#fff;transition:background .15s}
+.btn{padding:8px 18px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:'DM Sans',system-ui,sans-serif;transition:all .15s}
+.btn-g{background:var(--g700);color:#fff}
 .btn-g:hover{background:var(--g900)}
 .btn-g:disabled{opacity:.4;cursor:not-allowed}
-.btn-o{background:transparent;border:1.5px solid var(--border);color:var(--muted);transition:all .15s}
+.btn-o{background:transparent;border:1.5px solid var(--border);color:var(--muted)}
 .btn-o:hover{border-color:var(--g600);color:var(--g700)}
 .tag{font-size:10px;padding:2px 7px;border-radius:8px;font-weight:600;display:inline-block;white-space:nowrap}
 .tg{background:#dcfce7;color:#166534}
@@ -39,12 +40,17 @@ h1{font-size:16px;font-weight:700;color:var(--g900)}
 .pw-center h2{font-size:22px;margin-bottom:8px;color:var(--g900)}
 .pw-center p{color:var(--muted);font-size:13px;margin-bottom:20px}
 .pw-row{display:flex;gap:8px;max-width:340px;margin:0 auto}
-input.pw{flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;outline:none;color:var(--text);font-family:'DM Sans',system-ui,sans-serif}
+input.pw{flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;outline:none;color:var(--text);font-family:inherit}
 input.pw:focus{border-color:var(--g600)}
-.err{color:#dc2626;font-size:12px;margin-top:8px;text-align:center}
+.err-t{color:#dc2626;font-size:12px;margin-top:8px;text-align:center}
+/* Tabs */
+.tabs{display:flex;gap:3px;background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:3px;margin-bottom:16px;width:fit-content}
+.tab{padding:7px 18px;border-radius:7px;border:none;background:transparent;color:var(--muted);font-family:inherit;font-size:13px;font-weight:500;cursor:pointer}
+.tab.active{background:var(--g700);color:#fff}
+/* Mikami table */
 .top-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px;padding-bottom:16px;border-bottom:1.5px solid var(--border)}
 #smsg{font-size:12px;color:var(--muted)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(256px,1fr));gap:10px;margin-top:4px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(256px,1fr));gap:10px}
 .lcard{border:1.5px solid var(--border);border-radius:10px;padding:12px;background:var(--bg)}
 .lhdr{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .lflag{font-size:18px}
@@ -54,10 +60,30 @@ input.pw:focus{border-color:var(--g600)}
 .srow{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px}
 .srow:last-child{border:none}
 .slabel{flex:1;font-weight:500}
-.sbtn{padding:3px 9px;font-size:11px;border-radius:5px;border:1.5px solid var(--g600);background:transparent;color:var(--g700);cursor:pointer;font-weight:600;font-family:'DM Sans',system-ui,sans-serif}
+.sbtn{padding:3px 9px;font-size:11px;border-radius:5px;border:1.5px solid var(--g600);background:transparent;color:var(--g700);cursor:pointer;font-weight:600;font-family:inherit}
 .sbtn:hover{background:var(--g50)}
 .sbtn:disabled{opacity:.35;cursor:not-allowed}
-#log{background:#0d1a0c;color:#4ade80;font-family:'DM Mono',monospace;font-size:11px;padding:12px 14px;border-radius:8px;max-height:200px;overflow-y:auto;white-space:pre-wrap;display:none;margin-top:14px;line-height:1.6}
+/* Manual upload section */
+.upload-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-top:4px}
+.ucard{border:1.5px solid var(--border);border-radius:10px;padding:14px;background:var(--bg)}
+.ucard-title{font-size:13px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.season-upload-list{display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto}
+.su-row{display:flex;align-items:center;gap:6px;font-size:12px;padding:3px 0;border-bottom:1px solid var(--border)}
+.su-row:last-child{border:none}
+.su-label{flex:1;font-weight:500}
+.dl-link{font-size:11px;color:var(--g700);text-decoration:none;font-weight:600;white-space:nowrap}
+.dl-link:hover{text-decoration:underline}
+.file-input-wrap{position:relative;overflow:hidden}
+.file-btn{padding:3px 9px;font-size:11px;border-radius:5px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;font-weight:600;font-family:inherit;white-space:nowrap}
+.file-btn:hover{border-color:var(--g600);color:var(--g700)}
+.file-input-wrap input[type=file]{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer}
+/* Drop zone */
+.drop-zone{border:2px dashed var(--border);border-radius:12px;padding:28px;text-align:center;margin-bottom:16px;transition:all .2s;cursor:pointer}
+.drop-zone.over{border-color:var(--g600);background:var(--g50)}
+.drop-zone p{font-size:13px;color:var(--muted);margin-top:6px}
+.drop-zone .dz-icon{font-size:32px}
+/* Log */
+#log{background:#0d1a0c;color:#4ade80;font-family:'DM Mono',monospace;font-size:11px;padding:12px 14px;border-radius:8px;max-height:180px;overflow-y:auto;white-space:pre-wrap;display:none;margin-top:14px;line-height:1.6}
 @keyframes spin{to{transform:rotate(360deg)}}
 .sp{display:inline-block;width:11px;height:11px;border:2px solid rgba(21,128,61,.2);border-top-color:var(--g700);border-radius:50%;animation:spin .5s linear infinite;vertical-align:middle;margin-right:3px}
 </style>
@@ -67,10 +93,11 @@ input.pw:focus{border-color:var(--g600)}
   <div class="logo">⚽</div>
   <div>
     <h1>Football Analytics — Data Import</h1>
-    <div class="sub">Import all seasons into Firebase · No Google sign-in required</div>
+    <div class="sub">Load all seasons into Firebase · No sign-in required</div>
   </div>
 </header>
 
+<!-- Password gate -->
 <div class="wrap" id="gate">
   <div class="pw-center">
     <h2>🔐 Admin</h2>
@@ -79,32 +106,80 @@ input.pw:focus{border-color:var(--g600)}
       <input type="password" id="pwIn" class="pw" placeholder="Password…" onkeydown="if(event.key==='Enter')checkPw()">
       <button class="btn btn-g" onclick="checkPw()">Enter</button>
     </div>
-    <div class="err" id="pwErr"></div>
+    <div class="err-t" id="pwErr"></div>
   </div>
 </div>
 
+<!-- Main -->
 <div class="wrap" id="main" style="display:none">
+
   <div class="info">
-    <strong>One-time setup:</strong> Click <strong>Import All Missing</strong> to load every season into Firebase (~5–10 min).
-    After that, re-import only the <strong>current season 🔄</strong> row after each matchday week.
-    Data sources: Mikami CSVs (1992–2021) and football-data.co.uk via jsDelivr CDN (2022–present).
+    <strong>Two import methods — use both:</strong>
+    <ol>
+      <li><strong>Auto (Mikami 1992–2021):</strong> Click "Import All Mikami" — fetches automatically, no download needed.</li>
+      <li><strong>Manual (2022–present):</strong> Click the ↓ download link for each season, save the file, then click "Upload CSV" to import it. Only takes ~30 seconds per season.</li>
+    </ol>
+    After the first full import, you only need to re-upload the <strong>current season</strong> after each matchday.
   </div>
-  <div class="card">
-    <div class="card-title">Import Controls</div>
-    <div class="card-sub">Green = already in Firebase. Numbers = match count stored.</div>
-    <div class="top-bar">
-      <button class="btn btn-g" id="allBtn" onclick="importAll()">⬇ Import All Missing</button>
-      <button class="btn btn-o" onclick="checkStatus()">↻ Refresh</button>
-      <span id="smsg"></span>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('mikami')">📦 Mikami (1992–2021)</button>
+    <button class="tab" onclick="showTab('manual')">📥 Manual Upload (2022–now)</button>
+    <button class="tab" onclick="showTab('drop')">🗂 Drop Files</button>
+  </div>
+
+  <!-- TAB: Mikami auto import -->
+  <div id="tab-mikami">
+    <div class="card">
+      <div class="card-title">Auto-import from Mikami CSVs</div>
+      <div class="card-sub">Fetches 1992–2021 seasons automatically. Big 5 leagues only.</div>
+      <div class="top-bar">
+        <button class="btn btn-g" id="allBtn" onclick="importAllMikami()">⬇ Import All Mikami</button>
+        <button class="btn btn-o" onclick="checkStatus()">↻ Refresh</button>
+        <span id="smsg"></span>
+      </div>
+      <div class="grid" id="mikGrid"></div>
     </div>
-    <div class="grid" id="grid"></div>
-    <pre id="log"></pre>
   </div>
+
+  <!-- TAB: Manual upload per season -->
+  <div id="tab-manual" style="display:none">
+    <div class="card">
+      <div class="card-title">Manual upload — 2022–present seasons</div>
+      <div class="card-sub">
+        Click ↓ to download the CSV from football-data.co.uk, then click "Upload CSV" to import it into Firebase.
+      </div>
+      <div class="upload-grid" id="manualGrid"></div>
+    </div>
+  </div>
+
+  <!-- TAB: Drop zone -->
+  <div id="tab-drop" style="display:none">
+    <div class="card">
+      <div class="card-title">Drop CSV files here</div>
+      <div class="card-sub">
+        Drag and drop any number of downloaded CSV files at once. The app auto-detects the league and season from the file contents.
+      </div>
+      <div class="drop-zone" id="dropZone"
+        ondragover="event.preventDefault();this.classList.add('over')"
+        ondragleave="this.classList.remove('over')"
+        ondrop="handleDrop(event)">
+        <div class="dz-icon">📂</div>
+        <strong style="font-size:14px">Drop CSV files here</strong>
+        <p>Or click to select files</p>
+        <input type="file" accept=".csv" multiple onchange="handleFileSelect(this.files)"
+          style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer">
+      </div>
+    </div>
+  </div>
+
+  <pre id="log"></pre>
+
 </div>
 
 <script>
-var ADMIN_PW = 'football2026';
-var FB_CFG = {
+var ADMIN_PW='football2026';
+var FB_CFG={
   apiKey:"AIzaSyCQbtCVM3Cm7Jdzg8dsEkG1SOJqzALXhTw",
   authDomain:"football-analytics-26e72.firebaseapp.com",
   projectId:"football-analytics-26e72",
@@ -112,57 +187,73 @@ var FB_CFG = {
   messagingSenderId:"458729335310",
   appId:"1:458729335310:web:5861c5d69493c52ee0ea5f"
 };
+
 var MIKAMI='https://mikami3345.cloudfree.jp/SoccerData/csv_data/';
-var FDCO='https://www.football-data.co.uk/mmz4281/';
-var JSDELIVR='https://cdn.jsdelivr.net/gh/footballcsv/cache.footballdata@master/';
+var FDCO_BASE='https://www.football-data.co.uk/mmz4281/';
 var PROXIES=[
   function(u){return 'https://corsproxy.io/?'+encodeURIComponent(u);},
   function(u){return 'https://api.allorigins.win/raw?url='+encodeURIComponent(u);},
   function(u){return 'https://proxy.cors.sh/'+u;}
 ];
-var GH={E0:'ENG.1',E1:'ENG.2',SP1:'ESP.1',D1:'DEU.1',I1:'ITA.1',F1:'FRA.1',N1:'NED.1',P1:'POR.1'};
-var LG={
-  PL:{name:'Premier League',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',mk:'Premier_1993-2022.csv',fdco:'E0',from:1992},
-  PD:{name:'La Liga',flag:'🇪🇸',mk:'LaLiga1_1994-2022.csv',fdco:'SP1',from:1993},
-  BL1:{name:'Bundesliga',flag:'🇩🇪',mk:'Bundes_1994-2022.csv',fdco:'D1',from:1993},
-  SA:{name:'Serie A',flag:'🇮🇹',mk:'SerieA_1994-2022.csv',fdco:'I1',from:1993},
-  FL1:{name:'Ligue 1',flag:'🇫🇷',mk:'Ligue1_1993-2022.csv',fdco:'F1',from:1992},
-  PPL:{name:'Primeira Liga',flag:'🇵🇹',fdco:'P1',from:2000},
-  DED:{name:'Eredivisie',flag:'🇳🇱',fdco:'N1',from:2000},
-  ELC:{name:'Championship',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',fdco:'E1',from:2000}
-};
-var db=null, status={}, busy=false;
-function cur(){var d=new Date();return d.getMonth()>=7?d.getFullYear():d.getFullYear()-1;}
-var CUR=cur();
 
+// Big 5 have Mikami + fdco. Others fdco only.
+var LG={
+  PL:{n:'Premier League',f:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',mk:'Premier_1993-2022.csv',fdco:'E0',from:1992,to:2021},
+  PD:{n:'La Liga',f:'🇪🇸',mk:'LaLiga1_1994-2022.csv',fdco:'SP1',from:1993,to:2021},
+  BL1:{n:'Bundesliga',f:'🇩🇪',mk:'Bundes_1994-2022.csv',fdco:'D1',from:1993,to:2021},
+  SA:{n:'Serie A',f:'🇮🇹',mk:'SerieA_1994-2022.csv',fdco:'I1',from:1993,to:2021},
+  FL1:{n:'Ligue 1',f:'🇫🇷',mk:'Ligue1_1993-2022.csv',fdco:'F1',from:1992,to:2021}
+};
+// fdco codes for manual seasons (2022+)
+var FDCO_CODES={PL:'E0',PD:'SP1',BL1:'D1',SA:'I1',FL1:'F1',PPL:'P1',DED:'N1',ELC:'E1'};
+var FDCO_NAMES={PL:'Premier League',PD:'La Liga',BL1:'Bundesliga',SA:'Serie A',FL1:'Ligue 1',PPL:'Primeira Liga',DED:'Eredivisie',ELC:'Championship'};
+var FDCO_FLAGS={PL:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',PD:'🇪🇸',BL1:'🇩🇪',SA:'🇮🇹',FL1:'🇫🇷',PPL:'🇵🇹',DED:'🇳🇱',ELC:'🏴󠁧󠁢󠁥󠁮󠁧󠁿'};
+
+var db=null, fbStatus={}, busy=false;
+
+function getCur(){var d=new Date();return d.getMonth()>=7?d.getFullYear():d.getFullYear()-1;}
+var CUR=getCur();
+
+// ── Password ──
 function checkPw(){
   if(document.getElementById('pwIn').value===ADMIN_PW){
     document.getElementById('gate').style.display='none';
     document.getElementById('main').style.display='block';
     firebase.initializeApp(FB_CFG);
     db=firebase.firestore();
-    log('Firebase connected');
-    buildGrid();
+    log('Firebase connected ✓');
     checkStatus();
   } else {
     document.getElementById('pwErr').textContent='Incorrect password';
   }
 }
 
-async function checkStatus(){
-  msg('Checking Firebase...');
-  try{
-    var snap=await db.collection('seasons').get();
-    snap.forEach(function(d){status[d.id]=d.data().matches?d.data().matches.length:0;});
-    msg(snap.size+' seasons in Firebase');
-    log('Found '+snap.size+' seasons');
-  }catch(e){msg('Error: '+e.message);}
-  buildGrid();
+// ── Tabs ──
+function showTab(name){
+  ['mikami','manual','drop'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display=t===name?'block':'none';
+  });
+  document.querySelectorAll('.tab').forEach(function(b,i){
+    b.classList.toggle('active',['mikami','manual','drop'][i]===name);
+  });
 }
 
+// ── Status ──
+async function checkStatus(){
+  msg('Checking Firebase…');
+  try{
+    var snap=await db.collection('seasons').get();
+    snap.forEach(function(d){fbStatus[d.id]=d.data().matches?d.data().matches.length:0;});
+    msg(snap.size+' seasons saved in Firebase');
+    log('Found '+snap.size+' seasons in Firebase');
+  }catch(e){msg('Error: '+e.message);}
+  buildMikGrid();
+  buildManualGrid();
+}
+
+// ── CSV Parsing ──
 function parseDDMMYY(s){
-  var p=s.trim().split('/');
-  if(p.length<3)return 0;
+  var p=s.trim().split('/');if(p.length<3)return 0;
   var y=parseInt(p[2]);y+=y<50?2000:1900;
   return new Date(y,parseInt(p[1])-1,parseInt(p[0])).getTime();
 }
@@ -175,7 +266,7 @@ function assignMDs(ms){
   }
   return ms;
 }
-function parseMK(text,ey){
+function parseMikami(text,ey){
   var ms=[],lines=text.split('\n');
   for(var i=1;i<lines.length;i++){
     var c=lines[i].split(',');
@@ -186,12 +277,11 @@ function parseMK(text,ey){
   }
   return assignMDs(ms);
 }
-function parseFD(text){
+function parseFdco(text){
   var ms=[],lines=text.split('\n');
   for(var i=1;i<lines.length;i++){
     if(!lines[i].trim())continue;
-    var c=lines[i].split(',');
-    if(c.length<6)continue;
+    var c=lines[i].split(',');if(c.length<6)continue;
     var h=c[2].trim(),a=c[3].trim(),hg=parseInt(c[4]),ag=parseInt(c[5]);
     if(!h||!a||isNaN(hg)||isNaN(ag))continue;
     ms.push({date:parseDDMMYY(c[1]),home:h,away:a,hg:hg,ag:ag});
@@ -199,130 +289,227 @@ function parseFD(text){
   return assignMDs(ms);
 }
 
+// Detect league+season from fdco filename like "E0.csv" and content
+function detectFromFdco(filename, text){
+  // Guess league from filename
+  var code=null;
+  for(var k in FDCO_CODES){
+    if(filename.toUpperCase().indexOf(FDCO_CODES[k].toUpperCase())!==-1){code=k;break;}
+  }
+  if(!code)return null;
+  // Guess season from first date in CSV
+  var lines=text.split('\n');
+  for(var i=1;i<Math.min(lines.length,5);i++){
+    var c=lines[i].split(',');if(c.length<3)continue;
+    var d=parseDDMMYY(c[1]);if(!d)continue;
+    var dt=new Date(d);
+    var mo=dt.getMonth();
+    var yr=dt.getFullYear();
+    var startYear=mo>=7?yr:yr-1;
+    return {code:code,year:startYear};
+  }
+  return null;
+}
+
+// ── Fetch (for Mikami only — fdco is manual) ──
 async function fetchText(url){
-  try{var r=await fetch(url,{signal:AbortSignal.timeout(12000)});if(r.ok)return r.text();}catch(e){}
+  try{var r=await fetch(url,{signal:AbortSignal.timeout(14000)});if(r.ok)return r.text();}catch(e){}
   for(var i=0;i<PROXIES.length;i++){
-    try{var r=await fetch(PROXIES[i](url),{signal:AbortSignal.timeout(12000)});if(r.ok)return r.text();}catch(e){}
+    try{var r=await fetch(PROXIES[i](url),{signal:AbortSignal.timeout(14000)});if(r.ok)return r.text();}catch(e){}
   }
-  throw new Error('All fetches failed for: '+url.split('/').slice(-2).join('/'));
+  throw new Error('All fetches failed');
 }
 
-async function getMatches(code,sy){
-  var lg=LG[code];
-  if(sy<=2021&&lg.mk){
-    log('  Mikami: '+code+' '+sy+'–'+String(sy+1).slice(2));
-    var t=await fetchText(MIKAMI+lg.mk);
-    var ms=parseMK(t,sy+1);
-    log('  → '+ms.length+' matches');
-    return ms;
-  }
-  var gh=GH[lg.fdco];
-  if(gh){
-    var season=sy+'-'+String(sy+1).slice(2);
-    var url=JSDELIVR+season+'/'+gh+'.csv';
-    try{
-      log('  jsDelivr: '+season+'/'+gh+'.csv');
-      var r=await fetch(url,{signal:AbortSignal.timeout(12000)});
-      if(r.ok){var t=await r.text();if(t.length>200){var ms=parseFD(t);log('  → '+ms.length+' matches');return ms;}}
-    }catch(e){log('  jsDelivr miss');}
-  }
-  var y1=String(sy).slice(2).padStart(2,'0'),y2=String(sy+1).slice(2).padStart(2,'0');
-  var url=FDCO+y1+y2+'/'+lg.fdco+'.csv';
-  log('  fdco proxy: '+y1+y2+'/'+lg.fdco+'.csv');
-  var t=await fetchText(url);
-  var ms=parseFD(t);
-  log('  → '+ms.length+' matches');
-  return ms;
+// ── Firebase Save ──
+async function saveToDB(code,year,matches){
+  var key=code+'_'+year;
+  await db.collection('seasons').doc(key).set({
+    matches:matches,league:code,year:year,
+    at:firebase.firestore.FieldValue.serverTimestamp()
+  });
+  fbStatus[key]=matches.length;
 }
 
-async function importOne(code,year,btn){
+// ── MIKAMI AUTO IMPORT ──
+async function importMikamiOne(code,year,btn){
   var key=code+'_'+year;
   if(btn){btn.disabled=true;btn.innerHTML='<span class="sp"></span>';}
-  badge(key,'...');
+  setBadge(key,'...');
   try{
-    var ms=await getMatches(code,year);
-    if(!ms||!ms.length)throw new Error('No matches returned');
-    await db.collection('seasons').doc(key).set({
-      matches:ms,league:code,year:year,
-      at:firebase.firestore.FieldValue.serverTimestamp()
-    });
-    status[key]=ms.length;
-    log('OK '+code+' '+year+': '+ms.length+' matches saved');
-    badge(key,ms.length+'');
+    var lg=LG[code];
+    log('Fetching Mikami: '+code+' '+year+'–'+String(year+1).slice(2)+'…');
+    var text=await fetchText(MIKAMI+lg.mk);
+    var ms=parseMikami(text,year+1);
+    if(!ms||!ms.length)throw new Error('No matches found');
+    await saveToDB(code,year,ms);
+    log('✅ Saved '+ms.length+' matches');
+    setBadge(key,ms.length+'');
     if(btn){btn.disabled=false;btn.textContent='↻';}
     return true;
   }catch(e){
-    log('FAIL '+code+' '+year+': '+e.message);
-    badge(key,'ERR');
+    log('❌ Error: '+e.message);
+    setBadge(key,'ERR');
     if(btn){btn.disabled=false;btn.textContent='Retry';}
     return false;
   }
 }
 
-function badge(key,val){
-  var el=document.getElementById('b_'+key);
-  if(!el)return;
-  if(val==='...')el.className='tag ta';
-  else if(val==='ERR')el.className='tag tr';
-  else el.className='tag tg';
-  el.textContent=val==='...'?'…':val==='ERR'?'Error':val+' ✓';
-}
-
-async function importAll(){
-  if(busy)return;
-  busy=true;
+var busy=false;
+async function importAllMikami(){
+  if(busy)return;busy=true;
   var btn=document.getElementById('allBtn');
   btn.disabled=true;
   var todo=[];
   for(var code in LG){
     var lg=LG[code];
-    for(var y=lg.from;y<=CUR;y++){
-      if(!status[code+'_'+y])todo.push([code,y]);
+    for(var y=lg.from;y<=lg.to;y++){
+      if(!fbStatus[code+'_'+y])todo.push([code,y]);
     }
   }
-  if(!todo.length){msg('Everything already in Firebase!');btn.disabled=false;busy=false;return;}
-  log('\nImporting '+todo.length+' missing seasons...\n');
+  if(!todo.length){msg('All Mikami seasons already imported!');btn.disabled=false;busy=false;return;}
+  log('\nImporting '+todo.length+' missing Mikami seasons…\n');
   var done=0,fail=0;
   for(var i=0;i<todo.length;i++){
     var code=todo[i][0],y=todo[i][1];
     msg((done+fail)+'/'+todo.length+' — '+code+' '+y+'–'+String(y+1).slice(2));
-    var ok=await importOne(code,y,null);
+    var ok=await importMikamiOne(code,y,null);
     ok?done++:fail++;
     await new Promise(function(r){setTimeout(r,300);});
   }
   msg('Done: '+done+' imported, '+fail+' failed');
-  log('\nFinished: '+done+' OK, '+fail+' failed');
+  log('\n═══ Mikami import done: '+done+' OK, '+fail+' failed ═══');
   btn.disabled=false;busy=false;
-  buildGrid();
+  buildMikGrid();
 }
 
-function buildGrid(){
-  var grid=document.getElementById('grid');
+// ── MANUAL UPLOAD ──
+function fdcoUrl(fdcoCode,startYear){
+  var y1=String(startYear).slice(2).padStart(2,'0');
+  var y2=String(startYear+1).slice(2).padStart(2,'0');
+  return FDCO_BASE+y1+y2+'/'+fdcoCode+'.csv';
+}
+
+function handleFileUpload(code,year,input){
+  var file=input.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=async function(e){
+    var text=e.target.result;
+    var key=code+'_'+year;
+    setBadge(key,'...');
+    try{
+      var ms=parseFdco(text);
+      if(!ms||!ms.length)throw new Error('No matches in file');
+      await saveToDB(code,year,ms);
+      log('✅ '+code+' '+year+'–'+String(year+1).slice(2)+': saved '+ms.length+' matches');
+      setBadge(key,ms.length+'');
+      buildManualGrid();
+    }catch(err){
+      log('❌ '+code+' '+year+': '+err.message);
+      setBadge(key,'ERR');
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ── DROP ZONE ──
+function handleDrop(e){
+  e.preventDefault();
+  document.getElementById('dropZone').classList.remove('over');
+  handleFileSelect(e.dataTransfer.files);
+}
+function handleFileSelect(files){
+  for(var i=0;i<files.length;i++) processDroppedFile(files[i]);
+}
+function processDroppedFile(file){
+  var reader=new FileReader();
+  reader.onload=async function(e){
+    var text=e.target.result;
+    var info=detectFromFdco(file.name,text);
+    if(!info){
+      log('Could not detect league from: '+file.name);
+      return;
+    }
+    var key=info.code+'_'+info.year;
+    try{
+      var ms=parseFdco(text);
+      if(!ms||!ms.length)throw new Error('No matches');
+      await saveToDB(info.code,info.year,ms);
+      log('✅ '+file.name+' → '+info.code+' '+info.year+'–'+String(info.year+1).slice(2)+': '+ms.length+' matches saved');
+      buildManualGrid();
+      checkStatus();
+    }catch(err){
+      log('❌ '+file.name+': '+err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ── BUILD GRIDS ──
+function buildMikGrid(){
+  var grid=document.getElementById('mikGrid');
   var html='';
   for(var code in LG){
     var lg=LG[code];
     var years=[],saved=0;
-    for(var y=lg.from;y<=CUR;y++){years.push(y);if(status[code+'_'+y]>0)saved++;}
-    var shown=years.slice().reverse().slice(0,12);
+    for(var y=lg.from;y<=lg.to;y++){years.push(y);if(fbStatus[code+'_'+y]>0)saved++;}
+    var shown=years.slice().reverse().slice(0,10);
     var rows='';
     for(var i=0;i<shown.length;i++){
-      var y=shown[i],key=code+'_'+y,cnt=status[key]||0,isCur=y===CUR;
-      var lbl=y+'–'+String(y+1).slice(2)+(isCur?' 🔄':'');
-      var bdg=cnt>0
-        ?'<span class="tag tg" id="b_'+key+'">'+cnt+' ✓</span>'
-        :'<span class="tag tn" id="b_'+key+'">Missing</span>';
+      var y=shown[i],key=code+'_'+y,cnt=fbStatus[key]||0;
+      var lbl=y+'–'+String(y+1).slice(2);
+      var bdg=cnt>0?'<span class="tag tg" id="b_'+key+'">'+cnt+' ✓</span>':'<span class="tag tn" id="b_'+key+'">Missing</span>';
       rows+='<div class="srow"><span class="slabel">'+lbl+'</span>'+bdg
-        +'<button class="sbtn" onclick="importOne(\''+code+'\','+y+',this)">'
-        +(cnt>0&&!isCur?'↻':'Import')+'</button></div>';
+        +'<button class="sbtn" onclick="importMikamiOne(\''+code+'\','+y+',this)">'
+        +(cnt>0?'↻':'Import')+'</button></div>';
     }
-    html+='<div class="lcard"><div class="lhdr"><span class="lflag">'+lg.flag+'</span>'
-      +'<div><div class="lname">'+lg.name+'</div>'
-      +'<div class="lprog">'+saved+'/'+years.length+' in Firebase</div></div></div>'
+    html+='<div class="lcard"><div class="lhdr"><span class="lflag">'+lg.f+'</span>'
+      +'<div><div class="lname">'+lg.n+'</div><div class="lprog">'+saved+'/'+years.length+' in Firebase</div></div></div>'
       +'<div class="slist">'+rows+'</div></div>';
   }
   grid.innerHTML=html;
 }
 
+function buildManualGrid(){
+  var grid=document.getElementById('manualGrid');
+  var html='';
+  for(var code in FDCO_CODES){
+    var fdcoCode=FDCO_CODES[code];
+    var rows='';
+    // Show 2022 up to current season
+    for(var y=CUR;y>=2022;y--){
+      var key=code+'_'+y;
+      var cnt=fbStatus[key]||0;
+      var isCur=y===CUR;
+      var lbl=y+'–'+String(y+1).slice(2)+(isCur?' 🔄':'');
+      var dlUrl=fdcoUrl(fdcoCode,y);
+      var bdg=cnt>0
+        ?'<span class="tag tg" id="b_'+key+'">'+cnt+' ✓</span>'
+        :'<span class="tag tn" id="b_'+key+'">Missing</span>';
+      rows+='<div class="su-row">'
+        +'<span class="su-label">'+lbl+'</span>'
+        +bdg
+        +'<a class="dl-link" href="'+dlUrl+'" target="_blank" title="Download CSV">↓ CSV</a>'
+        +'<div class="file-input-wrap">'
+        +'<button class="file-btn">Upload</button>'
+        +'<input type="file" accept=".csv" onchange="handleFileUpload(\''+code+'\','+y+',this)">'
+        +'</div>'
+        +'</div>';
+    }
+    html+='<div class="ucard">'
+      +'<div class="ucard-title"><span>'+FDCO_FLAGS[code]+'</span>'+FDCO_NAMES[code]+'</div>'
+      +'<div class="season-upload-list">'+rows+'</div>'
+      +'</div>';
+  }
+  grid.innerHTML=html;
+}
+
+function setBadge(key,val){
+  var el=document.getElementById('b_'+key);if(!el)return;
+  if(val==='...')el.className='tag ta';
+  else if(val==='ERR')el.className='tag tr';
+  else el.className='tag tg';
+  el.textContent=val==='...'?'…':val==='ERR'?'Error':val+' ✓';
+}
 function msg(s){document.getElementById('smsg').textContent=s;}
 function log(s){
   var el=document.getElementById('log');
