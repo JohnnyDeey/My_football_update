@@ -486,7 +486,9 @@ async function importAllFdco(){
   var todo=[];
   for(var code in FDCO_CODES){
     for(var y=2022;y<=CUR;y++){
-      if(!fbStatus[code+'_'+y])todo.push([code,y]);
+      var key=code+'_'+y;
+      // Always include current season (to get latest matches) + missing seasons
+      if(!fbStatus[key]||y===CUR)todo.push([code,y]);
     }
   }
   if(!todo.length){
@@ -522,27 +524,30 @@ async function importAllFdco(){
 
 async function getFdcoMatches(code,y){
   var fdcoCode=FDCO_CODES[code];
+  var y1=String(y).slice(2).padStart(2,'0'),y2=String(y+1).slice(2).padStart(2,'0');
+  var fdcoUrl=FDCO_BASE+y1+y2+'/'+fdcoCode+'.csv';
   var ghCode=GH[fdcoCode];
-  // Try jsDelivr first (CORS-enabled, no proxy)
+
+  // 1. Try jsDelivr (CORS, no proxy needed)
   if(ghCode){
     var season=y+'-'+String(y+1).slice(2);
-    var url=JSDELIVR+season+'/'+ghCode+'.csv';
+    var ghUrl=JSDELIVR+season+'/'+ghCode+'.csv';
     try{
-      var r=await fetch(url,{signal:AbortSignal.timeout(12000)});
-      if(r.ok){
-        var t=await r.text();
-        if(t.length>200){
-          var ms=parseFdco(t);
-          if(ms.length>0){log('  jsDelivr: '+ms.length+' matches');return ms;}
-        }
-      }
-    }catch(e){log('  jsDelivr miss for '+season);}
+      var r=await fetch(ghUrl,{signal:AbortSignal.timeout(12000)});
+      if(r.ok){var t=await r.text();if(t.length>200){var ms=parseFdco(t);if(ms.length>0){log('  ✓ jsDelivr ('+ms.length+' matches)');return ms;}}}
+    }catch(e){}
+    log('  jsDelivr miss — trying direct/proxy');
   }
-  // Fallback: fdco via proxy
-  var y1=String(y).slice(2).padStart(2,'0'),y2=String(y+1).slice(2).padStart(2,'0');
-  var url=FDCO_BASE+y1+y2+'/'+fdcoCode+'.csv';
-  log('  Proxy: '+y1+y2+'/'+fdcoCode+'.csv');
-  var t=await fetchText(url);
+
+  // 2. Try direct fetch of fdco (works from browser directly sometimes)
+  try{
+    var r=await fetch(fdcoUrl,{signal:AbortSignal.timeout(10000)});
+    if(r.ok){var t=await r.text();if(t.length>200){var ms=parseFdco(t);if(ms.length>0){log('  ✓ Direct fdco ('+ms.length+' matches)');return ms;}}}
+  }catch(e){}
+
+  // 3. Proxy fallback
+  log('  Trying proxy for '+y1+y2+'/'+fdcoCode+'.csv');
+  var t=await fetchText(fdcoUrl);
   return parseFdco(t);
 }
 
