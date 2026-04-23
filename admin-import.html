@@ -147,7 +147,11 @@ input.pw:focus{border-color:var(--g600)}
     <div class="card">
       <div class="card-title">Manual upload — 2022–present seasons</div>
       <div class="card-sub">
-        Click ↓ to download the CSV from football-data.co.uk, then click "Upload CSV" to import it into Firebase.
+        Try <strong>Auto-Import All</strong> first — it now works for most seasons. If any fail, use the ↓ download + Upload CSV method below.
+      </div>
+      <div class="top-bar">
+        <button class="btn btn-g" id="fdcoAllBtn" onclick="importAllFdco()">⬇ Auto-Import All (2022–now)</button>
+        <span id="fdcoMsg" style="font-size:12px;color:var(--muted)"></span>
       </div>
       <div class="upload-grid" id="manualGrid"></div>
     </div>
@@ -282,7 +286,12 @@ function parseFdco(text){
   for(var i=1;i<lines.length;i++){
     if(!lines[i].trim())continue;
     var c=lines[i].split(',');if(c.length<6)continue;
-    var h=c[2].trim(),a=c[3].trim(),hg=parseInt(c[4]),ag=parseInt(c[5]);
+    // New fdco format has Time column at c[2]: Div,Date,Time,HomeTeam,AwayTeam,FTHG,FTAG
+    // Old format:                                Div,Date,HomeTeam,AwayTeam,FTHG,FTAG
+    // Detect by checking if c[2] looks like a time (HH:MM) or a team name
+    var hasTime=/^\d{1,2}:\d{2}$/.test(c[2].trim());
+    var off=hasTime?1:0;
+    var h=c[2+off].trim(),a=c[3+off].trim(),hg=parseInt(c[4+off]),ag=parseInt(c[5+off]);
     if(!h||!a||isNaN(hg)||isNaN(ag))continue;
     ms.push({date:parseDDMMYY(c[1]),home:h,away:a,hg:hg,ag:ag});
   }
@@ -467,6 +476,74 @@ function buildMikGrid(){
       +'<div class="slist">'+rows+'</div></div>';
   }
   grid.innerHTML=html;
+}
+
+async function importAllFdco(){
+  var btn=document.getElementById('fdcoAllBtn');
+  var msgEl=document.getElementById('fdcoMsg');
+  if(busy){return;}
+  busy=true; btn.disabled=true;
+  var todo=[];
+  for(var code in FDCO_CODES){
+    for(var y=2022;y<=CUR;y++){
+      if(!fbStatus[code+'_'+y])todo.push([code,y]);
+    }
+  }
+  if(!todo.length){
+    msgEl.textContent='Everything already imported!';
+    btn.disabled=false;busy=false;return;
+  }
+  log('\nAuto-importing '+todo.length+' fdco seasons (2022–now)…\n');
+  var done=0,fail=0;
+  for(var i=0;i<todo.length;i++){
+    var code=todo[i][0],y=todo[i][1];
+    msgEl.textContent=(done+fail)+'/'+todo.length+' — '+code+' '+y+'–'+String(y+1).slice(2);
+    var key=code+'_'+y;
+    setBadge(key,'...');
+    try{
+      var ms=await getFdcoMatches(code,y);
+      if(!ms||!ms.length)throw new Error('No matches');
+      await saveToDB(code,y,ms);
+      log('✅ '+code+' '+y+'–'+String(y+1).slice(2)+': '+ms.length+' matches');
+      setBadge(key,ms.length+'');
+      done++;
+    }catch(e){
+      log('❌ '+code+' '+y+': '+e.message+' — use manual download below');
+      setBadge(key,'ERR');
+      fail++;
+    }
+    await new Promise(function(r){setTimeout(r,400);});
+  }
+  msgEl.textContent='Done: '+done+' imported, '+fail+' failed';
+  log('\n═══ Done: '+done+' OK, '+fail+' failed ═══');
+  btn.disabled=false;busy=false;
+  buildManualGrid();
+}
+
+async function getFdcoMatches(code,y){
+  var fdcoCode=FDCO_CODES[code];
+  var ghCode=GH_MAP[fdcoCode];
+  // Try jsDelivr first (CORS-enabled, no proxy)
+  if(ghCode){
+    var season=y+'-'+String(y+1).slice(2);
+    var url=JSDELIVR+season+'/'+ghCode+'.csv';
+    try{
+      var r=await fetch(url,{signal:AbortSignal.timeout(12000)});
+      if(r.ok){
+        var t=await r.text();
+        if(t.length>200){
+          var ms=parseFdco(t);
+          if(ms.length>0){log('  jsDelivr: '+ms.length+' matches');return ms;}
+        }
+      }
+    }catch(e){log('  jsDelivr miss for '+season);}
+  }
+  // Fallback: fdco via proxy
+  var y1=String(y).slice(2).padStart(2,'0'),y2=String(y+1).slice(2).padStart(2,'0');
+  var url=FDCO_BASE+y1+y2+'/'+fdcoCode+'.csv';
+  log('  Proxy: '+y1+y2+'/'+fdcoCode+'.csv');
+  var t=await fetchText(url);
+  return parseFdco(t);
 }
 
 function buildManualGrid(){
