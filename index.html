@@ -61,16 +61,6 @@ header{background:var(--card);border-bottom:3px solid var(--g700);position:stick
 /* SPINNER */
 .spinner{border:3px solid var(--border);border-top-color:var(--g600);border-radius:50%;animation:spin .75s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-/* API BAR */
-.apibar{background:var(--g50);border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:16px}
-.apibar-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.apibar label{font-size:13px;font-weight:600;color:var(--text2);white-space:nowrap}
-#apiKeyInput{flex:1;min-width:200px;padding:8px 12px;background:var(--card);border:1.5px solid var(--border);border-radius:8px;font-family:var(--fm);font-size:12px;color:var(--text);outline:none}
-#apiKeyInput:focus{border-color:var(--g600)}
-.btn-p{padding:8px 16px;background:var(--g700);color:#fff;border:none;border-radius:8px;font-family:var(--fb);font-size:13px;font-weight:600;cursor:pointer}
-.btn-p:hover{background:var(--g900)}
-.apibar-hint{font-size:12px;color:var(--muted);margin-top:8px}
-.apibar-hint a{color:var(--g700)}
 /* SYNC BANNER */
 .sync-banner{background:var(--g50);border:1.5px solid var(--g600);border-radius:10px;padding:11px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--g700)}
 .sync-banner strong{font-weight:600}
@@ -227,14 +217,14 @@ body.dark .yt-head-club{background:var(--surface)}
 .bcr-scrub{flex:1;min-width:80px;accent-color:var(--g600)}
 .bcr-gw{font-family:var(--fd);font-size:22px;font-weight:800;color:var(--g700);white-space:nowrap;letter-spacing:.5px}
 .bcr-chart{position:relative;overflow:hidden;transition:height .3s}
-.bcr-row{position:absolute;left:0;right:0;display:flex;align-items:center;gap:6px;padding:0 4px;height:22px}
-.bcr-rank{font-family:var(--fm);font-size:9px;color:var(--muted);width:13px;text-align:right;flex-shrink:0}
-.bcr-crest{width:14px;height:14px;object-fit:contain;flex-shrink:0}
-.bcr-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0}
-.bcr-name{font-size:10px;font-weight:600;width:72px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)}
-.bcr-bar-wrap{flex:1;height:14px;background:var(--border-lt);border-radius:3px;overflow:hidden}
+.bcr-row{position:absolute;left:0;right:0;display:flex;align-items:center;gap:4px;padding:0 3px;height:18px}
+.bcr-rank{font-family:var(--fm);font-size:8px;color:var(--muted);width:11px;text-align:right;flex-shrink:0}
+.bcr-crest{width:12px;height:12px;object-fit:contain;flex-shrink:0}
+.bcr-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.bcr-name{font-size:9px;font-weight:600;width:62px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)}
+.bcr-bar-wrap{flex:1;height:11px;background:var(--border-lt);border-radius:2px;overflow:hidden}
 .bcr-bar{height:100%;border-radius:4px;min-width:3px}
-.bcr-pts{font-family:var(--fm);font-size:10px;font-weight:500;width:26px;text-align:right;flex-shrink:0;color:var(--text2)}
+.bcr-pts{font-family:var(--fm);font-size:9px;font-weight:500;width:22px;text-align:right;flex-shrink:0;color:var(--text2)}
 /* TLA TOOLTIP — hover on desktop, click-to-show on mobile */
 .tla-wrap{position:relative;display:inline-flex;align-items:center;gap:4px;cursor:default}
 .tla-tip{position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);background:var(--text);color:var(--card);font-size:10px;font-weight:600;font-family:var(--fb);padding:3px 8px;border-radius:5px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:999;letter-spacing:.2px;box-shadow:0 2px 6px rgba(0,0,0,.2)}
@@ -380,7 +370,6 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
       </div>
       <div class="hdr-r">
         <div id="authArea"></div>
-        <div id="keyStatus"></div>
         <button class="theme-toggle" id="themeToggle" onclick="toggleDark()" title="Toggle dark mode">☀️</button>
       </div>
     </div>
@@ -388,18 +377,6 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
 </header>
 
 <div class="wrap" style="padding-top:18px">
-  <div class="apibar" id="apibar" style="display:none">
-    <div class="apibar-row">
-      <label for="apiKeyInput">🔑 Live data API key</label>
-      <input type="password" id="apiKeyInput" placeholder="football-data.org key for current season…" autocomplete="off">
-      <button class="btn-p" onclick="saveKey()">Connect</button>
-      <button class="btn-p" style="background:var(--muted)" onclick="document.getElementById('apibar').style.display='none'">✕</button>
-    </div>
-    <div class="apibar-hint">
-      Free key at <a href="https://www.football-data.org/client/register" target="_blank">football-data.org/client/register</a> — only needed for the current live season. Historical data works without it.
-    </div>
-  </div>
-
   <div id="syncBanner" style="display:none"></div>
   <div class="ltabs" id="ltabs"></div>
 
@@ -459,12 +436,11 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
   <div class="wrap">
     <div class="footer-inner">
       <div>
-        Data: <a href="https://www.football-data.org" target="_blank">football-data.org</a> (live) ·
-        <a href="https://mikami3345.cloudfree.jp/SoccerData/MatchData.html" target="_blank">mikami3345</a> &amp;
-        <a href="https://www.football-data.co.uk" target="_blank">football-data.co.uk</a> (historical)
+        Data: <a href="https://mikami3345.cloudfree.jp/SoccerData/MatchData.html" target="_blank">mikami3345.cloudfree.jp</a> (1993–2022) ·
+        <a href="https://www.football-data.co.uk" target="_blank">football-data.co.uk</a> (2023–present)
       </div>
       <div>
-        Contact: <a href="mailto:sjohndamilola92@gmail.com">sjohndamilola92@gmail.com</a> ·
+        Contact: <a href="mailto:your@email.com">your@email.com</a> ·
         <a href="#" onclick="showPrivacy();return false">Privacy Policy</a>
       </div>
     </div>
@@ -484,7 +460,7 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
       <li><strong>No tracking:</strong> This app contains no analytics, advertising, or third-party tracking of any kind.</li>
       <li><strong>No data sharing:</strong> Your data is never sold or shared with third parties.</li>
     </ul>
-    <p style="margin-top:12px">Questions? Contact: <a href="mailto:sjohndamilola92@gmail.com">sjohndamilola92@gmail.com</a></p>
+    <p style="margin-top:12px">Questions? Contact: <a href="mailto:your@email.com">your@email.com</a></p>
   </div>
 </div>
 
@@ -504,7 +480,7 @@ if (_cfg) {
     if (e.code === 'failed-precondition') console.log('Multiple tabs — offline sync limited');
   });
 } else {
-  console.warn('No Firebase config — sync disabled. See config.example.js');
+  // Firebase sync disabled — no config provided (optional feature)
 }
 
 let currentUser = null;
@@ -517,7 +493,7 @@ if (auth) {
 }
 
 function signIn() {
-  if (!auth) { alert('Firebase not configured. See config.example.js'); return; }
+  if (!auth) { console.log('Firebase not configured — sync disabled'); return; }
   const provider = new firebase.auth.GoogleAuthProvider();
   auth.signInWithPopup(provider).catch(e => console.error('Sign in failed:', e));
 }
@@ -566,10 +542,17 @@ async function fload(league, year) {
 }
 
 // ══════════════════════════════════════════════════════════════
-// CONFIG
+// CONFIG — No API key needed. All data from Mikami (1993–2022) + football-data.co.uk (2023+)
 // ══════════════════════════════════════════════════════════════
-const API_BASE = 'https://api.football-data.org/v4';
-const PROXY    = 'https://corsproxy.io/?';
+// football-data.co.uk is the same source Mikami uses for his own website.
+// Multiple CORS proxies — tried in order until one works
+const PROXIES = [
+  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  url => `https://proxy.cors.sh/${url}`,
+  url => `https://corsproxy.org/?${encodeURIComponent(url)}`,
+];
+const PROXY = 'https://corsproxy.io/?'; // kept for any remaining references
 const MIKAMI   = 'https://mikami3345.cloudfree.jp/SoccerData/csv_data/';
 const FDCO     = 'https://www.football-data.co.uk/mmz4281/';
 
@@ -584,13 +567,16 @@ const FLAGS = {
   PL:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',PD:'🇪🇸',BL1:'🇩🇪',SA:'🇮🇹',FL1:'🇫🇷',
   PPL:'🇵🇹',DED:'🇳🇱',ELC:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',BSA:'🇧🇷',
 };
-// Historical CSV sources. Only big 5 have mikami/fdco data.
+// CSV sources — Mikami for 1993–2022, football-data.co.uk (same source Mikami uses) for 2023+
 const CSV_MAP = {
-  PL: {mikami:'Premier_1993-2022.csv', fdco:'E0'},
-  PD: {mikami:'LaLiga1_1994-2022.csv', fdco:'SP1'},
-  BL1:{mikami:'Bundes_1994-2022.csv',  fdco:'D1'},
-  SA: {mikami:'SerieA_1994-2022.csv',  fdco:'I1'},
-  FL1:{mikami:'Ligue1_1993-2022.csv',  fdco:'F1'},
+  PL:  {mikami:'Premier_1993-2022.csv',  fdco:'E0'},   // Premier League
+  PD:  {mikami:'LaLiga1_1994-2022.csv',  fdco:'SP1'},  // La Liga
+  BL1: {mikami:'Bundes_1994-2022.csv',   fdco:'D1'},   // Bundesliga
+  SA:  {mikami:'SerieA_1994-2022.csv',   fdco:'I1'},   // Serie A
+  FL1: {mikami:'Ligue1_1993-2022.csv',   fdco:'F1'},   // Ligue 1
+  PPL: {fdco:'P1'},   // Primeira Liga (no Mikami CSV)
+  DED: {fdco:'N1'},   // Eredivisie (no Mikami CSV)
+  ELC: {fdco:'E1'},   // Championship (no Mikami CSV)
 };
 
 const LEAGUES = {
@@ -642,25 +628,19 @@ function buildSeasonSelect() {
   const hasCsv = !!CSV_MAP[S.league];
   sel.innerHTML = '';
 
-  // Current season (live API)
+  // Current season (from football-data.co.uk CSV, updates daily after matches)
   const opt = document.createElement('option');
   opt.value = cur;
-  opt.textContent = `${cur}–${String(cur+1).slice(2)} ● Live`;
+  opt.textContent = `${cur}–${String(cur+1).slice(2)} (current)`;
   sel.appendChild(opt);
 
   if (hasCsv) {
-    // 2023 and 2024: football-data.co.uk
-    for (let y = cur - 1; y >= cur - 2 && y >= 2023; y--) {
+    // All historical seasons — fdco for 2023+, Mikami for ≤2022
+    for (let y = cur - 1; y >= 1992; y--) {
       const o = document.createElement('option');
       o.value = y;
-      o.textContent = `${y-1}–${String(y).slice(2)}`;
-      sel.appendChild(o);
-    }
-    // 1993–2022: mikami CSVs
-    for (let y = 2022; y >= 1993; y--) {
-      const o = document.createElement('option');
-      o.value = y;
-      o.textContent = `${y-1}–${String(y).slice(2)}`;
+      const src = y <= 2022 ? 'Mikami' : 'fdco';
+      o.textContent = `${y}–${String(y+1).slice(2)}`;
       sel.appendChild(o);
     }
   } else {
@@ -720,29 +700,7 @@ async function drainQueue() {
   throttle.draining = false;
 }
 
-function getKey() { return localStorage.getItem('fb_key') || ''; }
 
-async function apiFetch(path) {
-  const key = getKey();
-  if (!key) { const e = new Error(); e.code = 'NO_KEY'; throw e; }
-  const cacheId = 'fc:' + path;
-  try {
-    const raw = sessionStorage.getItem(cacheId);
-    if (raw) { const {ts,d}=JSON.parse(raw); if (Date.now()-ts<5*60*1000) return d; }
-  } catch {}
-  await acquireSlot();
-  const url = PROXY + encodeURIComponent(`${API_BASE}${path}`);
-  let res;
-  try { res = await fetch(url, {method:'GET', headers:{'X-Auth-Token':key}}); }
-  catch { const e=new Error(); e.code='NETWORK'; throw e; }
-  updateThrottle(res.headers);
-  if (res.status===401){const e=new Error();e.code='BAD_KEY';throw e;}
-  if (res.status===429){throttle.available=0;const e=new Error();e.code='RATE';throw e;}
-  if (!res.ok){const e=new Error();e.code='HTTP_'+res.status;throw e;}
-  const data = await res.json();
-  try { sessionStorage.setItem(cacheId, JSON.stringify({ts:Date.now(),d:data})); } catch {}
-  return data;
-}
 
 // ══════════════════════════════════════════════════════════════
 // HISTORICAL CSV DATA
@@ -802,9 +760,18 @@ function parseFdcoCSV(text) {
 }
 
 async function fetchCSV(url) {
-  const res = await fetch(PROXY + encodeURIComponent(url));
-  if (!res.ok) throw new Error('CSV fetch failed: ' + res.status);
-  return res.text();
+  let lastErr;
+  for (const makeUrl of PROXIES) {
+    try {
+      const res = await fetch(makeUrl(url), {signal: AbortSignal.timeout(12000)});
+      if (res.ok) return res.text();
+      lastErr = new Error(`HTTP ${res.status}`);
+    } catch(e) {
+      lastErr = e;
+      // Try next proxy
+    }
+  }
+  throw lastErr || new Error('All proxies failed for: ' + url);
 }
 
 async function loadHistoricalMatches(league, year) {
@@ -818,11 +785,17 @@ async function loadHistoricalMatches(league, year) {
   const src = CSV_MAP[league];
   if (!src) { const e=new Error(); e.code='NO_CSV'; throw e; }
   let matches;
-  if (year <= 2022) {
+  if (year <= 2022 && src.mikami) {
+    // Mikami CSV (all 1993–2022 in one file)
+    // parseMikamiCSV filters by the season_end_year column
+    // Mikami's season_end_year = start year + 1, e.g. 1993 means 1992-93 season
+    // But our year value IS the start year, so we pass year+1 to get the right season
     const text = await fetchCSV(MIKAMI + src.mikami);
-    matches = parseMikamiCSV(text, year);
+    matches = parseMikamiCSV(text, year + 1);
   } else {
-    const text = await fetchCSV(fdcoUrl(src.fdco, year));
+    // football-data.co.uk — same source Mikami uses, no API key, updates daily
+    // fdcoUrl expects the END year: 2023 = 2022-23, 2026 = 2025-26
+    const text = await fetchCSV(fdcoUrl(src.fdco, year + 1));
     matches = parseFdcoCSV(text);
   }
   if (!matches?.length) { const e=new Error(); e.code='EMPTY_CSV'; throw e; }
@@ -959,7 +932,7 @@ function renderBarRace() {
 function bcrInit(teams, ptsH, labels) {
   const chart = document.getElementById('bcrChart');
   if (!chart) return;
-  const ROW = 22;
+  const ROW = 18;
   chart.style.height = (teams.length * ROW + 8) + 'px';
   chart.innerHTML = '';
   teams.forEach(r => {
@@ -996,7 +969,7 @@ function bcrRender() {
     .sort((a,b) => b.pts - a.pts || a.name.localeCompare(b.name));
 
   const maxPts = Math.max(1, ...teams.map(t => t.pts));
-  const ROW = 22;
+  const ROW = 18;
 
   teams.forEach((t, rank) => {
     const id = 'bcr_' + t.name.replace(/\W/g,'_');
@@ -1092,18 +1065,7 @@ function renderLeagueTabs() {
     </button>`).join('');
 }
 
-function renderKeyStatus() {
-  const key = getKey();
-  const el = document.getElementById('keyStatus');
-  if (!el) return;
-  if (key) {
-    el.innerHTML = `<span style="font-size:11px;color:var(--g600);font-weight:600">● Live</span>
-      <button class="btn-signout" onclick="clearKey()">Disconnect</button>`;
-  } else {
-    el.innerHTML = `<button class="btn-auth" onclick="document.getElementById('apibar').style.display='block';document.getElementById('apiKeyInput').focus()">🔑 Add live key</button>`;
-    document.getElementById('apibar').style.display = 'none';
-  }
-}
+// API key removed — all data from CSVs
 
 function renderChips() {
   if (!S.standings) { document.getElementById('chips').innerHTML=''; return; }
@@ -1198,7 +1160,7 @@ function renderError(code) {
     RATE:    ['Rate limit reached','Quota resets automatically — the bar above shows the countdown.'],
     NO_DATA: ['No data available','This league may not have started or standings aren\'t available yet.'],
     NO_CSV:  ['No historical data','Historical CSV data is only available for the Big 5 leagues.'],
-    EMPTY_CSV:['Empty CSV','The CSV file returned no matches for this season.'],
+    EMPTY_CSV:['No data found','The data file returned no matches. This season may not have started yet, or the data source is temporarily unavailable. Try again later.'],
     HTTP_403:['Access denied','Your API key doesn\'t have access to this competition or season.'],
     HTTP_404:['Not found','This competition doesn\'t exist in the API.'],
   };
@@ -1306,7 +1268,7 @@ function renderPositionChart() {
   const borderCol  = dark ? '#2d3d32' : '#d2dace';
   const {labels, posH} = S.trends;
   const GWS = labels.length;
-  const GW_WIDTH = 28;
+  const GW_WIDTH = 56;
   const minW = Math.max(GWS * GW_WIDTH, 320);
   // Work out max position across all selected teams so chart is never clipped
   const selectedData = S.standings.filter(r => S.sel.has(r.team.name));
@@ -1389,19 +1351,22 @@ async function loadYearlyData(league) {
     }
   } catch(e) { console.warn('Mikami full CSV failed:', e); }
 
-  // Add fdco recent seasons (2023 onwards) — Mikami CSV stops at 2022
-  const cur = getCurrentSeason();
-  for (let y = 2023; y <= cur; y++) {
+  // Add fdco recent seasons (2023-end_year onwards) — Mikami CSV stops at 2022
+  // y is the END year of the season: y=2023 means 2022-23, y=2026 means 2025-26
+  const curStart = getCurrentSeason(); // e.g. 2025 for 2025-26 season
+  const curEnd = curStart + 1;         // e.g. 2026
+  for (let y = 2023; y <= curEnd; y++) {
     try {
       const lk = `hist:${league}:${y}`;
       let matches;
       const cached = localStorage.getItem(lk);
-      if (cached) {
+      // Only use cache for completed seasons (not current)
+      if (cached && y < curEnd) {
         matches = JSON.parse(cached);
       } else {
         const text = await fetchCSV(fdcoUrl(src.fdco, y));
         matches = parseFdcoCSV(text);
-        if (matches?.length) {
+        if (matches?.length && y < curEnd) {
           try { localStorage.setItem(lk, JSON.stringify(matches)); } catch {}
         }
       }
@@ -1593,54 +1558,22 @@ function yearlySelTop(n) {
 }
 
 // ══════════════════════════════════════════════════════════════
-// LOADING
+// LOADING — All data from CSVs, no API key needed
 // ══════════════════════════════════════════════════════════════
 async function loadData() {
-  const cur = getCurrentSeason();
-  S.isHistorical = S.season !== cur;
-  if (S.isHistorical) {
-    await loadHistoricalSeason();
-  } else {
-    await loadLiveSeason();
-  }
-}
-
-async function loadLiveSeason() {
-  if (!getKey()) {
-    // No key — fall back to most recent historical season if available
-    if (CSV_MAP[S.league]) {
-      S.season = 2024;
-      buildSeasonSelect();
-      await loadHistoricalSeason();
-    } else {
-      S.error = 'NO_KEY';
-      renderContent();
-    }
-    return;
-  }
-  S.loading=true; S.error=null; S.standings=null; S.trends=null; S.trendsLoading=false;
-  renderContent();
-  try {
-    const data=await apiFetch(`/competitions/${S.league}/standings?season=${S.season}`);
-    const total=data.standings?.find(s=>s.type==='TOTAL');
-    if (!total?.table?.length){const e=new Error();e.code='NO_DATA';throw e;}
-    S.standings=total.table;
-    S.sel=new Set(S.standings.map(r=>r.team.name));
-    S.loading=false; S.gwSlider=null;
-    document.getElementById('formCtrl').style.display='flex';
-    renderChips();renderStats();updateBadge();renderContent();
-    loadTrends();
-  } catch(e) {
-    S.loading=false; S.error=e.code||'ERR'; renderContent();
-  }
+  // Everything comes from CSV (Mikami ≤2022, football-data.co.uk 2023+)
+  await loadHistoricalSeason();
 }
 
 async function loadHistoricalSeason() {
-  S.loading=true; S.error=null; S.standings=null; S.trends=null; S.trendsLoading=false;
-  show('<div class="hist-load"><div class="spinner" style="width:32px;height:32px;margin:0 auto"></div><p>Loading historical data for '+S.season+'…<br>This may take a moment on first load — it will be cached for future visits.</p></div>');
+  S.loading=true; S.error=null; S.standings=null; S.trends=null; S.trendsLoading=false; S.matches=null;
+  const cur = getCurrentSeason();
+  const label = S.season === cur ? 'current season' : `${S.season}–${String(S.season+1).slice(2)}`;
+  show(`<div class="hist-load"><div class="spinner" style="width:32px;height:32px;margin:0 auto"></div><p>Loading ${label}…<br>Cached after first load — future visits are instant.</p></div>`);
   S.loading=false;
   try {
     const matches=await loadHistoricalMatches(S.league, S.season);
+    S.matches=matches;
     S.standings=matchesToStandings(matches);
     S.sel=new Set(S.standings.map(r=>r.team.name));
     S.trends=buildTrends(matches, S.standings.map(r=>r.team.name));
@@ -1653,14 +1586,13 @@ async function loadHistoricalSeason() {
 }
 
 async function loadTrends() {
-  if (S.trends||S.trendsLoading||!S.standings||S.isHistorical) return;
-  S.trendsLoading=true;
-  try {
-    const data=await apiFetch(`/competitions/${S.league}/matches?season=${S.season}&status=FINISHED&limit=500`);
-    S.trends=buildTrends(data.matches, S.standings.map(r=>r.team.name));
-    S.trendsLoading=false;
+  // Trends come from the same CSV that loaded standings — already in S.matches
+  // Just build from S.matches directly (set during loadHistoricalSeason)
+  if (S.trends||S.trendsLoading||!S.standings) return;
+  if (S.matches?.length) {
+    S.trends = buildTrends(S.matches, S.standings.map(r=>r.team.name));
     renderContent();
-  } catch(e) { S.trendsLoading=false; console.warn('Trends failed:',e.code); }
+  }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1692,6 +1624,7 @@ document.addEventListener('click', e => {
 // ══════════════════════════════════════════════════════════════
 function setLeague(k) {
   S.league=k; S.standings=null; S.trends=null; S.trendsLoading=false;
+  delete yearlyCache[k]; // force reload so new fdco years appear
   S.fopen=false; S.isHistorical=false; S.gwSlider=null; bcr.built=false;
   document.getElementById('fpanel').classList.remove('open');
   document.getElementById('fbtn').classList.remove('open');
@@ -1774,20 +1707,9 @@ function toggleDark() {
   if (S.view==='position'&&S.trends) renderPositionChart();
 }
 
-function saveKey() {
-  const k=document.getElementById('apiKeyInput').value.trim();
-  if (!k) return;
-  localStorage.setItem('fb_key',k);
-  renderKeyStatus();
-  loadData();
-}
 
-function clearKey() {
-  localStorage.removeItem('fb_key');
-  Object.keys(sessionStorage).filter(k=>k.startsWith('fc:')).forEach(k=>sessionStorage.removeItem(k));
-  S.standings=null;S.trends=null;S.error='NO_KEY';
-  renderKeyStatus();renderContent();
-}
+
+
 
 function showPrivacy() { document.getElementById('privacyModal').style.display='flex'; }
 function hidePrivacy() { document.getElementById('privacyModal').style.display='none'; }
@@ -1843,7 +1765,7 @@ window.addEventListener('beforeinstallprompt', e => {
 // ══════════════════════════════════════════════════════════════
 // EVENT LISTENERS
 // ══════════════════════════════════════════════════════════════
-document.getElementById('apiKeyInput').addEventListener('keydown', e=>{if(e.key==='Enter')saveKey();});
+
 document.getElementById('ssel').addEventListener('change', e=>{
   S.season=parseInt(e.target.value);
   S.trends=null; S.trendsLoading=false; S.gwSlider=null; bcr.built=false;
@@ -1869,7 +1791,6 @@ if (localStorage.getItem('fb_dark')==='1') {
 
 renderLeagueTabs();
 buildSeasonSelect();
-renderKeyStatus();
 renderAuthArea();
 
 // Always load data — historical works without a key, live needs one
