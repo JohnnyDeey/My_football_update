@@ -10,16 +10,12 @@
 <meta name="apple-mobile-web-app-title" content="Football">
 <title>Football Analytics</title>
 <link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2315803d'/><text x='50' y='72' font-size='58' text-anchor='middle'>⚽</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
-<!-- config.js is gitignored — contains your Firebase credentials -->
-<!-- Copy config.example.js → config.js and fill in your values -->
-<script src="config.js" onerror="console.warn('config.js not found — Firebase sync disabled')"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -41,12 +37,12 @@ body.dark{
   --win:#4ade80;--drw:#fbbf24;--los:#f87171;
   --sh:0 1px 3px rgba(0,0,0,.4);--shm:0 4px 12px rgba(0,0,0,.5);
 }
-body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px;line-height:1.5;min-height:100vh;transition:background .25s,color .25s;overflow-x:hidden}
-.wrap{max-width:1240px;margin:0 auto;padding:0 20px;min-width:0}
+body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px;line-height:1.5;min-height:100vh;transition:background .25s,color .25s}
+.wrap{max-width:1240px;margin:0 auto;padding:0 20px}
 /* HEADER */
 header{background:var(--card);border-bottom:3px solid var(--g700);position:sticky;top:0;z-index:200;box-shadow:var(--shm)}
-.hdr{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0 8px;min-width:0}
-.hdr-l{display:flex;align-items:center;gap:12px;min-width:0;overflow:hidden}
+.hdr{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0 8px}
+.hdr-l{display:flex;align-items:center;gap:12px}
 .logo{width:40px;height:40px;background:var(--g700);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
 .site-title{font-family:var(--fd);font-size:19px;font-weight:800;color:var(--g900);line-height:1}
 .site-sub{font-size:11px;color:var(--muted);margin-top:2px}
@@ -58,7 +54,14 @@ header{background:var(--card);border-bottom:3px solid var(--g700);position:stick
 .btn-signout{background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline;font-family:var(--fb)}
 .theme-toggle{background:var(--surface);border:1.5px solid var(--border);border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .theme-toggle:hover{border-color:var(--g600)}
-/* SPINNER */
+/* THROTTLE */
+.throttle-bar{display:flex;align-items:center;gap:8px;padding:5px 0 7px;border-top:1px solid var(--border-lt);font-size:11px}
+.tb-label{color:var(--muted);white-space:nowrap}
+.tb-track{width:80px;height:4px;background:var(--border);border-radius:2px;overflow:hidden;flex-shrink:0}
+.tb-fill{height:100%;border-radius:2px;transition:width .4s,background .4s}
+.tb-count{font-family:var(--fm);white-space:nowrap}
+.tb-reset{color:var(--muted);font-family:var(--fm)}
+.throttle-wait{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12px;color:var(--drw);border-top:1px solid var(--border-lt)}
 .spinner{border:3px solid var(--border);border-top-color:var(--g600);border-radius:50%;animation:spin .75s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 /* API BAR */
@@ -82,10 +85,10 @@ header{background:var(--card);border-bottom:3px solid var(--g700);position:stick
 .ltab:hover{border-color:var(--g600);color:var(--text)}
 .ltab.active{background:var(--g700);color:#fff;border-color:var(--g700);font-weight:700;box-shadow:var(--shm)}
 /* CONTROLS */
-.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;min-width:0}
-.ssel{background:var(--card);border:1.5px solid var(--border);color:var(--text);padding:7px 28px 7px 11px;border-radius:8px;font-family:var(--fb);font-size:13px;font-weight:500;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b7280'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;box-shadow:var(--sh);max-width:100%}
+.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.ssel{background:var(--card);border:1.5px solid var(--border);color:var(--text);padding:7px 28px 7px 11px;border-radius:8px;font-family:var(--fb);font-size:13px;font-weight:500;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b7280'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;box-shadow:var(--sh)}
 .ssel:hover,.ssel:focus{border-color:var(--g600)}
-.fbtn{display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--card);border:1.5px solid var(--border);border-radius:8px;color:var(--text2);font-family:var(--fb);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;box-shadow:var(--sh);white-space:nowrap}
+.fbtn{display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--card);border:1.5px solid var(--border);border-radius:8px;color:var(--text2);font-family:var(--fb);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;box-shadow:var(--sh)}
 .fbtn:hover,.fbtn.open{border-color:var(--g600);color:var(--g700)}
 .fbadge{background:var(--g700);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px}
 /* FILTER PANEL */
@@ -116,9 +119,8 @@ header{background:var(--card);border-bottom:3px solid var(--g700);position:stick
 .sval{font-family:var(--fm);font-size:24px;font-weight:500;color:var(--text);line-height:1}
 .ssub{font-size:11px;color:var(--muted);margin-top:3px}
 /* VIEW TABS */
-.vtabs-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;min-width:0}
-.vtabs{display:flex;gap:3px;background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:3px;box-shadow:var(--sh);overflow-x:auto;scrollbar-width:none;flex-shrink:0}
-.vtabs::-webkit-scrollbar{display:none}
+.vtabs-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.vtabs{display:flex;gap:3px;background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:3px;box-shadow:var(--sh)}
 .vtab{padding:6px 16px;border-radius:7px;border:none;background:transparent;color:var(--muted);font-family:var(--fb);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap}
 .vtab:hover{color:var(--text)}
 .vtab.active{background:var(--g700);color:#fff;box-shadow:var(--sh)}
@@ -128,34 +130,28 @@ header{background:var(--card);border-bottom:3px solid var(--g700);position:stick
 .md-slider{flex:1;accent-color:var(--g600);min-width:80px}
 .md-val{font-family:var(--fm);font-size:12px;color:var(--g700);font-weight:500;white-space:nowrap;min-width:48px}
 /* TABLE */
-.twrap{overflow-x:auto;border-radius:10px;border:1.5px solid var(--border);box-shadow:var(--sh);-webkit-overflow-scrolling:touch}
-table{width:100%;border-collapse:separate;border-spacing:0;min-width:560px;background:var(--card)}
-thead th{background:var(--surface);padding:6px 8px;text-align:right;font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap;border-bottom:1.5px solid var(--border);transition:color .2s}
-thead th:first-child{text-align:center;min-width:34px;cursor:default;position:sticky;left:0;z-index:3;background:var(--surface)}
-thead th:nth-child(2){text-align:left;position:sticky;left:34px;z-index:3;background:var(--surface);box-shadow:2px 0 5px rgba(0,0,0,.07);transition:min-width .2s;min-width:72px}
-.twrap.scrolled thead th:nth-child(2){min-width:30px}
-.twrap.scrolled tbody td:nth-child(2) .cname{opacity:0;max-width:0;display:none}
-.twrap.scrolled tbody td:nth-child(2) .cc{gap:0}
+.twrap{overflow-x:auto;border-radius:10px;border:1.5px solid var(--border);box-shadow:var(--sh)}
+table{width:100%;border-collapse:collapse;min-width:580px;background:var(--card)}
+thead th{background:var(--surface);padding:10px 12px;text-align:right;font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap;border-bottom:1.5px solid var(--border);transition:color .2s}
+thead th:first-child{text-align:center;min-width:44px;cursor:default}
+thead th:nth-child(2){text-align:left;min-width:155px}
 thead th:hover{color:var(--g700)}
 thead th.sa::after{content:' ↑';color:var(--g600)}
 thead th.sd::after{content:' ↓';color:var(--g600)}
-tbody tr{transition:background .12s}
+tbody tr{border-top:1px solid var(--border-lt);transition:background .12s}
 tbody tr:hover{background:var(--g50)}
-tbody tr:hover td:first-child,
-tbody tr:hover td:nth-child(2){background:var(--g50)}
 tbody tr.ucl-row td:first-child{box-shadow:inset 3px 0 0 var(--ucl)}
 tbody tr.uel-row td:first-child{box-shadow:inset 3px 0 0 var(--uel)}
 tbody tr.rel-row td:first-child{box-shadow:inset 3px 0 0 var(--rel)}
-tbody td{padding:5px 8px;text-align:right;font-size:12px;font-family:var(--fm);border-top:1px solid var(--border-lt)}
-tbody td:first-child{text-align:center;font-family:var(--fb);position:sticky;left:0;z-index:2;background:var(--card)}
-tbody td:nth-child(2){text-align:left;font-family:var(--fb);position:sticky;left:34px;z-index:2;background:var(--card);box-shadow:2px 0 5px rgba(0,0,0,.07)}
+tbody td{padding:9px 12px;text-align:right;font-size:13px;font-family:var(--fm)}
+tbody td:first-child{text-align:center;font-family:var(--fb)}
+tbody td:nth-child(2){text-align:left;font-family:var(--fb)}
 tbody td:last-child{font-family:var(--fb)}
-.pbadge{display:inline-flex;width:18px;height:18px;align-items:center;justify-content:center;border-radius:4px;font-size:10px;font-weight:700;color:var(--muted);font-family:var(--fm)}
-.cc{display:flex;align-items:center;gap:5px}
-.crest{width:18px;height:18px;object-fit:contain;flex-shrink:0}
-.cbar{width:3px;height:18px;border-radius:2px;flex-shrink:0}
-.cname{font-weight:700;color:var(--text);font-size:11px;letter-spacing:.3px;font-family:var(--fm)}
-tbody td:nth-child(2) .cname{transition:opacity .15s,max-width .2s;opacity:1;max-width:46px;overflow:hidden;white-space:nowrap}
+.pbadge{display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center;border-radius:6px;font-size:12px;font-weight:700;color:var(--muted);font-family:var(--fm)}
+.cc{display:flex;align-items:center;gap:8px}
+.crest{width:22px;height:22px;object-fit:contain;flex-shrink:0}
+.cbar{width:4px;height:24px;border-radius:2px;flex-shrink:0}
+.cname{font-weight:600;color:var(--text)}
 /* FORM BADGES - larger, more distinct like mikami */
 .fbs{display:flex;gap:4px;justify-content:flex-end}
 .fb{width:26px;height:26px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;letter-spacing:0}
@@ -165,59 +161,10 @@ tbody td:nth-child(2) .cname{transition:opacity .15s,max-width .2s;opacity:1;max
 body.dark .fb.W{background:rgba(74,222,128,.15);color:#4ade80;border-color:rgba(74,222,128,.3)}
 body.dark .fb.D{background:rgba(251,191,36,.15);color:#fbbf24;border-color:rgba(251,191,36,.3)}
 body.dark .fb.L{background:rgba(248,113,113,.15);color:#f87171;border-color:rgba(248,113,113,.3)}
-body.dark tbody td:first-child,
-body.dark tbody td:nth-child(2){background:var(--card)}
-body.dark tbody tr:hover td:first-child,
-body.dark tbody tr:hover td:nth-child(2){background:var(--g50)}
-body.dark thead th:first-child,
-body.dark thead th:nth-child(2){background:var(--surface)}
 .gp{color:var(--win)}.gn{color:var(--los)}
 .pts-cell{font-weight:700!important;font-size:14px!important}
-/* CHART — scrollable on mobile */
-.cwrap{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:14px;box-shadow:var(--sh)}
-.chart-scroll{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
-.chart-scroll::-webkit-scrollbar{height:4px}
-.chart-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-.chart-canvas-wrap{min-width:100%;}
-/* YEARLY TREND HEATMAP */
-.yearly-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:14px 0 14px 0;box-shadow:var(--sh)}
-.yearly-hint{font-size:11px;color:var(--muted);margin:0 14px 10px;line-height:1.5}
-.yearly-filter{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 14px 10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px}
-.yearly-filter-label{font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap}
-.yearly-filter-btns{display:flex;gap:5px;flex-wrap:wrap}
-.ycb-btn{padding:3px 10px;border-radius:5px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-weight:500;cursor:pointer;font-family:var(--fb);transition:all .15s}
-.ycb-btn:hover{border-color:var(--g600);color:var(--g700)}
-.yearly-clubs{display:flex;flex-wrap:wrap;gap:5px;margin:0 14px 10px}
-.ycb{display:flex;align-items:center;gap:4px;padding:3px 8px;border-radius:14px;border:1.5px solid var(--border);font-size:11px;font-weight:500;cursor:pointer;font-family:var(--fb);color:var(--muted);transition:all .12s;user-select:none}
-.ycb input{width:12px;height:12px;accent-color:var(--g600);cursor:pointer;flex-shrink:0}
-.ycb.checked{border-color:var(--g600);color:var(--text);background:var(--g50)}
-.yearly-scroll{overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding-bottom:4px;position:relative}
-.yearly-scroll::-webkit-scrollbar{height:3px}
-.yearly-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-.yt{border-collapse:collapse;font-family:var(--fm);table-layout:fixed;border-spacing:0}
-.yt thead tr{background:var(--surface)}
-/* Sticky club column - MUST have solid background and high z-index */
-.yt-head-club{position:sticky;left:0;z-index:20;background:var(--surface);padding:4px 6px 4px 12px;text-align:left;font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;width:62px;min-width:62px;border-bottom:2px solid var(--border);box-shadow:2px 0 5px rgba(0,0,0,.08)}
-.yt-head-yr{font-size:9px;font-weight:700;color:var(--muted);text-align:center;padding:4px 1px;white-space:nowrap;width:26px;min-width:26px;letter-spacing:-.3px;border-bottom:2px solid var(--border);position:relative;z-index:0}
-.yt-club-cell{position:sticky;left:0;z-index:18;background:var(--card);padding:2px 5px 2px 10px;font-size:10px;font-weight:700;color:var(--text);white-space:nowrap;width:62px;min-width:62px;font-family:var(--fm);letter-spacing:.3px;border-bottom:1px solid var(--border-lt);box-shadow:2px 0 5px rgba(0,0,0,.08);vertical-align:middle}
-.yt-cell-inner{display:flex;align-items:center;gap:4px;width:100%}
-.yt-tla{transition:opacity .15s,max-width .15s;opacity:1;max-width:40px;overflow:hidden;display:inline-block;vertical-align:middle;white-space:nowrap}
-.yt-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0;vertical-align:middle}
-.yearly-scroll.scrolled .yt-tla{opacity:0;max-width:0}
-.yt-pos{width:26px;min-width:26px;height:22px;border-radius:0;text-align:center;vertical-align:middle;font-size:10px;font-weight:700;cursor:default;padding:0;border-bottom:1px solid var(--border-lt);border-right:1px solid rgba(255,255,255,.15)}
-.yt-absent{background:var(--border-lt)!important;color:var(--muted)!important;font-size:9px}
-body.dark .yt-club-cell{background:var(--card)}
-body.dark .yt-head-club{background:var(--surface)}
-
-/* Name popup toast */
-/* TLA tooltip toast — shown on tap/hover everywhere TLAs appear */
-.name-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
-  background:rgba(10,10,10,.88);color:#fff;padding:7px 18px;border-radius:20px;
-  font-size:13px;font-weight:500;font-family:var(--fb);pointer-events:none;
-  z-index:1000;white-space:nowrap;opacity:1;transition:opacity .3s;box-shadow:0 4px 12px rgba(0,0,0,.3)}
-.name-toast.hide{opacity:0}
-/* Desktop: show full name as CSS tooltip via title attribute (browser native) */
-[data-fullname]{cursor:pointer}
+/* CHART */
+.cwrap{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:18px;height:480px;box-shadow:var(--sh)}
 /* BAR CHART RACE */
 .bcr-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:18px;box-shadow:var(--sh)}
 .bcr-controls{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
@@ -227,19 +174,14 @@ body.dark .yt-head-club{background:var(--surface)}
 .bcr-scrub{flex:1;min-width:80px;accent-color:var(--g600)}
 .bcr-gw{font-family:var(--fd);font-size:22px;font-weight:800;color:var(--g700);white-space:nowrap;letter-spacing:.5px}
 .bcr-chart{position:relative;overflow:hidden;transition:height .3s}
-.bcr-row{position:absolute;left:0;right:0;display:flex;align-items:center;gap:6px;padding:0 4px;height:22px}
-.bcr-rank{font-family:var(--fm);font-size:9px;color:var(--muted);width:13px;text-align:right;flex-shrink:0}
-.bcr-crest{width:14px;height:14px;object-fit:contain;flex-shrink:0}
-.bcr-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0}
-.bcr-name{font-size:10px;font-weight:600;width:72px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)}
-.bcr-bar-wrap{flex:1;height:14px;background:var(--border-lt);border-radius:3px;overflow:hidden}
+.bcr-row{position:absolute;left:0;right:0;display:flex;align-items:center;gap:8px;padding:0 4px;height:36px}
+.bcr-rank{font-family:var(--fm);font-size:11px;color:var(--muted);width:16px;text-align:right;flex-shrink:0}
+.bcr-crest{width:20px;height:20px;object-fit:contain;flex-shrink:0}
+.bcr-dot{width:20px;height:20px;border-radius:50%;flex-shrink:0}
+.bcr-name{font-size:12px;font-weight:600;width:88px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)}
+.bcr-bar-wrap{flex:1;height:22px;background:var(--border-lt);border-radius:4px;overflow:hidden}
 .bcr-bar{height:100%;border-radius:4px;min-width:3px}
-.bcr-pts{font-family:var(--fm);font-size:10px;font-weight:500;width:26px;text-align:right;flex-shrink:0;color:var(--text2)}
-/* TLA TOOLTIP — hover on desktop, click-to-show on mobile */
-.tla-wrap{position:relative;display:inline-flex;align-items:center;gap:4px;cursor:default}
-.tla-tip{position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);background:var(--text);color:var(--card);font-size:10px;font-weight:600;font-family:var(--fb);padding:3px 8px;border-radius:5px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:999;letter-spacing:.2px;box-shadow:0 2px 6px rgba(0,0,0,.2)}
-.tla-tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:var(--text)}
-.tla-wrap:hover .tla-tip,.tla-wrap.tip-show .tla-tip{opacity:1}
+.bcr-pts{font-family:var(--fm);font-size:12px;font-weight:500;width:32px;text-align:right;flex-shrink:0;color:var(--text2)}
 /* QUAL LEGEND */
 .qleg{display:flex;gap:18px;margin-top:10px;flex-wrap:wrap}
 .qi{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
@@ -279,91 +221,9 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
 ::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 @media(max-width:640px){
-  /* LAYOUT */
-  .wrap{padding:0 12px}
-  body{font-size:13px}
-
-  /* HEADER */
-  .hdr{padding:10px 0 6px;gap:8px}
-  .logo{width:34px;height:34px;font-size:17px}
-  .site-title{font-size:15px}
-  .site-sub{display:none}
+  .ltab .lname{display:none}.srow{grid-template-columns:1fr 1fr}
+  .site-title{font-size:16px}.site-sub{display:none}
   .auth-name{display:none}
-  .theme-toggle{width:30px;height:30px;font-size:13px}
-  .btn-auth{padding:4px 9px;font-size:11px}
-
-  /* LEAGUE TABS — icon only */
-  .ltab .lname{display:none}
-  .ltab{padding:7px 11px}
-
-  /* CONTROLS */
-  .controls{gap:6px}
-  .ssel{font-size:12px;padding:6px 24px 6px 9px}
-  .fbtn{font-size:12px;padding:6px 10px}
-  .form-ctrl{gap:6px}
-  .form-label{display:none}
-  .fmbtn{padding:4px 9px;font-size:11px}
-
-  /* STAT CARDS — 2 per row */
-  .srow{grid-template-columns:1fr 1fr;gap:8px}
-  .scard{padding:10px 12px}
-  .sval{font-size:20px}
-
-  /* VIEW TABS */
-  .vtabs-row{gap:8px}
-  .vtab{padding:6px 11px;font-size:12px}
-  .md-slider-wrap{flex-wrap:wrap;gap:6px;padding:7px 10px}
-  .md-label{font-size:11px}
-
-  /* TABLE — make it scroll with a clear indicator */
-  .twrap{border-radius:8px;-webkit-overflow-scrolling:touch}
-  table{min-width:520px}
-  thead th{padding:8px 8px;font-size:10px}
-  tbody td{padding:7px 8px;font-size:12px}
-  .cname{font-size:12px}
-  .fb{width:22px;height:22px;font-size:11px}
-  .fbs{gap:3px}
-  /* Hide less critical columns on very small screens */
-  thead th:nth-child(8), /* GA */
-  tbody td:nth-child(8){display:none}
-
-  /* BAR CHART RACE */
-  .bcr-controls{gap:7px}
-  .bcr-btn{padding:6px 12px;font-size:12px}
-  .bcr-gw{font-size:17px}
-  .bcr-name{width:68px;font-size:11px}
-  .bcr-pts{font-size:11px;width:26px}
-
-  /* CHART */
-  .cwrap{height:360px;padding:12px}
-
-  /* FILTER PANEL */
-  .fpanel{padding:12px}
-  .chips{gap:5px}
-  .chip{font-size:11px;padding:4px 9px}
-
-  /* FOOTER */
-  .footer-inner{flex-direction:column;gap:6px;text-align:center}
-
-  /* QUAL LEGEND */
-  .qleg{gap:10px}
-  .qi{font-size:10px}
-
-  /* MODAL */
-  .modal{padding:20px}
-  .modal h2{font-size:16px}
-}
-
-/* Extra small phones */
-@media(max-width:380px){
-  .ltab{padding:6px 9px}
-  .vtab{padding:5px 9px;font-size:11px}
-  .srow{grid-template-columns:1fr 1fr}
-  thead th:nth-child(6), /* L */
-  tbody td:nth-child(6),
-  thead th:nth-child(5), /* D */
-  tbody td:nth-child(5){display:none}
-  .bcr-name{width:52px;font-size:10px}
 }
 </style>
 </head>
@@ -383,10 +243,26 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
         <button class="theme-toggle" id="themeToggle" onclick="toggleDark()" title="Toggle dark mode">☀️</button>
       </div>
     </div>
+    <div id="throttleBar" class="throttle-bar" style="display:none"></div>
+    <div id="throttleWait" class="throttle-wait" style="display:none">
+      <div class="spinner" style="width:14px;height:14px;border-width:2px"></div>
+      <span>Rate limit — waiting for quota to reset…</span>
+    </div>
   </div>
 </header>
 
 <div class="wrap" style="padding-top:18px">
+  <div class="apibar" id="apibar">
+    <div class="apibar-row">
+      <label for="apiKeyInput">🔑 football-data.org API key</label>
+      <input type="password" id="apiKeyInput" placeholder="Paste your free API key here…" autocomplete="off">
+      <button class="btn-p" onclick="saveKey()">Connect</button>
+    </div>
+    <div class="apibar-hint">
+      Free key at <a href="https://www.football-data.org/client/register" target="_blank">football-data.org/client/register</a> — covers 9 leagues, live standings. Stored in your browser only.
+    </div>
+  </div>
+
   <div id="syncBanner" style="display:none"></div>
   <div class="ltabs" id="ltabs"></div>
 
@@ -432,8 +308,7 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
     <div class="vtabs">
       <button class="vtab active" onclick="setView('table')">📊 Standings</button>
       <button class="vtab" onclick="setView('race')">🏁 Bar Race</button>
-      <button class="vtab" onclick="setView('position')">📉 Season Trend</button>
-      <button class="vtab" onclick="setView('yearly')">📆 Yearly Trend</button>
+      <button class="vtab" onclick="setView('position')">📉 Position Trend</button>
     </div>
     <div id="mdSliderWrap" style="display:none"></div>
   </div>
@@ -446,8 +321,9 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
   <div class="wrap">
     <div class="footer-inner">
       <div>
-        Data: <a href="https://mikami3345.cloudfree.jp/SoccerData/MatchData.html" target="_blank">mikami3345.cloudfree.jp</a> (1993–2022) ·
-        <a href="https://www.football-data.co.uk" target="_blank">football-data.co.uk</a> (2023–present)
+        Data: <a href="https://www.football-data.org" target="_blank">football-data.org</a> (live) ·
+        <a href="https://mikami3345.cloudfree.jp/SoccerData/MatchData.html" target="_blank">mikami3345</a> &amp;
+        <a href="https://www.football-data.co.uk" target="_blank">football-data.co.uk</a> (historical)
       </div>
       <div>
         Contact: <a href="mailto:your@email.com">your@email.com</a> ·
@@ -478,36 +354,34 @@ footer{background:var(--card);border-top:1px solid var(--border);margin-top:40px
 // ══════════════════════════════════════════════════════════════
 // FIREBASE
 // ══════════════════════════════════════════════════════════════
-// Firebase config loaded from config.js (gitignored — never commit this file)
-// Copy config.example.js → config.js and fill in your values
-const _cfg = window.FIREBASE_CONFIG || null;
-let auth = null, db = null;
-if (_cfg) {
-  firebase.initializeApp(_cfg);
-  auth = firebase.auth();
-  db = firebase.firestore();
-  db.enablePersistence({synchronizeTabs:true}).catch(e => {
-    if (e.code === 'failed-precondition') console.log('Multiple tabs — offline sync limited');
-  });
-} else {
-  // Firebase sync disabled — no config provided (optional feature)
-}
+const firebaseConfig = {
+  apiKey: "AIzaSyCQbtCVM3Cm7Jdzg8dsEkG1SOJqzALXhTw",
+  authDomain: "football-analytics-26e72.firebaseapp.com",
+  projectId: "football-analytics-26e72",
+  storageBucket: "football-analytics-26e72.firebasestorage.app",
+  messagingSenderId: "458729335310",
+  appId: "1:458729335310:web:5861c5d69493c52ee0ea5f"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+// Enable offline persistence so cached data works without internet
+db.enablePersistence({synchronizeTabs:true}).catch(e => {
+  if (e.code === 'failed-precondition') console.log('Multiple tabs open — offline sync limited');
+});
 
 let currentUser = null;
-if (auth) {
-  auth.onAuthStateChanged(user => {
-    currentUser = user;
-    renderAuthArea();
-    if (user) showSyncBanner();
-  });
-}
+auth.onAuthStateChanged(user => {
+  currentUser = user;
+  renderAuthArea();
+  if (user) showSyncBanner();
+});
 
 function signIn() {
-  if (!auth) { console.log('Firebase not configured — sync disabled'); return; }
   const provider = new firebase.auth.GoogleAuthProvider();
   auth.signInWithPopup(provider).catch(e => console.error('Sign in failed:', e));
 }
-function signOut() { if (auth) auth.signOut(); }
+function signOut() { auth.signOut(); }
 
 function renderAuthArea() {
   const el = document.getElementById('authArea');
@@ -534,7 +408,7 @@ function showSyncBanner() {
 
 // Firestore helpers
 async function fsave(league, year, matches) {
-  if (!currentUser || !db) return;
+  if (!currentUser) return;
   try {
     await db.collection('users').doc(currentUser.uid)
       .collection('seasons').doc(`${league}_${year}`)
@@ -543,7 +417,7 @@ async function fsave(league, year, matches) {
 }
 
 async function fload(league, year) {
-  if (!currentUser || !db) return null;
+  if (!currentUser) return null;
   try {
     const doc = await db.collection('users').doc(currentUser.uid)
       .collection('seasons').doc(`${league}_${year}`).get();
@@ -552,17 +426,10 @@ async function fload(league, year) {
 }
 
 // ══════════════════════════════════════════════════════════════
-// CONFIG — No API key needed. All data from Mikami (1993–2022) + football-data.co.uk (2023+)
+// CONFIG
 // ══════════════════════════════════════════════════════════════
-// football-data.co.uk is the same source Mikami uses for his own website.
-// Multiple CORS proxies — tried in order until one works
-const PROXIES = [
-  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-  url => `https://proxy.cors.sh/${url}`,
-  url => `https://corsproxy.org/?${encodeURIComponent(url)}`,
-];
-const PROXY = 'https://corsproxy.io/?'; // kept for any remaining references
+const API_BASE = 'https://api.football-data.org/v4';
+const PROXY    = 'https://corsproxy.io/?';
 const MIKAMI   = 'https://mikami3345.cloudfree.jp/SoccerData/csv_data/';
 const FDCO     = 'https://www.football-data.co.uk/mmz4281/';
 
@@ -577,16 +444,13 @@ const FLAGS = {
   PL:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',PD:'🇪🇸',BL1:'🇩🇪',SA:'🇮🇹',FL1:'🇫🇷',
   PPL:'🇵🇹',DED:'🇳🇱',ELC:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',BSA:'🇧🇷',
 };
-// CSV sources — Mikami for 1993–2022, football-data.co.uk (same source Mikami uses) for 2023+
+// Historical CSV sources. Only big 5 have mikami/fdco data.
 const CSV_MAP = {
-  PL:  {mikami:'Premier_1993-2022.csv',  fdco:'E0'},   // Premier League
-  PD:  {mikami:'LaLiga1_1994-2022.csv',  fdco:'SP1'},  // La Liga
-  BL1: {mikami:'Bundes_1994-2022.csv',   fdco:'D1'},   // Bundesliga
-  SA:  {mikami:'SerieA_1994-2022.csv',   fdco:'I1'},   // Serie A
-  FL1: {mikami:'Ligue1_1993-2022.csv',   fdco:'F1'},   // Ligue 1
-  PPL: {fdco:'P1'},   // Primeira Liga (no Mikami CSV)
-  DED: {fdco:'N1'},   // Eredivisie (no Mikami CSV)
-  ELC: {fdco:'E1'},   // Championship (no Mikami CSV)
+  PL: {mikami:'Premier_1993-2022.csv', fdco:'E0'},
+  PD: {mikami:'LaLiga1_1994-2022.csv', fdco:'SP1'},
+  BL1:{mikami:'Bundes_1994-2022.csv',  fdco:'D1'},
+  SA: {mikami:'SerieA_1994-2022.csv',  fdco:'I1'},
+  FL1:{mikami:'Ligue1_1993-2022.csv',  fdco:'F1'},
 };
 
 const LEAGUES = {
@@ -616,16 +480,8 @@ function teamColor(name) {
   return colorCache[name];
 }
 
-// Generate stable 3-letter TLA from team name when API doesn't provide one
-function teamTLA(name, apiTla) {
-  if (apiTla && apiTla.length === 3) return apiTla.toUpperCase();
-  // Clean suffixes
-  const clean = name.replace(/ (F\.?C\.?|AFC|CF|SC|RFC|BC|AC|AS|SS|US|SD|RC|RCD|CA|CD|SV|VfB|VfL|TSG|FSV|FC)$/i,'').trim();
-  const words = clean.split(/[\s\-]+/).filter(Boolean);
-  if (words.length === 1) return words[0].slice(0,3).toUpperCase();
-  if (words.length === 2) return (words[0].slice(0,2) + words[1].slice(0,1)).toUpperCase();
-  return words.slice(0,3).map(w=>w[0]).join('').toUpperCase();
-}
+// ══════════════════════════════════════════════════════════════
+// SEASONS
 // ══════════════════════════════════════════════════════════════
 function getCurrentSeason() {
   const d = new Date();
@@ -638,10 +494,10 @@ function buildSeasonSelect() {
   const hasCsv = !!CSV_MAP[S.league];
   sel.innerHTML = '';
 
-  // Current season (from football-data.co.uk CSV, updates daily after matches)
+  // Current season (live API)
   const opt = document.createElement('option');
   opt.value = cur;
-  opt.textContent = `${cur}–${String(cur+1).slice(2)} (current)`;
+  opt.textContent = `${cur}–${String(cur+1).slice(2)} ● Live`;
   sel.appendChild(opt);
 
   if (hasCsv) {
@@ -676,7 +532,7 @@ function buildSeasonSelect() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// API FETCH — simple, no throttle UI
+// API THROTTLE
 // ══════════════════════════════════════════════════════════════
 const throttle = {available:10, resetAt:Date.now()+60000, queue:[], draining:false};
 
@@ -684,15 +540,30 @@ setInterval(() => {
   if (Date.now() >= throttle.resetAt) {
     throttle.available = 10;
     throttle.resetAt = Date.now() + 60000;
+    updateThrottleStatus();
     if (throttle.queue.length) drainQueue();
   }
 }, 1000);
+setInterval(updateThrottleStatus, 1000);
 
 function updateThrottle(headers) {
   const a = headers.get('X-Requests-Available-Minute');
   const r = headers.get('X-RequestCounter-Reset');
   if (a !== null) throttle.available = parseInt(a);
   if (r !== null) throttle.resetAt = Date.now() + parseInt(r) * 1000;
+}
+
+function updateThrottleStatus() {
+  const el = document.getElementById('throttleBar');
+  if (!el || el.style.display === 'none') return;
+  const left = throttle.available;
+  const pct = Math.round((left / 10) * 100);
+  const color = left <= 2 ? 'var(--los)' : left <= 5 ? 'var(--drw)' : 'var(--win)';
+  const secs = Math.max(0, Math.ceil((throttle.resetAt - Date.now()) / 1000));
+  el.innerHTML = `<span class="tb-label">API quota</span>
+    <div class="tb-track"><div class="tb-fill" style="width:${pct}%;background:${color}"></div></div>
+    <span class="tb-count" style="color:${color}">${left}/10 per min</span>
+    <span class="tb-reset">resets in ${secs}s</span>`;
 }
 
 function acquireSlot() {
@@ -705,18 +576,44 @@ async function drainQueue() {
   while (throttle.queue.length) {
     if (throttle.available <= 0) {
       const wait = Math.max(0, throttle.resetAt - Date.now()) + 200;
+      document.getElementById('throttleWait').style.display = 'flex';
       await new Promise(r => setTimeout(r, wait));
+      document.getElementById('throttleWait').style.display = 'none';
       if (throttle.available <= 0) throttle.available = 10;
     }
     const next = throttle.queue.shift();
     throttle.available = Math.max(0, throttle.available - 1);
+    updateThrottleStatus();
     next();
     if (throttle.queue.length) await new Promise(r => setTimeout(r, 150));
   }
   throttle.draining = false;
 }
 
+function getKey() { return localStorage.getItem('fb_key') || ''; }
 
+async function apiFetch(path) {
+  const key = getKey();
+  if (!key) { const e = new Error(); e.code = 'NO_KEY'; throw e; }
+  const cacheId = 'fc:' + path;
+  try {
+    const raw = sessionStorage.getItem(cacheId);
+    if (raw) { const {ts,d}=JSON.parse(raw); if (Date.now()-ts<5*60*1000) return d; }
+  } catch {}
+  await acquireSlot();
+  const url = PROXY + encodeURIComponent(`${API_BASE}${path}`);
+  let res;
+  try { res = await fetch(url, {method:'GET', headers:{'X-Auth-Token':key}}); }
+  catch { const e=new Error(); e.code='NETWORK'; throw e; }
+  updateThrottle(res.headers);
+  updateThrottleStatus();
+  if (res.status===401){const e=new Error();e.code='BAD_KEY';throw e;}
+  if (res.status===429){throttle.available=0;const e=new Error();e.code='RATE';throw e;}
+  if (!res.ok){const e=new Error();e.code='HTTP_'+res.status;throw e;}
+  const data = await res.json();
+  try { sessionStorage.setItem(cacheId, JSON.stringify({ts:Date.now(),d:data})); } catch {}
+  return data;
+}
 
 // ══════════════════════════════════════════════════════════════
 // HISTORICAL CSV DATA
@@ -776,18 +673,9 @@ function parseFdcoCSV(text) {
 }
 
 async function fetchCSV(url) {
-  let lastErr;
-  for (const makeUrl of PROXIES) {
-    try {
-      const res = await fetch(makeUrl(url), {signal: AbortSignal.timeout(12000)});
-      if (res.ok) return res.text();
-      lastErr = new Error(`HTTP ${res.status}`);
-    } catch(e) {
-      lastErr = e;
-      // Try next proxy
-    }
-  }
-  throw lastErr || new Error('All proxies failed for: ' + url);
+  const res = await fetch(PROXY + encodeURIComponent(url));
+  if (!res.ok) throw new Error('CSV fetch failed: ' + res.status);
+  return res.text();
 }
 
 async function loadHistoricalMatches(league, year) {
@@ -801,14 +689,11 @@ async function loadHistoricalMatches(league, year) {
   const src = CSV_MAP[league];
   if (!src) { const e=new Error(); e.code='NO_CSV'; throw e; }
   let matches;
-  if (year <= 2022 && src.mikami) {
-    // Mikami CSV (all years 1993-2022 in one file, very efficient)
+  if (year <= 2022) {
     const text = await fetchCSV(MIKAMI + src.mikami);
     matches = parseMikamiCSV(text, year);
   } else {
-    // football-data.co.uk — the same source Mikami uses, no API key, updates daily
-    // S.season is the START year of the season, fdcoUrl needs the END year (+1)
-    const text = await fetchCSV(fdcoUrl(src.fdco, year + 1));
+    const text = await fetchCSV(fdcoUrl(src.fdco, year));
     matches = parseFdcoCSV(text);
   }
   if (!matches?.length) { const e=new Error(); e.code='EMPTY_CSV'; throw e; }
@@ -945,7 +830,7 @@ function renderBarRace() {
 function bcrInit(teams, ptsH, labels) {
   const chart = document.getElementById('bcrChart');
   if (!chart) return;
-  const ROW = 22;
+  const ROW = 40;
   chart.style.height = (teams.length * ROW + 8) + 'px';
   chart.innerHTML = '';
   teams.forEach(r => {
@@ -961,7 +846,7 @@ function bcrInit(teams, ptsH, labels) {
       ${r.team.crest
         ? `<img class="bcr-crest" src="${r.team.crest}" loading="lazy" onerror="this.style.display='none'">`
         : `<div class="bcr-dot" style="background:${c}"></div>`}
-      <span class="bcr-name" data-fullname="${r.team.name||name}" title="${r.team.name||name}">${short}</span>
+      <span class="bcr-name">${short}</span>
       <div class="bcr-bar-wrap">
         <div class="bcr-bar" style="background:${c};width:0%;transition:width 0.45s cubic-bezier(.4,0,.2,1)"></div>
       </div>
@@ -982,7 +867,7 @@ function bcrRender() {
     .sort((a,b) => b.pts - a.pts || a.name.localeCompare(b.name));
 
   const maxPts = Math.max(1, ...teams.map(t => t.pts));
-  const ROW = 22;
+  const ROW = 40;
 
   teams.forEach((t, rank) => {
     const id = 'bcr_' + t.name.replace(/\W/g,'_');
@@ -1061,14 +946,6 @@ function formColLabel() {
 // ══════════════════════════════════════════════════════════════
 // RENDER
 // ══════════════════════════════════════════════════════════════
-// TOOLTIP — click shows full name briefly on mobile
-function tipClick(el) {
-  const wrap = el.closest(".tla-wrap");
-  if (!wrap) return;
-  wrap.classList.add("tip-show");
-  setTimeout(() => wrap.classList.remove("tip-show"), 1800);
-}
-
 let chartInst = null;
 
 function renderLeagueTabs() {
@@ -1078,7 +955,12 @@ function renderLeagueTabs() {
     </button>`).join('');
 }
 
-// API key removed — all data from CSVs
+function renderKeyStatus() {
+  const key = getKey();
+  document.getElementById('apibar').style.display = key ? 'none' : 'block';
+  document.getElementById('throttleBar').style.display = key ? 'flex' : 'none';
+  if (key) updateThrottleStatus();
+}
 
 function renderChips() {
   if (!S.standings) { document.getElementById('chips').innerHTML=''; return; }
@@ -1144,23 +1026,14 @@ function renderContent() {
   }
   if (S.view==='table')    renderTable();
   else if (S.view==='race') renderBarRace();
-  else if (S.view==='yearly') renderYearlyTrend();
   else                     renderPositionChart();
 }
 
 function renderError(code) {
   if (code==='NO_KEY') {
-    const hasCsv = !!CSV_MAP[S.league];
-    if (hasCsv) {
-      // Silently fall back to most recent historical season
-      S.season = 2024;
-      buildSeasonSelect();
-      loadData();
-      return;
-    }
-    show(`<div class="nokey"><h3>🔑 Live key needed for this league</h3>
-      <p>Historical data is only available for the Big 5 leagues. To view ${LEAGUES[S.league]?.name||S.league}, add your free API key.</p>
-      <button class="btn-p" style="margin-top:8px" onclick="document.getElementById('apibar').style.display='block'">Add API key</button></div>`);
+    show(`<div class="nokey"><h3>🔑 Connect to football-data.org</h3>
+      <p>Enter your free API key above to load live standings for 9 leagues. Historical data (1993–2024) loads automatically for the Big 5 leagues — no extra key needed.</p>
+      <a href="https://www.football-data.org/client/register" target="_blank">Get your free key →</a></div>`);
     return;
   }
   if (code==='NETWORK') {
@@ -1173,7 +1046,7 @@ function renderError(code) {
     RATE:    ['Rate limit reached','Quota resets automatically — the bar above shows the countdown.'],
     NO_DATA: ['No data available','This league may not have started or standings aren\'t available yet.'],
     NO_CSV:  ['No historical data','Historical CSV data is only available for the Big 5 leagues.'],
-    EMPTY_CSV:['No data found','The data file returned no matches. This season may not have started yet, or the data source is temporarily unavailable. Try again later.'],
+    EMPTY_CSV:['Empty CSV','The CSV file returned no matches for this season.'],
     HTTP_403:['Access denied','Your API key doesn\'t have access to this competition or season.'],
     HTTP_404:['Not found','This competition doesn\'t exist in the API.'],
   };
@@ -1230,18 +1103,14 @@ function renderTable() {
         const c=teamColor(r.team.name),gd=r.goalDifference;
         const form=getFormForTeam(r.team.name);
         const pts=S.gwSlider&&r._sliderPts!=null?r._sliderPts:r.points;
-        const tla=teamTLA(r.team.name, r.team.tla);
-        const fullName=r.team.name;
         return `<tr class="${zone}">
           <td><span class="pbadge">${pos}</span></td>
-          <td title="${fullName}" onclick="showNameToast('${fullName.replace(/'/g,"\\'")}')">
-            <div class="cc">
+          <td><div class="cc">
             ${r.team.crest
               ?`<img class="crest" src="${r.team.crest}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><div class="cbar" style="background:${c};display:none"></div>`
               :`<div class="cbar" style="background:${c}"></div>`}
-            <span class="cname" data-fullname="${r.team.name}" title="${r.team.name}">${tla}</span>
-            </div>
-          </td>
+            <span class="cname">${r.team.shortName||r.team.name}</span>
+          </div></td>
           <td>${r.playedGames}</td>
           <td style="color:var(--win)">${r.won}</td>
           <td style="color:var(--drw)">${r.draw}</td>
@@ -1259,13 +1128,6 @@ function renderTable() {
       ${zones.rel>0?`<div class="qi"><div class="qdot" style="background:var(--rel)"></div>Relegation Zone (Bottom ${zones.rel})</div>`:''}
     </div>
   </div>`;
-  // Scroll listener: hide club name when scrolled right, show only logo
-  requestAnimationFrame(() => {
-    const tw = document.querySelector('.twrap');
-    if (tw) tw.addEventListener('scroll', function() {
-      this.classList.toggle('scrolled', this.scrollLeft > 8);
-    }, {passive:true});
-  });
 }
 
 function renderPositionChart() {
@@ -1275,318 +1137,76 @@ function renderPositionChart() {
     if (!S.trendsLoading) loadTrends();
     return;
   }
-  const dark = document.body.classList.contains('dark');
-  const gridColor  = dark ? 'rgba(255,255,255,.05)' : 'rgba(0,0,0,.05)';
-  const tickColor  = dark ? '#607a68' : '#9ca3af';
-  const borderCol  = dark ? '#2d3d32' : '#d2dace';
-  const {labels, posH} = S.trends;
-  const GWS = labels.length;
-  const GW_WIDTH = 28;
-  const minW = Math.max(GWS * GW_WIDTH, 320);
-  // Work out max position across all selected teams so chart is never clipped
-  const selectedData = S.standings.filter(r => S.sel.has(r.team.name));
-  const allPositions = selectedData.flatMap(r => posH[r.team.name]||[]).filter(Boolean);
-  const maxPos = allPositions.length ? Math.max(...allPositions) : 20;
-  // Height: at least 22px per position so bottom positions never get clipped
-  const chartH = Math.max(500, maxPos * 26 + 80);
-
-  document.getElementById('content').innerHTML = `<div class="vc cwrap">
-    <div class="chart-scroll">
-      <div class="chart-canvas-wrap" style="width:${minW}px;height:${chartH}px">
-        <canvas id="mc"></canvas>
-      </div>
-    </div>
-  </div>`;
-
-  const datasets = selectedData.map(r => {
-    const n = r.team.name, c = teamColor(n);
-    return {label:teamTLA(n, r.team.tla), data:posH[n]||[], borderColor:c,
-      backgroundColor:c+'15', borderWidth:2.5, pointRadius:0,
-      pointHoverRadius:5, tension:0.35, fill:false};
+  document.getElementById('content').innerHTML=`<div class="vc"><div class="cwrap"><canvas id="mc"></canvas></div></div>`;
+  const dark=document.body.classList.contains('dark');
+  const gridColor=()=>dark?'rgba(255,255,255,.05)':'rgba(0,0,0,.05)';
+  const tickColor=()=>dark?'#607a68':'#9ca3af';
+  const borderColor=()=>dark?'#2d3d32':'#d2dace';
+  const {labels,posH}=S.trends;
+  const datasets=S.standings.filter(r=>S.sel.has(r.team.name)).map(r=>{
+    const n=r.team.name,c=teamColor(n);
+    return {label:r.team.shortName||n,data:posH[n]||[],borderColor:c,backgroundColor:c+'15',
+      borderWidth:2.5,pointRadius:0,pointHoverRadius:5,tension:0.35,fill:false};
   });
-
-  chartInst = new Chart(document.getElementById('mc').getContext('2d'), {
-    type:'line', data:{labels, datasets},
-    options:{
-      responsive:true, maintainAspectRatio:false, animation:{duration:300},
-      layout:{padding:{top:8, bottom:16, left:4, right:8}},
-      interaction:{mode:'index', intersect:false},
-      plugins:{legend:{display:false}, tooltip:{
-        backgroundColor:dark?'#1e2922':'#fff',
-        borderColor:dark?'#2d3d32':'#d2dace', borderWidth:1,
-        titleColor:dark?'#607a68':'#6b7280',
-        bodyColor:dark?'#e8f0ea':'#0d1a0c', padding:12,
-        callbacks:{title:ctx=>ctx[0].label, label:ctx=>`  ${ctx.dataset.label}: #${ctx.parsed.y}`}
+  chartInst=new Chart(document.getElementById('mc').getContext('2d'),{
+    type:'line',data:{labels,datasets},
+    options:{responsive:true,maintainAspectRatio:false,animation:{duration:300},
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{
+        backgroundColor:()=>dark?'#1e2922':'#fff',
+        borderColor:()=>dark?'#2d3d32':'#d2dace',borderWidth:1,
+        titleColor:()=>dark?'#607a68':'#6b7280',
+        bodyColor:()=>dark?'#e8f0ea':'#0d1a0c',padding:12,
+        callbacks:{title:ctx=>ctx[0].label,label:ctx=>`  ${ctx.dataset.label}: #${ctx.parsed.y}`}
       }},
       scales:{
-        x:{grid:{color:gridColor}, ticks:{color:tickColor, font:{size:10}, maxRotation:0, autoSkip:true, maxTicksLimit:Math.ceil(GWS/5)}, border:{color:borderCol}},
-        y:{reverse:true, min:1, max:maxPos,
-          grid:{color:gridColor},
-          ticks:{color:tickColor, font:{size:11}, stepSize:1, callback:v=>`#${v}`},
-          border:{color:borderCol},
-          title:{display:true, text:'League Position', color:tickColor, font:{size:11}}}
+        x:{grid:{color:gridColor},ticks:{color:tickColor,font:{size:11},maxTicksLimit:12},border:{color:borderColor}},
+        y:{reverse:true,grid:{color:gridColor},
+          ticks:{color:tickColor,font:{size:11},stepSize:1,callback:v=>`#${v}`},
+          border:{color:borderColor},
+          title:{display:true,text:'League Position',color:tickColor,font:{size:11}}}
       }
     }
   });
 }
 
 // ══════════════════════════════════════════════════════════════
-// YEARLY TREND
-// ══════════════════════════════════════════════════════════════
-// yearlyCache[league] = { year: { teamName: finalPosition } }
-const yearlyCache = {};
-
-async function loadYearlyData(league) {
-  if (yearlyCache[league]) return yearlyCache[league];
-  const src = CSV_MAP[league];
-  if (!src) return null;
-
-  // Parse ALL years from single mikami file (most efficient)
-  let allData = {};
-  try {
-    const text = await fetchCSV(MIKAMI + src.mikami);
-    // Group by season end year
-    const byYear = {};
-    for (const line of text.split('\n').slice(1)) {
-      const c = line.split(',');
-      if (c.length < 8) continue;
-      const yr = parseInt(c[0]);
-      if (isNaN(yr)) continue;
-      (byYear[yr] = byYear[yr] || []).push(line);
-    }
-    // For each year, compute final standings
-    for (const [yr, lines] of Object.entries(byYear)) {
-      const header = 'Season_End_Year,Date,HomeTeam,HomeTeamJP,AwayTeam,AwayTeamJP,HomeGoals,AwayGoals,Result\n';
-      const matches = parseMikamiCSV(header + lines.join('\n'), parseInt(yr));
-      const standings = matchesToStandings(matches);
-      allData[yr] = {};
-      standings.forEach(r => { allData[yr][r.team.name] = r.position; });
-    }
-  } catch(e) { console.warn('Mikami full CSV failed:', e); }
-
-  // Add fdco recent seasons (2023-end_year onwards) — Mikami CSV stops at 2022
-  // y is the END year of the season: y=2023 means 2022-23, y=2026 means 2025-26
-  const curStart = getCurrentSeason(); // e.g. 2025 for 2025-26 season
-  const curEnd = curStart + 1;         // e.g. 2026
-  for (let y = 2023; y <= curEnd; y++) {
-    try {
-      const lk = `hist:${league}:${y}`;
-      let matches;
-      const cached = localStorage.getItem(lk);
-      // Only use cache for completed seasons (not current)
-      if (cached && y < curEnd) {
-        matches = JSON.parse(cached);
-      } else {
-        const text = await fetchCSV(fdcoUrl(src.fdco, y));
-        matches = parseFdcoCSV(text);
-        if (matches?.length && y < curEnd) {
-          try { localStorage.setItem(lk, JSON.stringify(matches)); } catch {}
-        }
-      }
-      if (matches?.length) {
-        const standings = matchesToStandings(matches);
-        allData[y] = {};
-        standings.forEach(r => { allData[y][r.team.name] = r.position; });
-      }
-    } catch(e) { console.warn(`fdco yearly ${y} failed:`, e.message); }
-  }
-
-  yearlyCache[league] = allData;
-  return allData;
-}
-
-// Yearly trend selected clubs (separate from main S.sel)
-let yearlySelected = new Set();
-
-async function renderYearlyTrend() {
-  if (chartInst) { chartInst.destroy(); chartInst = null; }
-  const src = CSV_MAP[S.league];
-  if (!src) {
-    show(`<div class="errbox"><h3>Yearly trend: Big 5 only</h3>
-      <p>Historical data is only available for Premier League, La Liga, Bundesliga, Serie A, and Ligue 1.</p></div>`);
-    return;
-  }
-
-  show(`<div class="yearly-wrap" style="padding:32px 16px;text-align:center">
-    <div class="spinner" style="width:26px;height:26px;margin:0 auto 10px"></div>
-    <p style="font-size:12px;color:var(--muted)">Loading all seasons… cached after first load.</p>
-  </div>`);
-
-  let data;
-  try { data = await loadYearlyData(S.league); }
-  catch(e) { show(`<div class="errbox"><h3>Failed to load yearly data</h3><p>${e.message||e.code||'Unknown'}</p></div>`); return; }
-  if (!data || !Object.keys(data).length) { show(`<div class="errbox"><h3>No data found</h3></div>`); return; }
-
-  const years = Object.keys(data).map(Number).sort((a,b)=>a-b);
-  const allTeams = [...new Set(years.flatMap(y=>Object.keys(data[y])))];
-  allTeams.sort((a,b) => {
-    const aN=years.filter(y=>data[y]?.[a]).length, bN=years.filter(y=>data[y]?.[b]).length;
-    if (bN!==aN) return bN-aN;
-    const aA=years.reduce((s,y)=>s+(data[y]?.[a]||0),0)/(aN||1);
-    const bA=years.reduce((s,y)=>s+(data[y]?.[b]||0),0)/(bN||1);
-    return aA-bA;
-  });
-
-  // Init selection to current standings teams if not yet set for this league
-  if (!yearlySelected.size || ![...yearlySelected].some(t=>allTeams.includes(t))) {
-    yearlySelected = new Set(allTeams.slice(0, Math.min(12, allTeams.length)));
-  }
-
-  buildYearlyGrid(data, years, allTeams);
-}
-
-function buildYearlyGrid(data, years, allTeams) {
-  const teams = allTeams.filter(t => yearlySelected.has(t));
-
-  function posColor(pos, total) {
-    if (!pos||!total) return null;
-    const r=(pos-1)/Math.max(total-1,1);
-    let h,s,l;
-    if (r<=0.5){const t=r*2;h=142-(142-45)*t;s=65+(85-65)*t;l=35+(48-35)*t;}
-    else{const t=(r-0.5)*2;h=45-45*t;s=85+(75-85)*t;l=48+(38-48)*t;}
-    return `hsl(${Math.round(h)},${Math.round(s)}%,${Math.round(l)}%)`;
-  }
-  function textColor(pos,total){
-    if(!pos)return'var(--muted)';
-    const r=(pos-1)/Math.max(total-1,1);
-    return(r<0.18||r>0.72)?'#fff':'#1a1a1a';
-  }
-
-  const yearHeaders = years.map(y=>`<th class="yt-head-yr">'${String(y).slice(2)}</th>`).join('');
-
-  const rows = teams.map(name => {
-    const tla = teamTLA(name);
-    const c = teamColor(name);
-    const cells = years.map(y => {
-      const pos=data[y]?.[name], total=Object.keys(data[y]||{}).length;
-      if (!pos) return `<td class="yt-pos yt-absent">–</td>`;
-      const bg=posColor(pos,total), fg=textColor(pos,total);
-      return `<td class="yt-pos" style="background:${bg};color:${fg}" title="${y-1}–${String(y).slice(2)}: #${pos} of ${total}">${pos}</td>`;
-    }).join('');
-    return `<tr><td class="yt-club-cell" data-fullname="${name}" title="${name}"><span class="yt-dot" style="background:${c}"></span><span class="yt-tla">${tla}</span></td>${cells}</tr>`;
-  }).join('');
-
-  // Checkboxes
-  const cbHtml = allTeams.map(name => {
-    const tla=teamTLA(name), checked=yearlySelected.has(name);
-    return `<label class="ycb ${checked?'checked':''}" onclick="toggleYearlyCb('${name.replace(/'/g,"\\'")}',this)">
-      <input type="checkbox" ${checked?'checked':''} onclick="event.stopPropagation()">
-      ${tla}
-    </label>`;
-  }).join('');
-
-  // Scale legend
-  const scale=[1,5,10,15,20].map(p=>{
-    const bg=posColor(p,20),fg=textColor(p,20);
-    return `<span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:18px;border-radius:3px;font-size:10px;font-weight:700;background:${bg};color:${fg}">${p}</span>`;
-  }).join('');
-
-  document.getElementById('content').innerHTML = `<div class="vc yearly-wrap">
-    <p class="yearly-hint">
-      Final position per season (Mikami data: 1993–2022). Color: <span style="color:var(--win);font-weight:600">■ 1st</span> → <span style="color:var(--drw);font-weight:600">■ mid</span> → <span style="color:var(--los);font-weight:600">■ last</span>. — = not in this league.
-      Scale: ${scale}
-    </p>
-    <div class="yearly-filter">
-      <span class="yearly-filter-label">Clubs:</span>
-      <div class="yearly-filter-btns">
-        <button class="ycb-btn" onclick="yearlySelAll()">Select all</button>
-        <button class="ycb-btn" onclick="yearlySelNone()">Deselect all</button>
-        <button class="ycb-btn" onclick="yearlySelTop(10)">Top 10</button>
-        <button class="ycb-btn" onclick="yearlySelTop(5)">Top 5</button>
-        <button class="ycb-btn" id="ycbToggle" onclick="toggleYearlyPanel()">▾ Show clubs</button>
-      </div>
-    </div>
-    <div class="yearly-clubs" id="yearlyCbs" style="display:none">${cbHtml}</div>
-    <div class="yearly-scroll" id="yearlyScroll">
-      <table class="yt">
-        <thead><tr>
-          <th class="yt-head-club">CLUB</th>${yearHeaders}
-        </tr></thead>
-        <tbody id="ytBody">${rows}</tbody>
-      </table>
-    </div>
-  </div>`;
-
-  document.getElementById('content')._ytData = {data, years, allTeams};
-
-  // Scroll listener — same as standings table
-  requestAnimationFrame(() => {
-    const sc = document.getElementById('yearlyScroll');
-    if (sc) sc.addEventListener('scroll', function() {
-      this.classList.toggle('scrolled', this.scrollLeft > 8);
-    }, {passive:true});
-  });
-}
-
-function toggleYearlyPanel() {
-  const panel = document.getElementById('yearlyCbs');
-  const btn = document.getElementById('ycbToggle');
-  if (!panel||!btn) return;
-  const open = panel.style.display === 'none';
-  panel.style.display = open ? 'flex' : 'none';
-  btn.textContent = open ? '▴ Hide clubs' : '▾ Show clubs';
-}
-
-function toggleYearlyCb(name, label) {
-  if (yearlySelected.has(name)) yearlySelected.delete(name);
-  else yearlySelected.add(name);
-  label.classList.toggle('checked', yearlySelected.has(name));
-  label.querySelector('input').checked = yearlySelected.has(name);
-  // Re-render just the tbody and checkboxes
-  const ref = document.getElementById('content')._ytData;
-  if (!ref) return;
-  reRenderYearlyBody(ref.data, ref.years, ref.allTeams);
-}
-
-function reRenderYearlyBody(data, years, allTeams) {
-  const teams = allTeams.filter(t=>yearlySelected.has(t));
-  function posColor(pos,total){if(!pos||!total)return null;const r=(pos-1)/Math.max(total-1,1);let h,s,l;if(r<=0.5){const t=r*2;h=142-(142-45)*t;s=65+(85-65)*t;l=35+(48-35)*t;}else{const t=(r-0.5)*2;h=45-45*t;s=85+(75-85)*t;l=48+(38-48)*t;}return`hsl(${Math.round(h)},${Math.round(s)}%,${Math.round(l)}%)`;}
-  function textColor(pos,total){if(!pos)return'var(--muted)';const r=(pos-1)/Math.max(total-1,1);return(r<0.18||r>0.72)?'#fff':'#1a1a1a';}
-  const body = document.getElementById('ytBody');
-  if (body) body.innerHTML = teams.map(name=>{
-    const tla=teamTLA(name);
-    const cells=years.map(y=>{const pos=data[y]?.[name],total=Object.keys(data[y]||{}).length;if(!pos)return`<td class="yt-pos yt-absent">–</td>`;const bg=posColor(pos,total),fg=textColor(pos,total);return`<td class="yt-pos" style="background:${bg};color:${fg}" title="#${pos}">${pos}</td>`;}).join('');
-    const c3=teamColor(name);
-    return`<tr><td class="yt-club-cell" data-fullname="${name}" title="${name}"><span class="yt-dot" style="background:${c3}"></span><span class="yt-tla">${tla}</span></td>${cells}</tr>`;
-  }).join('');
-}
-
-function yearlySelAll() {
-  const ref = document.getElementById('content')._ytData; if (!ref) return;
-  ref.allTeams.forEach(t=>yearlySelected.add(t));
-  document.querySelectorAll('.ycb').forEach(el=>{el.classList.add('checked');el.querySelector('input').checked=true;});
-  reRenderYearlyBody(ref.data, ref.years, ref.allTeams);
-}
-function yearlySelNone() {
-  const ref = document.getElementById('content')._ytData; if (!ref) return;
-  yearlySelected.clear();
-  document.querySelectorAll('.ycb').forEach(el=>{el.classList.remove('checked');el.querySelector('input').checked=false;});
-  reRenderYearlyBody(ref.data, ref.years, ref.allTeams);
-}
-function yearlySelTop(n) {
-  const ref = document.getElementById('content')._ytData; if (!ref) return;
-  yearlySelected = new Set(ref.allTeams.slice(0,n));
-  document.querySelectorAll('.ycb').forEach((el,i)=>{const on=yearlySelected.has(ref.allTeams[i]);el.classList.toggle('checked',on);el.querySelector('input').checked=on;});
-  reRenderYearlyBody(ref.data, ref.years, ref.allTeams);
-}
-
-// ══════════════════════════════════════════════════════════════
-// LOADING — All data from CSVs, no API key needed
+// LOADING
 // ══════════════════════════════════════════════════════════════
 async function loadData() {
-  // Everything comes from CSV (Mikami ≤2022, football-data.co.uk 2023+)
-  await loadHistoricalSeason();
+  const cur = getCurrentSeason();
+  S.isHistorical = S.season !== cur;
+  if (S.isHistorical) {
+    await loadHistoricalSeason();
+  } else {
+    await loadLiveSeason();
+  }
+}
+
+async function loadLiveSeason() {
+  S.loading=true; S.error=null; S.standings=null; S.trends=null; S.trendsLoading=false;
+  renderContent();
+  try {
+    const data=await apiFetch(`/competitions/${S.league}/standings?season=${S.season}`);
+    const total=data.standings?.find(s=>s.type==='TOTAL');
+    if (!total?.table?.length){const e=new Error();e.code='NO_DATA';throw e;}
+    S.standings=total.table;
+    S.sel=new Set(S.standings.map(r=>r.team.name));
+    S.loading=false; S.gwSlider=null;
+    document.getElementById('formCtrl').style.display='flex';
+    renderChips();renderStats();updateBadge();renderContent();
+    loadTrends();
+  } catch(e) {
+    S.loading=false; S.error=e.code||'ERR'; renderContent();
+  }
 }
 
 async function loadHistoricalSeason() {
-  S.loading=true; S.error=null; S.standings=null; S.trends=null; S.trendsLoading=false; S.matches=null;
-  const cur = getCurrentSeason();
-  const label = S.season === cur ? 'current season' : `${S.season}–${String(S.season+1).slice(2)}`;
-  show(`<div class="hist-load"><div class="spinner" style="width:32px;height:32px;margin:0 auto"></div><p>Loading ${label}…<br>Cached after first load — future visits are instant.</p></div>`);
+  S.loading=true; S.error=null; S.standings=null; S.trends=null; S.trendsLoading=false;
+  show('<div class="hist-load"><div class="spinner" style="width:32px;height:32px;margin:0 auto"></div><p>Loading historical data for '+S.season+'…<br>This may take a moment on first load — it will be cached for future visits.</p></div>');
   S.loading=false;
   try {
     const matches=await loadHistoricalMatches(S.league, S.season);
-    S.matches=matches;
     S.standings=matchesToStandings(matches);
     S.sel=new Set(S.standings.map(r=>r.team.name));
     S.trends=buildTrends(matches, S.standings.map(r=>r.team.name));
@@ -1599,45 +1219,21 @@ async function loadHistoricalSeason() {
 }
 
 async function loadTrends() {
-  // Trends come from the same CSV that loaded standings — already in S.matches
-  // Just build from S.matches directly (set during loadHistoricalSeason)
-  if (S.trends||S.trendsLoading||!S.standings) return;
-  if (S.matches?.length) {
-    S.trends = buildTrends(S.matches, S.standings.map(r=>r.team.name));
+  if (S.trends||S.trendsLoading||!S.standings||S.isHistorical) return;
+  S.trendsLoading=true;
+  try {
+    const data=await apiFetch(`/competitions/${S.league}/matches?season=${S.season}&status=FINISHED&limit=500`);
+    S.trends=buildTrends(data.matches, S.standings.map(r=>r.team.name));
+    S.trendsLoading=false;
     renderContent();
-  }
+  } catch(e) { S.trendsLoading=false; console.warn('Trends failed:',e.code); }
 }
-
-// ══════════════════════════════════════════════════════════════
-// NAME TOAST — tap to see full name on mobile, title attr on desktop
-// ══════════════════════════════════════════════════════════════
-let _toastTimer = null;
-function showNameToast(name) {
-  let el = document.getElementById('nameToast');
-  if (el) el.remove();
-  clearTimeout(_toastTimer);
-  el = document.createElement('div');
-  el.id = 'nameToast';
-  el.className = 'name-toast';
-  el.textContent = name;
-  document.body.appendChild(el);
-  _toastTimer = setTimeout(() => {
-    el.classList.add('hide');
-    setTimeout(() => el.remove(), 300);
-  }, 2200);
-}
-// Global delegated handler — any element with data-fullname shows toast on click/tap
-document.addEventListener('click', e => {
-  const el = e.target.closest('[data-fullname]');
-  if (el) showNameToast(el.dataset.fullname);
-}, {passive:true});
 
 // ══════════════════════════════════════════════════════════════
 // INTERACTIONS
 // ══════════════════════════════════════════════════════════════
 function setLeague(k) {
   S.league=k; S.standings=null; S.trends=null; S.trendsLoading=false;
-  delete yearlyCache[k]; // force reload so new fdco years appear
   S.fopen=false; S.isHistorical=false; S.gwSlider=null; bcr.built=false;
   document.getElementById('fpanel').classList.remove('open');
   document.getElementById('fbtn').classList.remove('open');
@@ -1652,7 +1248,7 @@ function setView(v) {
   S.view=v;
   if (v!=='race') { bcr.playing=false; clearTimeout(bcr.timer); }
   document.querySelectorAll('.vtab').forEach((b,i)=>
-    b.classList.toggle('active',['table','race','position','yearly'][i]===v));
+    b.classList.toggle('active',['table','race','position'][i]===v));
   renderContent();
 }
 
@@ -1720,9 +1316,20 @@ function toggleDark() {
   if (S.view==='position'&&S.trends) renderPositionChart();
 }
 
+function saveKey() {
+  const k=document.getElementById('apiKeyInput').value.trim();
+  if (!k) return;
+  localStorage.setItem('fb_key',k);
+  renderKeyStatus();
+  loadData();
+}
 
-
-
+function clearKey() {
+  localStorage.removeItem('fb_key');
+  Object.keys(sessionStorage).filter(k=>k.startsWith('fc:')).forEach(k=>sessionStorage.removeItem(k));
+  S.standings=null;S.trends=null;S.error='NO_KEY';
+  renderKeyStatus();renderContent();
+}
 
 function showPrivacy() { document.getElementById('privacyModal').style.display='flex'; }
 function hidePrivacy() { document.getElementById('privacyModal').style.display='none'; }
@@ -1733,30 +1340,10 @@ function hidePrivacy() { document.getElementById('privacyModal').style.display='
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js', {scope:'./'})
-      .then(reg => {
-        console.log('SW registered');
-        // Lock orientation to portrait to match manifest setting
-        if (screen.orientation?.lock) {
-          screen.orientation.lock('portrait').catch(() => {});
-        }
-      })
-      .catch(e => console.log('SW failed:', e));
+      .then(()=>console.log('SW registered'))
+      .catch(e=>console.log('SW failed:',e));
   });
 }
-
-// Orientation lock — portrait only, respects phone settings
-// Uses Screen Orientation API which only works in standalone PWA mode
-window.addEventListener('load', () => {
-  if (window.matchMedia('(display-mode: standalone)').matches ||
-      window.navigator.standalone === true) {
-    // Running as installed PWA — lock to portrait
-    if (screen.orientation && screen.orientation.lock) {
-      screen.orientation.lock('portrait').catch(() => {
-        // Some browsers don't support locking — manifest orientation handles it
-      });
-    }
-  }
-});
 
 // Install prompt
 let deferredPrompt = null;
@@ -1778,7 +1365,7 @@ window.addEventListener('beforeinstallprompt', e => {
 // ══════════════════════════════════════════════════════════════
 // EVENT LISTENERS
 // ══════════════════════════════════════════════════════════════
-
+document.getElementById('apiKeyInput').addEventListener('keydown', e=>{if(e.key==='Enter')saveKey();});
 document.getElementById('ssel').addEventListener('change', e=>{
   S.season=parseInt(e.target.value);
   S.trends=null; S.trendsLoading=false; S.gwSlider=null; bcr.built=false;
@@ -1804,10 +1391,15 @@ if (localStorage.getItem('fb_dark')==='1') {
 
 renderLeagueTabs();
 buildSeasonSelect();
+renderKeyStatus();
 renderAuthArea();
 
-// Always load data — historical works without a key, live needs one
-loadData();
+if (getKey()) {
+  loadData();
+} else {
+  S.error='NO_KEY';
+  renderContent();
+}
 </script>
 </body>
 </html>
